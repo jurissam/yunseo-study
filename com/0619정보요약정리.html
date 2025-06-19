@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정보 핵심 정리: 프로그래밍 구조</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Cool Neutrals with Green Accent for Code -->
+    <!-- Application Structure Plan: A new single-page application focused on the 'Information' subject. The structure is a sequential learning path: 1. Exam/Assignment Guide (most urgent for the student), 2. Basic Control Structures (fundamental theory), 3. Interactive 'if' statement practice, 4. Interactive 'for' loop practice including divisors and break/continue, 5. Operator shortcuts, and 6. A final comprehensive quiz. This task-oriented flow from theory to interactive practice is designed for effective memorization and understanding of programming concepts for an exam. -->
+    <!-- Visualization & Content Choices: 
+        1. Control Structures: Report Info -> Sequential, Selection, Repetition. Goal -> Organize/Compare concepts. Viz -> Clickable info cards (HTML/CSS/JS). Interaction -> Click a card to see its details. Justification -> Simple and direct way to learn core definitions.
+        2. 'if' Statement Practice: Report Info -> Fine dust example. Goal -> Practice conditional logic. Viz -> Interactive slider and output box (HTML/JS). Interaction -> User moves slider to change dust level, sees corresponding code output. Justification -> Makes abstract 'if/elif/else' tangible.
+        3. 'for' Loop Practice (Divisors): Report Info -> Finding divisors. Goal -> Practice loops and logic. Viz -> Input field and results area (HTML/JS). Interaction -> User enters a number, clicks button to see its divisors calculated by a 'for' loop. Justification -> Provides hands-on practice for a key exam problem.
+        4. break/continue: Report Info -> Difference between the two. Goal -> Compare loop control statements. Viz -> Two side-by-side code simulations (HTML/JS). Interaction -> User clicks 'run' to see how each statement alters the loop's output. Justification -> Clearly demonstrates the functional difference.
+        5. Comprehensive Quiz: Report Info -> All key concepts from the 'Information' report. Goal -> Assess and reinforce learning. Viz -> Interactive multiple-choice quiz (HTML/JS). Interaction -> Click answers for immediate feedback. Justification -> A robust tool for final exam preparation.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .exam-highlight {
+            background-color: #fefce8;
+            border-left: 4px solid #eab308;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0.25rem;
+        }
+        .exam-marker {
+            color: #ca8a04;
+            font-weight: 700;
+        }
+        .nav-button {
+            transition: all 0.3s;
+        }
+        .nav-button.active {
+            background-color: #15803d;
+            color: white;
+        }
+        .control-card {
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        .control-card.active, .control-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            border-color: #22c55e;
+        }
+        .code-block {
+            background-color: #1f2937;
+            color: #d1d5db;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .quiz-option {
+            transition: background-color 0.3s;
+        }
+        .quiz-option.correct {
+            background-color: #22c55e;
+            color: white;
+            border-color: #16a34a;
+        }
+        .quiz-option.incorrect {
+            background-color: #ef4444;
+            color: white;
+            border-color: #dc2626;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 py-3">
+            <ul class="flex flex-wrap justify-center items-center gap-2">
+                <li><button data-target="section-1" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-green-700 hover:text-white">1. 시험/수행평가 안내</button></li>
+                <li><button data-target="section-2" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-green-700 hover:text-white">2. 제어 구조</button></li>
+                <li><button data-target="section-3" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-green-700 hover:text-white">3. 선택 구조 실습</button></li>
+                <li><button data-target="section-4" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-green-700 hover:text-white">4. 반복 구조 실습</button></li>
+                <li><button data-target="section-5" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-amber-200 hover:bg-amber-500 hover:text-white">★ 최종 암기 퀴즈 ★</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-12">
+        
+        <section id="section-1" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">1. 시험 & 수행평가 핵심 안내</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">선생님께서 알려주신 가장 중요한 시험 및 수행평가 정보입니다. 이것부터 확인하고 시작하세요!</p>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-lg grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="font-bold text-xl mb-3 text-green-700">📜 지필 시험 안내</h3>
+                    <ul class="space-y-2 list-disc list-inside">
+                        <li>다른 학교보다 <span class="font-bold text-red-600">훨씬 쉽게</span> 출제될 예정!</li>
+                        <li>프로그래밍 문제는 5문제 미만!</li>
+                        <li><span class="exam-marker">★ 주요 출제 범위:</span> 2단원, 5단원 집중 공략!</li>
+                        <li>목표 평균 점수: 70점</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-xl mb-3 text-green-700">💻 프로그래밍 수행평가 안내</h3>
+                     <ul class="space-y-2 list-disc list-inside">
+                        <li><span class="font-bold">월요일</span>에 실시 (내일 아님!)</li>
+                        <li>어려운 심화 문제 아님, <span class="font-bold">예제 따라쓰기 수준</span></li>
+                        <li><span class="exam-marker">★ 준비물:</span> 예제 코드 한번 꼭 따라서 쳐보고 오기!</li>
+                        <li>보고서 작성: 구글 폼, 글만 1000자 내외 작성 (A4 2/3 분량)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-2" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">2. 프로그래밍의 뼈대, 제어 구조</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">모든 프로그램은 이 세 가지 구조의 조합으로 이루어집니다. 각 구조의 역할을 정확히 이해하는 것이 첫걸음입니다.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div id="card-seq" class="control-card active border-2 border-green-500 bg-white p-6 rounded-lg text-center">
+                    <div class="text-4xl mb-2">➡️</div>
+                    <h3 class="text-xl font-bold">순차 구조</h3>
+                    <p class="text-slate-600 mt-2">명령이 위에서 아래로, 순서대로 실행되는 가장 기본적인 구조</p>
+                </div>
+                <div id="card-sel" class="control-card border-2 border-slate-200 bg-white p-6 rounded-lg text-center">
+                    <div class="text-4xl mb-2">🤔</div>
+                    <h3 class="text-xl font-bold">선택 구조</h3>
+                    <p class="text-slate-600 mt-2">조건의 참/거짓에 따라 다른 명령을 선택하여 실행하는 구조</p>
+                </div>
+                <div id="card-rep" class="control-card border-2 border-slate-200 bg-white p-6 rounded-lg text-center">
+                     <div class="text-4xl mb-2">🔄</div>
+                    <h3 class="text-xl font-bold">반복 구조</h3>
+                    <p class="text-slate-600 mt-2">특정 조건을 만족하는 동안, 정해진 횟수만큼 명령을 반복 실행하는 구조</p>
+                </div>
+            </div>
+             <div class="exam-highlight">
+                <p><span class="exam-marker">★ 100% 시험 출제</span>: 순차, 선택, 반복 구조의 개념과 차이점은 반드시 암기해야 합니다!</p>
+            </div>
+        </section>
+
+        <section id="section-3" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">3. 선택 구조 (if) 실습하기</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">미세먼지 농도에 따라 다른 메시지를 보여주는 예제를 통해 `if`, `elif`, `else`의 쓰임새를 직접 확인해 보세요.</p>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="w-full md:w-1/2">
+                        <label for="dust-slider" class="font-bold">미세먼지 농도 조절: <span id="dust-value" class="text-blue-600 font-bold">80</span> µg/m³</label>
+                        <input id="dust-slider" type="range" min="0" max="200" value="80" class="w-full mt-2">
+                        <div class="exam-highlight mt-4">
+                            <p><span class="exam-marker">★ 조건 분기</span></p>
+                            <ul class="list-disc list-inside text-sm">
+                                <li>~30: 좋음</li>
+                                <li>31~80: 보통</li>
+                                <li>81~150: 나쁨</li>
+                                <li>151~: 매우 나쁨</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <p class="font-bold mb-2">실행 결과</p>
+                        <div class="code-block">
+                            <span class="text-gray-400"># Python Code</span><br>
+                            <span class="text-purple-400">dust</span> = <span id="code-dust-value" class="text-green-400">80</span><br>
+                            <span class="text-pink-400">if</span> dust <= 30:<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;print("<span class="text-yellow-300">좋음</span>")<br>
+                            <span class="text-pink-400">elif</span> dust <= 80:<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;print("<span class="text-yellow-300">보통</span>")<br>
+                            <span class="text-pink-400">elif</span> dust <= 150:<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;print("<span class="text-yellow-300">나쁨</span>")<br>
+                            <span class="text-pink-400">else</span>:<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;print("<span class="text-yellow-300">매우 나쁨</span>")<br>
+                            <br>
+                            <span class="text-gray-400"># 출력</span><br>
+                            <span id="dust-output" class="text-white font-bold text-lg">> 보통</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-4" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">4. 반복 구조 (for) 실습하기</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">반복문은 프로그래밍의 핵심입니다. 시험에 꼭 나오는 '약수 구하기'와 'break/continue' 차이점을 실습해 봅시다.</p>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
+                 <h3 class="font-bold text-xl mb-3 text-green-700">📜 약수 구하기</h3>
+                 <div class="flex items-center gap-4">
+                     <input id="number-input" type="number" value="12" class="border-2 border-slate-300 rounded-lg p-2 w-full">
+                     <button id="divisor-button" class="bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700">실행</button>
+                 </div>
+                 <div class="mt-4">
+                    <p class="font-bold mb-2">실행 결과</p>
+                    <div id="divisor-output" class="p-4 bg-slate-100 rounded-lg min-h-[50px]"></div>
+                 </div>
+                 <div class="exam-highlight">
+                    <p><span class="exam-marker">★ 시험 출제 예고!</span>: 어떤 수를 1부터 자기 자신까지 차례로 나누었을 때, <span class="font-bold">나머지가 0</span>이 되는 수가 바로 약수입니다. 이 원리를 꼭 기억하세요!</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                 <h3 class="font-bold text-xl mb-3 text-green-700">🚦 break vs continue</h3>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <p class="font-bold mb-2">break 예제 (3을 만나면 중단)</p>
+                        <button data-loop="break" class="loop-run-btn bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 mb-2">실행</button>
+                        <div class="code-block">for i in range(5):<br>&nbsp;&nbsp;if i == 3:<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-red-400 font-bold">break</span><br>&nbsp;&nbsp;print(i)</div>
+                        <p class="font-bold mt-2">결과: <span id="break-output" class="font-mono"></span></p>
+                    </div>
+                    <div>
+                        <p class="font-bold mb-2">continue 예제 (3만 건너뛰기)</p>
+                        <button data-loop="continue" class="loop-run-btn bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 mb-2">실행</button>
+                        <div class="code-block">for i in range(5):<br>&nbsp;&nbsp;if i == 3:<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-yellow-300 font-bold">continue</span><br>&nbsp;&nbsp;print(i)</div>
+                        <p class="font-bold mt-2">결과: <span id="continue-output" class="font-mono"></span></p>
+                    </div>
+                 </div>
+            </div>
+        </section>
+
+        <section id="section-5" class="scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">★ 최종 암기 퀴즈 ★</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">지금까지 학습한 정보 과목 핵심 내용을 퀴즈로 최종 점검해 보세요. 완벽하게 암기할 때까지 도전!</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg max-w-3xl mx-auto">
+                <div id="quiz-container"></div>
+                <div id="quiz-result" class="text-center font-bold text-2xl mt-6 hidden"></div>
+                <button id="quiz-retry-button" class="w-full mt-4 bg-amber-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-amber-600 transition-colors hidden">다시 풀기</button>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="text-center py-6 bg-slate-100 mt-12">
+        <p class="text-slate-500 text-sm">정보 핵심 개념 학습용 인터랙티브 요약 자료</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const sections = document.querySelectorAll('main section');
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+                    const targetSection = document.getElementById(targetId);
+                    if(targetSection) {
+                        window.scrollTo({ top: targetSection.offsetTop - 80, behavior: 'smooth' });
+                    }
+                });
+            });
+            
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) { current = section.getAttribute('id'); }
+                });
+                navButtons.forEach(button => {
+                    button.classList.remove('active');
+                    if (button.dataset.target === current) { button.classList.add('active'); }
+                });
+            });
+
+            const controlCards = document.querySelectorAll('.control-card');
+            controlCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    controlCards.forEach(c => c.classList.remove('active', 'border-green-500'));
+                    card.classList.add('active', 'border-green-500');
+                });
+            });
+            
+            const dustSlider = document.getElementById('dust-slider');
+            const dustValue = document.getElementById('dust-value');
+            const codeDustValue = document.getElementById('code-dust-value');
+            const dustOutput = document.getElementById('dust-output');
+
+            dustSlider.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                dustValue.textContent = value;
+                codeDustValue.textContent = value;
+                let resultText = '';
+                if (value <= 30) { resultText = '좋음'; }
+                else if (value <= 80) { resultText = '보통'; }
+                else if (value <= 150) { resultText = '나쁨'; }
+                else { resultText = '매우 나쁨'; }
+                dustOutput.textContent = `> ${resultText}`;
+            });
+
+            const numberInput = document.getElementById('number-input');
+            const divisorButton = document.getElementById('divisor-button');
+            const divisorOutput = document.getElementById('divisor-output');
+
+            divisorButton.addEventListener('click', () => {
+                const num = parseInt(numberInput.value);
+                if(isNaN(num) || num <= 0) {
+                    divisorOutput.textContent = '1 이상의 숫자를 입력해주세요.';
+                    return;
+                }
+                let divisors = [];
+                for(let i = 1; i <= num; i++) {
+                    if (num % i === 0) {
+                        divisors.push(i);
+                    }
+                }
+                divisorOutput.textContent = `${num}의 약수: ${divisors.join(', ')}`;
+            });
+
+            const loopRunBtns = document.querySelectorAll('.loop-run-btn');
+            loopRunBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const type = e.target.dataset.loop;
+                    let output = [];
+                    if (type === 'break') {
+                        for(let i=0; i<5; i++){
+                            if(i === 3) break;
+                            output.push(i);
+                        }
+                        document.getElementById('break-output').textContent = output.join(', ');
+                    } else if (type === 'continue') {
+                         for(let i=0; i<5; i++){
+                            if(i === 3) continue;
+                            output.push(i);
+                        }
+                        document.getElementById('continue-output').textContent = output.join(', ');
+                    }
+                });
+            });
+
+            const quizContainer = document.getElementById('quiz-container');
+            const quizResult = document.getElementById('quiz-result');
+            const quizRetryButton = document.getElementById('quiz-retry-button');
+            
+            const quizData = [
+                { question: '1. 프로그램이 위에서 아래로 순서대로 실행되는 구조는?', options: ['선택 구조', '반복 구조', '순차 구조', '분기 구조'], answer: '순차 구조' },
+                { question: '2. 조건이 여러 개일 때, "만약 ~이라면"을 계속해서 추가하는 선택 구조 명령어는?', options: ['if', 'else', 'switch', 'elif'], answer: 'elif' },
+                { question: '3. for i in range(5)가 실행될 때, 변수 i에 들어가지 않는 값은?', options: ['0', '2', '4', '5'], answer: '5' },
+                { question: '4. 반복문을 즉시, 완전히 탈출하는 명령어는?', options: ['continue', 'break', 'stop', 'exit'], answer: 'break' },
+                { question: '5. 12의 약수가 아닌 것을 고르시오.', options: ['1', '4', '5', '12'], answer: '5' },
+                { question: '6. 현재 반복만 건너뛰고 다음 반복을 계속 실행하는 명령어는?', options: ['continue', 'break', 'skip', 'jump'], answer: 'continue' },
+                { question: '7. x = x + 1 을 축약한 표현으로 옳은 것은?', options: ['x++1', 'x =+ 1', 'x += 1', 'x + 1 = x'], answer: 'x += 1' },
+                { question: '8. 프로그래밍 수행평가에서 가장 중요한 준비 사항으로 선생님이 강조한 것은?', options: ['알고리즘 암기', '디자인 꾸미기', '예제 따라쓰기', '발표 연습'], answer: '예제 따라쓰기' },
+                { question: '9. 다음 중 지필 시험에서 출제 비중이 높다고 언급된 단원은?', options: ['1, 3 단원', '2, 5 단원', '3, 4 단원', '전 범위 동일'], answer: '2, 5 단원' },
+                { question: '10. 미세먼지 농도가 90일 때, if/elif/else 조건문에서 출력될 메시지는?', options: ['좋음', '보통', '나쁨', '매우 나쁨'], answer: '나쁨' }
+            ];
+
+            let currentQuestionIndex = 0;
+            let score = 0;
+
+            function loadQuiz() {
+                currentQuestionIndex = 0;
+                score = 0;
+                quizContainer.innerHTML = '';
+                quizResult.classList.add('hidden');
+                quizRetryButton.classList.add('hidden');
+                showQuestion();
+            }
+
+            function showQuestion() {
+                if (currentQuestionIndex >= quizData.length) {
+                    showResult();
+                    return;
+                }
+                const questionData = quizData[currentQuestionIndex];
+                const progress = `${currentQuestionIndex + 1} / ${quizData.length}`;
+                const questionElement = document.createElement('div');
+                questionElement.className = 'mb-6';
+                questionElement.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="font-bold text-lg text-slate-800">${questionData.question}</p>
+                        <span class="text-sm font-semibold text-slate-500 bg-slate-200 px-3 py-1 rounded-full">${progress}</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        ${questionData.options.map(option => `<button class="quiz-option w-full text-left p-3 border-2 border-slate-300 rounded-lg hover:bg-slate-100">${option}</button>`).join('')}
+                    </div>`;
+                quizContainer.appendChild(questionElement);
+                const optionButtons = questionElement.querySelectorAll('.quiz-option');
+                optionButtons.forEach(button => button.addEventListener('click', handleOptionClick));
+            }
+
+            function handleOptionClick(event) {
+                const selectedOption = event.target;
+                const questionData = quizData[currentQuestionIndex];
+                const isCorrect = selectedOption.textContent === questionData.answer;
+                if (isCorrect) {
+                    selectedOption.classList.add('correct');
+                    score++;
+                } else {
+                    selectedOption.classList.add('incorrect');
+                }
+                const optionButtons = selectedOption.parentElement.querySelectorAll('.quiz-option');
+                optionButtons.forEach(button => {
+                    button.disabled = true;
+                    if (button.textContent === questionData.answer) button.classList.add('correct');
+                });
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    quizContainer.innerHTML = '';
+                    showQuestion();
+                }, 1200);
+            }
+
+            function showResult() {
+                quizContainer.innerHTML = '';
+                quizResult.innerHTML = `🎉 퀴즈 완료! 총 ${quizData.length}문제 중 <span class="text-amber-500 text-3xl">${score}</span>문제를 맞혔습니다!`;
+                quizResult.classList.remove('hidden');
+                quizRetryButton.classList.remove('hidden');
+            }
+            quizRetryButton.addEventListener('click', loadQuiz);
+            loadQuiz();
+        });
+    </script>
+</body>
+</html>

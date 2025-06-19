@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정보 수업 핵심 요약 (날짜별 퀴즈 포함)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony Neutrals -->
+    <!-- Application Structure Plan: The single-page application is re-architected into a date-segmented, interactive learning platform. The primary structure uses a fixed sidebar navigation for selecting dates (acting as tabs) and a main content area that dynamically updates to display the selected date's lesson. Each date's lesson includes its relevant theoretical content, interactive elements (calculators, string manipulators, list accessors), and a dedicated quiz section for immediate concept reinforcement. This modular, date-based approach enhances user focus, reduces cognitive load, and provides targeted self-assessment, making the learning path clearer and more engaging than a single long scroll. -->
+    <!-- Visualization & Content Choices:
+        - Report Info (All Dates): Core Concepts, Variable Rules, Operators, String Ops, I/O, File I/O, Lists, 2D Lists, Practice Problems -> Goal: Inform, Practice, Assess -> Viz/Presentation: Segmented by date, each section features text explanation, interactive input forms/calculators, and date-specific quizzes. -> Interaction: Date selection via sidebar (shows/hides content), input fields for calculations/string/list ops, button clicks for quiz answers. -> Justification: Breaks down complex information into manageable, interactive chunks, allowing focused learning and immediate self-assessment per lesson. This is a significant improvement over a single continuous page. -> Library/Method: HTML/Tailwind/JS, Chart.js (for Interpreter vs Compiler chart).
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .teacher-quote {
+            background-color: #fffbeb;
+            border-left: 4px solid #facc15;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: #78350f;
+        }
+        .accordion-button {
+            width: 100%;
+            text-align: left;
+            padding: 1rem;
+            background-color: #f3f4f6;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 1rem;
+        }
+        .accordion-content.active {
+            max-height: 500px; /* Adjust as needed */
+            padding: 1rem;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 40vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .content-section {
+            display: none; /* Hidden by default */
+        }
+        .content-section.active {
+            display: block; /* Shown when active */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3">
+            <div class="flex justify-between items-center">
+                <div class="text-xl font-bold text-teal-600">정보 수업 핵심정리 (날짜별)</div>
+                <div class="hidden md:flex space-x-6 text-sm">
+                    <button class="nav-button text-gray-600 hover:text-teal-600 transition" data-target="content-0526">5월 26일</button>
+                    <button class="nav-button text-gray-600 hover:text-teal-600 transition" data-target="content-0528">5월 28일</button>
+                    <button class="nav-button text-gray-600 hover:text-teal-600 transition" data-target="content-0529">5월 29일</button>
+                    <button class="nav-button text-gray-600 hover:text-teal-600 transition" data-target="content-0602">6월 2일</button>
+                    <button class="nav-button text-gray-600 hover:text-teal-600 transition" data-target="content-0609">6월 9일</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12 flex-grow">
+        
+        <!-- 5월 26일 내용 -->
+        <section id="content-0526" class="content-section active mb-24">
+            <h1 class="text-4xl font-bold text-center mb-4">5월 26일: 프로그래밍의 첫걸음</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto text-center">
+                프로그래밍의 기본 개념부터 블록 프로그래밍과 텍스트 프로그래밍의 차이, 그리고 파이썬이 특별한 이유와 언어 처리 방식에 대해 알아봅니다.
+            </p>
+            <div class="teacher-quote max-w-xl mx-auto mt-8 text-left">
+                <p>"얘들아~ 이건 시험뿐만 아니라 실기에도 이어지니까 집중해~"</p>
+            </div>
+
+            <h2 class="text-3xl font-bold text-center mb-2 mt-12">프로그래밍 방식 비교</h2>
+            <p class="text-center text-gray-500 mb-12">우리가 접하는 프로그래밍 방식은 크게 두 가지로 나눌 수 있습니다. 각각 어떤 특징이 있는지 비교해 봅시다.</p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
+                    <h3 class="text-2xl font-bold mb-4 text-center">블록 프로그래밍</h3>
+                    <p class="text-center text-gray-600 mb-6">엔트리, 스크래치처럼 블록을 드래그해서 시각적으로 프로그램을 만드는 방식입니다.</p>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-bold text-lg text-green-600">👍 장점</h4>
+                            <ul class="list-disc list-inside text-gray-700 mt-2 space-y-1">
+                                <li>코딩 개념을 쉽고 직관적으로 이해</li>
+                                <li>문법 오류가 거의 없음</li>
+                                <li>프로그램 흐름을 시각적으로 파악하기 용이</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg text-red-600">👎 단점</h4>
+                            <ul class="list-disc list-inside text-gray-700 mt-2 space-y-1">
+                                <li>만들 수 있는 기능이 제한적</li>
+                                <li>전문적인 프로그래밍에는 활용하기 어려움</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
+                    <h3 class="text-2xl font-bold mb-4 text-center">텍스트 프로그래밍 (파이썬)</h3>
+                    <p class="text-center text-gray-600 mb-6">파이썬, C언어처럼 코드를 직접 타이핑하여 프로그램을 만드는 방식입니다.</p>
+                     <div class="space-y-4">
+                        <div>
+                            <h4 class="font-bold text-lg text-green-600">👍 장점</h4>
+                            <ul class="list-disc list-inside text-gray-700 mt-2 space-y-1">
+                                <li>상상하는 모든 프로그램을 만들 수 있음</li>
+                                <li>컴퓨터의 동작을 세밀하게 제어 가능</li>
+                                <li>실제 산업 현장에서 사용하는 전문 기술</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg text-red-600">👎 단점</h4>
+                            <ul class="list-disc list-inside text-gray-700 mt-2 space-y-1">
+                                <li>초기 문법 학습이 필요함</li>
+                                <li>작은 오타에도 오류가 발생할 수 있음</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="teacher-quote max-w-3xl mx-auto mt-12">
+                <p>"쉬우면 쉬울수록 만들 수 있는 건 한계가 있어요~ 어려운 건 어렵지만 뭐든 가능해요!"</p>
+            </div>
+
+            <h2 class="text-3xl font-bold text-center mb-2 mt-12">왜 파이썬일까?</h2>
+             <p class="text-center text-gray-500 mb-12">수많은 텍스트 언어 중 파이썬이 주목받는 이유를 알아봅시다.</p>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 px-8">
+                <div class="bg-teal-100 p-6 rounded-lg shadow text-center border border-teal-200">
+                    <div class="text-4xl mb-4">✍️</div>
+                    <h4 class="font-bold text-lg mb-2">간단한 문법</h4>
+                    <p class="text-gray-700 text-sm">사람의 언어와 비슷해 배우기 쉽고 코드가 간결해요.</p>
+                </div>
+                <div class="bg-teal-100 p-6 rounded-lg shadow text-center border border-teal-200">
+                    <div class="text-4xl mb-4">🎁</div>
+                    <h4 class="font-bold text-lg mb-2">무료</h4>
+                    <p class="text-gray-700 text-sm">누구나 자유롭게 사용할 수 있는 오픈소스 언어입니다.</p>
+                </div>
+                <div class="bg-teal-100 p-6 rounded-lg shadow text-center border border-teal-200">
+                    <div class="text-4xl mb-4">⚡️</div>
+                    <h4 class="font-bold text-lg mb-2">즉시 결과 확인</h4>
+                    <p class="text-gray-700 text-sm">코드를 쓰고 바로 실행하여 결과를 볼 수 있어요.</p>
+                </div>
+                <div class="bg-teal-100 p-6 rounded-lg shadow text-center border border-teal-200">
+                    <div class="text-4xl mb-4">📚</div>
+                    <h4 class="font-bold text-lg mb-2">풍부한 라이브러리</h4>
+                    <p class="text-gray-700 text-sm">미리 만들어진 코드(도구)가 많아 활용성이 높아요.</p>
+                </div>
+            </div>
+
+            <h2 class="text-3xl font-bold text-center mb-2 mt-12">언어 처리 방식: 인터프리터 vs 컴파일러</h2>
+            <p class="text-center text-gray-500 mb-12">우리가 쓴 코드는 컴퓨터가 이해할 수 있는 언어로 '번역'이 필요합니다. 번역 방식의 차이를 알아봅시다.</p>
+            <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
+                <div class="chart-container">
+                    <canvas id="executionChart"></canvas>
+                </div>
+                <div class="teacher-quote mt-8">
+                    <p>"파이썬은 인터프리터예요! 즉, 바로바로 실행 가능하다는 말이에요~"</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8 mt-8">
+                    <div>
+                        <h4 class="font-bold text-xl mb-2">인터프리터 (Interpreter)</h4>
+                        <p class="text-gray-600 mb-4">코드를 한 줄씩 읽으며 바로 번역하고 실행하는 '동시통역' 방식입니다. (예: 파이썬)</p>
+                        <ul class="list-none space-y-2">
+                            <li class="flex items-start"><span class="text-green-500 mr-2">✔️</span>오류 수정이 쉽고 개발이 유연합니다.</li>
+                            <li class="flex items-start"><span class="text-red-500 mr-2">❌</span>컴파일러 방식보다 실행 속도가 느릴 수 있습니다.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xl mb-2">컴파일러 (Compiler)</h4>
+                        <p class="text-gray-600 mb-4">전체 코드를 한 번에 번역해서 실행 파일을 만든 후 실행하는 '전체번역' 방식입니다. (예: C언어)</p>
+                         <ul class="list-none space-y-2">
+                            <li class="flex items-start"><span class="text-green-500 mr-2">✔️</span>실행 속도가 매우 빠릅니다.</li>
+                            <li class="flex items-start"><span class="text-red-500 mr-2">❌</span>오류를 찾기 어렵고 수정 후 다시 번역해야 합니다.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-3xl font-bold text-center mb-2 mt-12">5월 26일 핵심 개념 퀴즈</h2>
+            <p class="text-center text-gray-500 mb-12">오늘 배운 내용을 잘 이해했는지 간단한 퀴즈로 확인해 보세요!</p>
+            <div class="space-y-6 max-w-3xl mx-auto">
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. 컴퓨터가 특정 작업을 하도록 만드는 '행위'를 무엇이라고 할까요?</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. 프로그래밍 (Programming)</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. 컴퓨터에게 명령을 내리기 위해 사용하는, 파이썬이나 C언어 같은 언어를 무엇이라고 할까요?</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. 프로그래밍 언어 (Programming Language)</p>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. 특정 목표를 위해 만들어진, 컴퓨터 명령어들의 '모음'이자 '결과물'은 무엇일까요?</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. 프로그램 (Program)</p>
+                </div>
+            </div>
+            <div class="teacher-quote max-w-3xl mx-auto mt-12">
+                <p>"헷갈리지 마요~ 프로그램은 결과, 프로그래밍은 만드는 과정이에요~"</p>
+            </div>
+        </section>
+
+        <!-- 5월 28일 내용 -->
+        <section id="content-0528" class="content-section mb-24">
+            <h1 class="text-4xl font-bold text-center mb-4">5월 28일: 코딩의 진짜 시작 - 변수와 연산자</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto text-center">
+                오늘은 프로그램의 가장 기본적인 구성 요소인 '변수'와 데이터를 다루는 '연산자'에 대해 깊이 있게 알아봅니다. 
+                메모리 개념부터 사칙연산, 논리 연산까지 직접 실습하며 코딩의 기초를 탄탄히 다져보세요.
+            </p>
+            <div class="teacher-quote max-w-xl mx-auto mt-8 text-left">
+                <p>"얘들아~ 오늘부터 진짜 코딩 시작이야! 이거 헷갈리면 뒤에 while if 다 꼬여요~"</p>
+            </div>
+
+            <h2 class="text-3xl font-bold text-center mb-2 mt-12">변수란 무엇인가?</h2>
+            <p class="text-center text-gray-500 mb-12">변수는 데이터를 저장하는 공간이자, 마치 '이름 붙인 상자'와 같습니다.</p>
+            <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100 max-w-3xl mx-auto">
+                <h3 class="text-2xl font-bold mb-4 text-teal-700">변수: 데이터를 저장하는 '이름 붙인 상자'</h3>
+                <p class="text-gray-700 mb-4">
+                    프로그램에서 자주 사용하거나 변동될 수 있는 데이터를 메모리에 저장해 놓고, 그 데이터를 이름으로 불러서 사용하기 위해 변수를 사용합니다.
+                    복잡한 메모리 주소 대신 사람이 기억하기 쉬운 '이름'으로 데이터를 관리하는 것이죠.
+                </p>
+                <div class="teacher-quote max-w-full text-left">
+                    <p>"이름만 기억하면 값은 자동! 변수 없으면 사람 뇌가 터져요~"</p>
+                </div>
+
+                <h4 class="font-bold text-xl mt-8 mb-4">변수 이름 붙이기 규칙</h4>
+                <ul class="list-disc list-inside text-gray-700 space-y-2">
+                    <li>반드시 영문자로 시작해야 합니다.</li>
+                    <li>숫자는 변수 이름의 뒤에만 붙일 수 있습니다. (예: `a1`, `num2`는 가능, `1a`, `2num`은 불가능)</li>
+                    <li>특수문자(언더스코어 `_` 제외), 띄어쓰기는 사용할 수 없습니다.</li>
+                </ul>
+                <div class="teacher-quote max-w-full text-left mt-6">
+                    <p>"숫자로 시작하면? 파이썬은 계산식인 줄 안다니까~"</p>
+                </div>
+
+                <h4 class="font-bold text-xl mt-8 mb-4">변수와 메모리의 관계</h4>
+                <p class="text-gray-700 mb-4">
+                    컴퓨터는 모든 데이터를 **메모리(RAM)**에 저장합니다. 하지만 메모리 주소는 복잡한 숫자로 이루어져 있어 사람이 외우기 어렵습니다.
+                    변수는 이 메모리 주소에 사람이 이해하기 쉬운 '이름'을 붙여주는 역할을 합니다.
+                </p>
+                <div class="flex flex-col items-center justify-center space-y-4 md:space-y-0 md:flex-row md:space-x-8 bg-gray-50 p-6 rounded-lg shadow-inner">
+                    <div class="flex flex-col items-center">
+                        <div class="w-24 h-24 bg-blue-200 rounded-lg flex items-center justify-center text-blue-800 font-mono text-sm shadow">0xAF12B3C4</div>
+                        <p class="mt-2 text-sm text-gray-600">복잡한 메모리 주소</p>
+                    </div>
+                    <div class="text-4xl text-teal-500">→</div>
+                    <div class="flex flex-col items-center">
+                        <div class="w-24 h-24 bg-teal-200 rounded-lg flex items-center justify-center text-teal-800 font-bold text-2xl shadow">A</div>
+                        <p class="mt-2 text-sm text-gray-600">변수 이름</p>
+                    </div>
+                    <div class="text-4xl text-teal-500">→</div>
+                    <div class="flex flex-col items-center">
+                        <div class="w-24 h-24 bg-purple-200 rounded-lg flex items-center justify-center text-purple-800 font-bold text-2xl shadow">10</div>
+                        <p class="mt-2 text-sm text-gray-600">변수에 저장된 값</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-3xl font-bold text-center mb-2 mt-12">사칙연산과 연산자</h2>
+            <p class="text-center text-gray-500 mb-12">데이터를 가지고 다양한 계산을 하기 위해 '연산자'를 사용합니다.</p>
+            <div class="max-w-3xl mx-auto space-y-6">
+
+                <!-- Arithmetic Operators -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                    <button class="accordion-button flex justify-between items-center" data-target="arithmetic-content">
+                        <span>기본 사칙연산자</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div id="arithmetic-content" class="accordion-content">
+                        <ul class="list-disc list-inside text-gray-700 mt-4 space-y-1">
+                            <li>`+`: 더하기</li>
+                            <li>`-`: 빼기</li>
+                            <li>`*`: 곱하기</li>
+                            <li>`/`: 나누기 (결과는 실수)</li>
+                        </ul>
+                        <h4 class="font-bold text-xl mt-6 mb-2">특수 연산자 (중요!)</h4>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1">
+                            <li>`//`: 몫만 구함 (정수)</li>
+                            <li>`%`: 나머지 구함</li>
+                            <li>`**`: 제곱 (a**b = a의 b제곱)</li>
+                        </ul>
+                        <div class="teacher-quote max-w-full text-left mt-6">
+                            <p>"슬래시 두 번! 퍼센트! 별표 두 개! 이건 진짜 많이 나와요!"</p>
+                        </div>
+                        <div class="mt-6 p-4 bg-gray-50 rounded-md">
+                            <h5 class="font-bold mb-2">직접 계산해보기!</h5>
+                            <div class="flex items-center space-x-2 mb-4">
+                                <input type="number" id="numA" value="9" class="w-24 p-2 border rounded-md">
+                                <span class="font-bold">와</span>
+                                <input type="number" id="numB" value="4" class="w-24 p-2 border rounded-md">
+                                <span class="font-bold">의 연산 결과</span>
+                            </div>
+                            <div class="space-y-2 text-gray-700">
+                                <p>더하기 (`+`): <span id="addResult" class="font-semibold text-teal-600"></span></p>
+                                <p>빼기 (`-`): <span id="subResult" class="font-semibold text-teal-600"></span></p>
+                                <p>곱하기 (`*`): <span id="mulResult" class="font-semibold text-teal-600"></span></p>
+                                <p>나누기 (`/`): <span id="divResult" class="font-semibold text-teal-600"></span></p>
+                                <p>몫 (`//`): <span id="floorDivResult" class="font-semibold text-teal-600"></span></p>
+                                <p>나머지 (`%`): <span id="modResult" class="font-semibold text-teal-600"></span></p>
+                                <p>제곱 (`**`): <span id="powResult" class="font-semibold text-teal-600"></span></p>
+                            </div>
+                            <button id="calculateBtn" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">계산하기</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparison Operators -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                    <button class="accordion-button flex justify-between items-center" data-target="comparison-content">
+                        <span>비교 연산자</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div id="comparison-content" class="accordion-content">
+                        <p class="text-gray-700 mt-4 mb-2">두 값이 '크다', '작다', '같다' 등을 비교하여 참(True) 또는 거짓(False)을 반환합니다.</p>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1">
+                            <li>`>`: 크다</li>
+                            <li>`<`: 작다</li>
+                            <li>`>=`: 크거나 같다</li>
+                            <li>`<=`: 작거나 같다</li>
+                            <li>`==`: 같다 (⚠️ 등호 두 개! `=`는 값을 넣는 것!)</li>
+                            <li>`!=`: 같지 않다</li>
+                        </ul>
+                        <div class="mt-4 p-4 bg-gray-50 rounded-md text-gray-700">
+                            <p class="font-bold">예시:</p>
+                            <p>`a = 9`, `b = 4` 일 때</p>
+                            <p>`a > 10` 의 결과: <span class="font-semibold text-teal-600">False</span></p>
+                            <p>`a == 9` 의 결과: <span class="font-semibold text-teal-600">True</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logical Operators -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                    <button class="accordion-button flex justify-between items-center" data-target="logical-content">
+                        <span>논리 연산자</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div id="logical-content" class="accordion-content">
+                        <p class="text-gray-700 mt-4 mb-2">여러 조건을 조합하여 논리적인 판단을 할 때 사용하며, 결과는 참(True) 또는 거짓(False)입니다.</p>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1">
+                            <li>`and`: 그리고 (모든 조건이 참일 때만 True)</li>
+                            <li>`or`: 또는 (하나라도 조건이 참이면 True)</li>
+                        </ul>
+                         <div class="teacher-quote max-w-full text-left mt-6">
+                            <p>"논리는 일상에서도 쓰는 거랑 똑같아요~ 조건문 if에 들어가면 여기부터 쓰게 돼요~"</p>
+                        </div>
+                        <div class="mt-4 p-4 bg-gray-50 rounded-md text-gray-700">
+                            <p class="font-bold">예시:</p>
+                            <p>`a = 9`, `b = 4` 일 때</p>
+                            <p>`a > 10 and b > 3` 의 결과: <span class="font-semibold text-teal-600">False</span></p>
+                            <p>`a < 10 or b < 2` 의 결과: <span class="font-semibold text-teal-600">True</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-3xl font-bold text-center mb-2 mt-12">5월 28일 핵심 개념 퀴즈</h2>
+            <p class="text-center text-gray-500 mb-12">오늘 배운 내용을 잘 이해했는지 간단한 퀴즈로 확인해 보세요!</p>
+            <div class="space-y-6 max-w-3xl mx-auto">
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. 데이터를 저장하는 공간이자 '이름 붙인 상자'와 같은 이것은 무엇일까요?</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. 변수</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. 변수 이름은 반드시 무엇으로 시작해야 하며, 숫자는 이름의 어디에만 붙일 수 있을까요?</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. 영문자 (시작), 뒤에만 (숫자)</p>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. 몫을 구하는 연산자(`//`), 나머지를 구하는 연산자(`%`), 제곱을 구하는 연산자(`**`)를 특수 연산자라고 부릅니다. 이 세 연산자를 차례대로 써보세요.</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. `//`, `%`, `**`</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. 파이썬에서 '같다'를 의미하는 비교 연산자는 무엇이며, 단순히 값을 대입하는 `=`와 어떻게 구분되나요?</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. `==` (등호 두 개). `=`는 값을 대입할 때, `==`는 두 값이 같은지 비교할 때 사용합니다.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. 논리 연산자 `and`는 어떤 경우에 True를 반환하나요?</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. 모든 조건이 참(True)일 때만 True를 반환합니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5월 29일 내용 -->
+        <section id="content-0529" class="content-section mb-24">
+             <h1 class="text-4xl font-bold text-center mb-4">5월 29일: 변수 활용 심화 & 표준 입출력</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto text-center">
+                변수에 숫자 외에 문자도 넣는 방법, 문자열을 다루는 연산자, 그리고 사용자로부터 입력을 받고 결과를 출력하는 표준 입출력 방법을 자세히 배워봅니다.
+            </p>
+            <div class="teacher-quote max-w-xl mx-auto mt-8 text-left">
+                <p>"얘들아~ 변수에 숫자만 넣는 줄 알았지? 문자도 넣고 더하고 곱하고 다 된다~"</p>
+            </div>
+
+            <h2 class="text-3xl font-bold text-center mb-2 mt-12">변수 활용 심화: 문자열 연산</h2>
+            <p class="text-center text-gray-500 mb-12">변수에는 숫자만 넣는 것이 아닙니다! 문자(텍스트)도 넣고 연산할 수 있어요.</p>
+            <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100 max-w-3xl mx-auto">
+                <h4 class="font-bold text-xl mt-6 mb-4">문자열 연산의 종류</h4>
+                <ul class="list-disc list-inside text-gray-700 space-y-2">
+                    <li>`+`: 문자열 이어붙이기 (Concatenation)
+                        <p class="text-sm text-gray-500 ml-6">예: `"안녕" + "하세요"` → `"안녕하세요"`</p>
+                    </li>
+                    <li>`*`: 문자열 반복하기 (Repetition)
+                        <p class="text-sm text-gray-500 ml-6">예: `"안녕" * 3` → `"안녕안녕안녕"`</p>
+                    </li>
+                </ul>
+                <div class="teacher-quote max-w-full text-left mt-6">
+                    <p>"문자 * 숫자? 돼요! 세 번 반복되게! 근데 문자 + 숫자는 안 돼요~ 에러나요!"</p>
+                </div>
+                <h4 class="font-bold text-xl mt-8 mb-4">직접 문자열 연산해보기!</h4>
+                <div class="p-4 bg-gray-50 rounded-md">
+                    <div class="flex flex-col space-y-4 mb-4">
+                        <div class="flex flex-col">
+                            <label for="stringA" class="font-semibold mb-1">문자열 A:</label>
+                            <input type="text" id="stringA" value="나는 " class="p-2 border rounded-md">
+                        </div>
+                        <div class="flex flex-col">
+                            <label for="stringB" class="font-semibold mb-1">문자열 B:</label>
+                            <input type="text" id="stringB" value="바보입니다." class="p-2 border rounded-md">
+                        </div>
+                        <div class="flex flex-col">
+                            <label for="repeatNum" class="font-semibold mb-1">반복 횟수:</label>
+                            <input type="number" id="repeatNum" value="3" min="0" class="p-2 border rounded-md">
+                        </div>
+                    </div>
+                    <button id="stringOpBtn" class="mt-4 bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition">결과 확인</button>
+                    <div class="mt-4 space-y-2 text-gray-700">
+                        <p>이어붙이기 결과 (`A + B`): <span id="stringAddResult" class="font-semibold text-teal-600"></span></p>
+                        <p>반복하기 결과 (`(A + B) * N`): <span id="stringMulResult" class="font-semibold text-teal-600"></span></p>
+                        <p class="text-sm text-gray-500">※ 괄호 사용에 주의하세요! `(A+B)*N`은 전체를 반복합니다.</p>
+                    </div>
+                    <div class="teacher-quote max-w-full text-left mt-6">
+                        <p>"곱하기 먼저 하니까 괄호 꼭! 괄호 안 치면 '나는'만 3번 반복돼요~"</p>
+                    </div>
+                </div>
+
+                <h4 class="font-bold text-xl mt-8 mb-4">복합 대입 연산자</h4>
+                <p class="text-gray-700 mb-4">
+                    변수 값에 연산을 더해서 다시 그 변수에 저장하는 편리한 방식입니다.
+                </p>
+                <ul class="list-disc list-inside text-gray-700 space-y-1">
+                    <li>`a += 3`  →  `a = a + 3` 와 같습니다.</li>
+                    <li>`b *= 2`  →  `b = b * 2` 와 같습니다.</li>
+                </ul>
+                 <div class="teacher-quote max-w-full text-left mt-6">
+                    <p>"얘들아, 이건 실기 문제로도 나와요! '복합'이란 단어 나오면 이거예요~"</p>
+                </div>
+            </div>
+
+            <h2 class="text-3xl font-bold text-center mb-2 mt-12">표준 입출력 (Input/Output)</h2>
+            <p class="text-center text-gray-500 mb-12">사용자로부터 입력을 받고, 결과를 화면에 출력하는 방법을 배워봅시다.</p>
+            <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100 max-w-3xl mx-auto">
+                <h4 class="font-bold text-xl mb-4">입력: `input()` 함수</h4>
+                <p class="text-gray-700 mb-4">
+                    `input()` 함수를 사용하여 사용자로부터 값을 입력받을 수 있습니다. 
+                    **주의할 점은 `input()`으로 입력받은 값은 항상 문자(str) 형태로 받아진다는 것입니다.**
+                </p>
+                <ul class="list-disc list-inside text-gray-700 space-y-1">
+                    <li>`a = input("이름을 입력하세요: ")`</li>
+                    <li>`num = input("숫자를 입력하세요: ")`  <span class="text-red-500 font-bold">(※ 이 상태로 `num`을 숫자로 계산하면 오류!)</span></li>
+                </ul>
+                <div class="teacher-quote max-w-full text-left mt-6">
+                    <p>"input은 다 문자야! 정수 계산하려면 꼭 int()로 싸줘야 돼요~"</p>
+                </div>
+
+                <h4 class="font-bold text-xl mt-8 mb-4">형변환 함수</h4>
+                <p class="text-gray-700 mb-4">
+                    `input()`으로 받은 문자열을 숫자로 계산하고 싶을 때는 '형변환'을 해야 합니다.
+                </p>
+                <ul class="list-disc list-inside text-gray-700 space-y-1">
+                    <li>`int()`: 문자열을 정수형(Integer)으로 변환합니다. (예: `int("123")` → `123`)</li>
+                    <li>`float()`: 문자열을 실수형(Float)으로 변환합니다. (예: `float("3.14")` → `3.14`)</li>
+                </ul>
+
+                <h4 class="font-bold text-xl mt-8 mb-4">출력: `print()` 함수</h4>
+                <p class="text-gray-700 mb-4">
+                    `print()` 함수를 사용하여 프로그램의 결과를 화면에 출력합니다. 여러 값을 출력할 때는 콤마(`,`)로 구분합니다.
+                </p>
+                <div class="teacher-quote max-w-full text-left mt-6">
+                    <p>"문자랑 숫자랑 같이 출력할 땐 콤마로 구분해줘요! + 쓰면 에러 나요!"</p>
+                </div>
+                
+                <h4 class="font-bold text-xl mt-8 mb-4">입출력 실습 예제</h4>
+                <div class="p-4 bg-gray-50 rounded-md">
+                    <p class="mb-4 text-gray-700">이름과 나이를 입력하고, 내년 나이를 출력하는 간단한 프로그램을 실행해 보세요.</p>
+                    <div class="flex flex-col space-y-4 mb-4">
+                        <div class="flex flex-col">
+                            <label for="userName" class="font-semibold mb-1">이름을 입력하세요:</label>
+                            <input type="text" id="userName" class="p-2 border rounded-md" placeholder="예: 윤서">
+                        </div>
+                        <div class="flex flex-col">
+                            <label for="userAge" class="font-semibold mb-1">나이를 입력하세요:</label>
+                            <input type="number" id="userAge" class="p-2 border rounded-md" placeholder="예: 15">
+                        </div>
+                    </div>
+                    <button id="ioExampleBtn" class="mt-4 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">결과 출력</button>
+                    <div class="mt-4 p-4 bg-white rounded-md border border-gray-200">
+                        <p class="font-semibold text-lg mb-2">출력 결과:</p>
+                        <p id="ioResult" class="text-gray-700"></p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-3xl font-bold text-center mb-2 mt-12">5월 29일 핵심 개념 퀴즈</h2>
+            <p class="text-center text-gray-500 mb-12">오늘 배운 내용을 잘 이해했는지 간단한 퀴즈로 확인해 보세요!</p>
+            <div class="space-y-6 max-w-3xl mx-auto">
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. 문자열 `"안녕"`과 `"하세요"`를 파이썬에서 이어붙이려면 어떤 연산자를 사용해야 할까요?</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. `+` 연산자</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. 문자열 `"반복!"`을 5번 반복하여 출력하고 싶을 때 사용하는 연산자는 무엇일까요?</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. `*` 연산자 (예: `"반복!" * 5`)</p>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. `input()` 함수로 사용자에게 숫자 '123'을 입력받으면 파이썬은 이 값을 어떤 자료형으로 인식할까요?</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. 문자열 (str)</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. `num = input("숫자를 입력하세요: ")`로 받은 값을 정수로 변환하여 계산에 사용하려면 어떤 함수로 감싸야 할까요?</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. `int()` 함수 (예: `int(num)`)</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. `a = 5` 일 때, `a += 3`은 어떤 의미의 복합 대입 연산자일까요?</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. `a = a + 3` 와 같은 의미입니다. (a에 3을 더한 후 다시 a에 저장)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6월 2일 내용 -->
+        <section id="content-0602" class="content-section mb-24">
+             <h1 class="text-4xl font-bold text-center mb-4">6월 2일: 유연한 코드와 파일 관리</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto text-center">
+                '하드코딩'의 한계와 '입력 기반 프로그래밍'의 중요성, 그리고 컴퓨터가 데이터를 영구적으로 저장하는 '파일 입출력' 개념을 배웁니다.
+                다양한 실습 예제를 통해 더욱 실용적인 코딩 능력을 길러보세요.
+            </p>
+            <div class="teacher-quote max-w-xl mx-auto mt-8 text-left">
+                <p>"얘들아~ 이젠 진짜 문제 만들어야 돼요. 하드코딩으로 짜면 점수 바뀔 때마다 코드 다 바꿔야 해요!"</p>
+            </div>
+
+            <h2 class="text-3xl font-bold text-center mb-2 mt-12">하드코딩 vs 입력 기반 프로그래밍</h2>
+            <p class="text-center text-gray-500 mb-12">더 유연하고 효율적인 프로그램을 만들기 위한 핵심 개념입니다.</p>
+            <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100 max-w-3xl mx-auto">
+                <h3 class="text-2xl font-bold mb-4 text-teal-700">하드코딩 (Hard Coding)</h3>
+                <p class="text-gray-700 mb-4">
+                    코드 안에 숫자나 문자를 직접 고정시켜 넣는 방식입니다. 예를 들어, `result = 3 + 4` 처럼 값을 직접 지정하는 것이죠.
+                    이는 프로그램이 특정 값에 종속되어 유연성이 떨어집니다. 값이 바뀔 때마다 코드를 직접 수정해야 합니다.
+                </p>
+                <h3 class="text-2xl font-bold mt-8 mb-4 text-teal-700">입력 기반 프로그래밍 (Input-based Programming)</h3>
+                <p class="text-gray-700 mb-4">
+                    사용자로부터 값을 입력받아 그 값에 따라 계산하거나 동작하는 방식입니다. `num1 = input("첫 번째 숫자를 입력하세요: ")` 처럼 사용자에게 값을 입력받으면,
+                    프로그램은 더 유연해지고 다양한 상황에 대처할 수 있습니다.
+                </p>
+                <div class="teacher-quote max-w-full text-left mt-6">
+                    <p>"계산기 만들 건데 3+4밖에 못 해? 그럼 계산기 아니지~"</p>
+                </div>
+            </div>
+
+            <h2 class="text-3xl font-bold text-center mb-2 mt-12">파일 입출력 기초</h2>
+            <p class="text-center text-gray-500 mb-12">디스크에 저장된 파일을 읽고 쓰는 방식, 영구적인 데이터 저장의 시작입니다.</p>
+            <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100 max-w-3xl mx-auto">
+                <p class="text-gray-700 mb-4">
+                    지금까지는 프로그램이 종료되면 데이터가 사라지는 '표준 입출력(키보드/모니터)'을 사용했습니다.
+                    '파일 입출력'은 데이터를 하드 디스크 같은 저장 장치에 영구적으로 저장하고, 필요할 때 다시 읽어오는 방식입니다.
+                </p>
+                <div class="teacher-quote max-w-full text-left">
+                    <p>"파일은 읽고 쓰고 닫아야 돼요. 까먹으면 저장이 안 돼요!"</p>
+                </div>
+
+                <h4 class="font-bold text-xl mt-8 mb-4">파일 입출력의 3단계</h4>
+                <ol class="list-decimal list-inside text-gray-700 space-y-2 mb-6">
+                    <li>**파일 열기 (`open()`):** 어떤 파일을 어떤 목적으로(읽기/쓰기/추가) 사용할지 지정합니다.</li>
+                    <li>**작업 (`write()`, `read()`, `readline()`, `readlines()` 등):** 파일에 내용을 쓰거나, 파일에서 내용을 읽어옵니다.</li>
+                    <li>**파일 닫기 (`close()`):** 작업이 끝난 파일을 안전하게 닫습니다. (매우 중요!)</li>
+                </ol>
+
+                <h4 class="font-bold text-xl mt-8 mb-4">주요 파일 관련 함수</h4>
+                <div class="space-y-4">
+                    <div class="bg-gray-50 p-4 rounded-md">
+                        <p class="font-bold mb-2">`f = open("파일명.txt", "모드")`</p>
+                        <p class="text-gray-700 text-sm">파일을 열고 파일 객체를 반환합니다.</p>
+                        <ul class="list-disc list-inside text-gray-600 text-xs mt-1">
+                            <li>`"r"`: 읽기 모드 (Read) - 파일이 없으면 오류 발생</li>
+                            <li>`"w"`: 쓰기 모드 (Write) - 파일이 없으면 새로 생성, 있으면 기존 내용 덮어씀</li>
+                            <li>`"a"`: 추가 모드 (Append) - 파일이 없으면 새로 생성, 있으면 기존 내용 뒤에 추가</li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-md">
+                        <p class="font-bold mb-2">`f.write("내용")`</p>
+                        <p class="text-gray-700 text-sm">파일에 문자열을 씁니다. `print()`와 비슷하지만 대상이 모니터가 아닌 파일입니다.</p>
+                         <div class="teacher-quote max-w-full text-left mt-2">
+                            <p>"write는 파일에 적는 거예요. print랑 비슷하지만 대상이 파일임~"</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-md">
+                        <p class="font-bold mb-2">`f.close()`</p>
+                        <p class="text-gray-700 text-sm">열었던 파일을 닫습니다. 변경사항 저장 및 자원 해제를 위해 필수입니다.</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-md">
+                        <p class="font-bold mb-2">`f.read()`</p>
+                        <p class="text-gray-700 text-sm">파일 전체 내용을 하나의 문자열로 읽어옵니다.</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-md">
+                        <p class="font-bold mb-2">`f.readline()`</p>
+                        <p class="text-gray-700 text-sm">파일에서 한 줄씩 읽어옵니다.</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-md">
+                        <p class="font-bold mb-2">`f.readlines()`</p>
+                        <p class="text-gray-700 text-sm">파일의 모든 줄을 읽어와 리스트 형태로 반환합니다.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-3xl font-bold text-center mb-2 mt-12">실습 문제 풀이</h2>
+            <p class="text-center text-gray-500 mb-12">직접 값을 입력하여 결과를 확인하고, 실기 시험에 대비해 봅시다!</p>
+
+            <div class="max-w-3xl mx-auto space-y-8">
+                <!-- 과목 평균 구하기 -->
+                <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
+                    <h3 class="text-2xl font-bold mb-4 text-orange-700">과목 평균 구하기</h3>
+                    <p class="text-gray-700 mb-4">세 과목의 점수를 입력받아 평균을 계산하고 소수점 둘째 자리까지 출력해 보세요.</p>
+                    <div class="p-4 bg-gray-50 rounded-md">
+                        <div class="flex flex-col space-y-3 mb-4">
+                            <div>
+                                <label for="score1" class="font-semibold mb-1">첫 번째 점수:</label>
+                                <input type="number" id="score1" class="w-full p-2 border rounded-md" placeholder="점수 입력">
+                            </div>
+                            <div>
+                                <label for="score2" class="font-semibold mb-1">두 번째 점수:</label>
+                                <input type="number" id="score2" class="w-full p-2 border rounded-md" placeholder="점수 입력">
+                            </div>
+                            <div>
+                                <label for="score3" class="font-semibold mb-1">세 번째 점수:</label>
+                                <input type="number" id="score3" class="w-full p-2 border rounded-md" placeholder="점수 입력">
+                            </div>
+                        </div>
+                        <button id="calcAvgBtn" class="mt-4 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition">평균 계산</button>
+                        <div class="mt-4 p-4 bg-white rounded-md border border-gray-200">
+                            <p class="font-semibold text-lg mb-2">평균 결과:</p>
+                            <p id="averageResult" class="text-gray-700 font-bold"></p>
+                        </div>
+                        <div class="teacher-quote max-w-full text-left mt-6">
+                            <p>"퍼센트 f! 소수점 자리 조절! 퍼센트 d는 정수, f는 실수~"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BMI 계산기 -->
+                <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
+                    <h3 class="text-2xl font-bold mb-4 text-green-700">BMI 계산기</h3>
+                    <p class="text-gray-700 mb-4">키(cm)와 몸무게(kg)를 입력하여 BMI를 계산하고 소수점 둘째 자리까지 출력해 보세요.</p>
+                    <div class="p-4 bg-gray-50 rounded-md">
+                        <div class="flex flex-col space-y-3 mb-4">
+                            <div>
+                                <label for="userHeight" class="font-semibold mb-1">키 (cm):</label>
+                                <input type="number" id="userHeight" class="w-full p-2 border rounded-md" placeholder="예: 170">
+                            </div>
+                            <div>
+                                <label for="userWeight" class="font-semibold mb-1">몸무게 (kg):</label>
+                                <input type="number" id="userWeight" class="w-full p-2 border rounded-md" placeholder="예: 65">
+                            </div>
+                        </div>
+                        <button id="calcBMIBtn" class="mt-4 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">BMI 계산</button>
+                        <div class="mt-4 p-4 bg-white rounded-md border border-gray-200">
+                            <p class="font-semibold text-lg mb-2">BMI 결과:</p>
+                            <p id="bmiResult" class="text-gray-700 font-bold"></p>
+                        </div>
+                        <div class="teacher-quote max-w-full text-left mt-6">
+                            <p>"이런 게 실기 나와요~ 직접 입력 받게끔 짜야 돼요. 숫자 직접 넣으면 하드코딩이라고 했죠~"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-3xl font-bold text-center mb-2 mt-12">6월 2일 핵심 개념 퀴즈</h2>
+            <p class="text-center text-gray-500 mb-12">오늘 배운 내용을 잘 이해했는지 간단한 퀴즈로 확인해 보세요!</p>
+            <div class="space-y-6 max-w-3xl mx-auto">
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. 코드에 숫자나 문자를 직접 고정시켜 넣는 방식을 무엇이라고 할까요? (이 방식의 단점은 무엇인가요?)</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. 하드코딩. 값이 바뀔 때마다 코드를 직접 수정해야 하는 단점이 있습니다.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. 파일 입출력을 할 때 필요한 3단계는 무엇일까요?</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. 파일 열기 → 작업 (쓰기/읽기) → 파일 닫기</p>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. 파일 쓰기 모드, 읽기 모드, 추가 모드를 나타내는 각각의 알파벳은 무엇일까요?</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. 쓰기: `"w"`, 읽기: `"r"`, 추가: `"a"`</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. 파일에 내용을 쓰는 함수는 `f.write("내용")` 입니다. 이 함수는 `print()` 함수와 무엇이 다를까요?</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. `print()`는 모니터에 출력하지만, `f.write()`는 파일에 내용을 저장합니다.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. 평균 계산기나 BMI 계산기처럼 사용자로부터 값을 입력받아 처리하는 것이 하드코딩보다 왜 더 좋은 방식일까요?</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. 사용자 입력에 따라 유연하게 계산할 수 있어, 값을 바꿀 때마다 코드를 수정할 필요가 없기 때문입니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6월 9일 내용 -->
+        <section id="content-0609" class="content-section mb-24">
+            <h1 class="text-4xl font-bold text-center mb-4">6월 9일: 리스트와 2차원 데이터 구조</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto text-center">
+                변수의 한계를 넘어, 여러 데이터를 효율적으로 저장하고 관리하는 '리스트'를 배워봅시다. 특히 실기 시험에 자주 등장하는 2차원 리스트를 집중적으로 다룹니다.
+            </p>
+            <div class="teacher-quote max-w-xl mx-auto mt-8 text-left">
+                <p>"얘들아~ 이건 진짜 실기 시험에도 나와요~"</p>
+            </div>
+
+            <h2 class="text-3xl font-bold text-center mb-2 mt-12">변수와 리스트 차이점</h2>
+            <p class="text-center text-gray-500 mb-12">변수는 데이터 한 개, 리스트는 여러 데이터를 저장합니다.</p>
+            <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100 max-w-3xl mx-auto">
+                <p class="text-gray-700 mb-4">
+                    **변수**는 데이터를 **한 개**만 저장할 수 있습니다. 예를 들어 31명의 이름을 저장하려면 변수 31개를 만들어야 하는 비효율적인 상황이 발생합니다.
+                    이를 해결하기 위해 등장한 개념이 바로 **리스트**입니다.
+                </p>
+                <div class="bg-gray-50 p-4 rounded-md mb-6">
+                    <p class="font-bold mb-2">리스트 예시: `my_list = ["봄", "여름", "가을", "겨울"]`</p>
+                    <ul class="list-disc list-inside text-gray-700 space-y-1">
+                        <li>**대괄호(`[]`)**를 사용합니다.</li>
+                        <li>여러 개의 값을 순서대로 저장할 수 있습니다.</li>
+                    </ul>
+                </div>
+
+                <h3 class="text-2xl font-bold mt-8 mb-4 text-green-700">리스트: 인덱싱, 슬라이싱, 수정</h3>
+                <p class="text-gray-700 mb-4">
+                    리스트에 저장된 값들은 '인덱스'라는 고유한 번호를 가집니다. **인덱스는 무조건 0부터 시작합니다!**
+                </p>
+                <div class="teacher-quote max-w-full text-left">
+                    <p>"여기서 실기 나오면, 인덱스 하나라도 헷갈리면 틀려요~ 조심!"</p>
+                </div>
+                
+                <h4 class="font-bold text-xl mt-6 mb-2">인덱싱 (Indexing): 특정 위치의 한 요소 가져오기</h4>
+                <div class="p-4 bg-gray-50 rounded-md">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <label for="listIndex" class="font-semibold">인덱스 입력 (0부터 시작):</label>
+                        <input type="number" id="listIndex" value="0" min="0" class="w-20 p-2 border rounded-md">
+                        <button id="getIndexBtn" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">값 가져오기</button>
+                    </div>
+                    <p>리스트: <span id="currentList" class="font-semibold text-teal-600">["봄", "여름", "가을", "겨울"]</span></p>
+                    <p>결과: <span id="indexedValue" class="font-bold text-purple-700"></span></p>
+                </div>
+
+                <h4 class="font-bold text-xl mt-6 mb-2">슬라이싱 (Slicing): 범위로 잘라서 여러 요소 가져오기</h4>
+                <p class="text-gray-700 mb-2">
+                    `my_list[시작_인덱스:끝_인덱스]` 형태로 사용하며, **끝 인덱스의 요소는 포함되지 않습니다!**
+                    시작 인덱스를 생략하면 처음부터, 끝 인덱스를 생략하면 끝까지 가져옵니다.
+                </p>
+                <div class="p-4 bg-gray-50 rounded-md">
+                     <div class="flex items-center space-x-2 mb-4">
+                        <label for="sliceStart" class="font-semibold">시작 인덱스 (생략 가능):</label>
+                        <input type="number" id="sliceStart" value="1" class="w-20 p-2 border border-gray-300 rounded-md">
+                        <span class="font-bold">:</span>
+                        <label for="sliceEnd" class="font-semibold">끝 인덱스 (생략 가능):</label>
+                        <input type="number" id="sliceEnd" value="3" class="w-20 p-2 border border-gray-300 rounded-md">
+                        <button id="getSliceBtn" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">슬라이싱 하기</button>
+                    </div>
+                    <p>리스트: <span class="font-semibold text-teal-600">["봄", "여름", "가을", "겨울"]</span></p>
+                    <p>결과: <span id="slicedValue" class="font-bold text-purple-700"></span></p>
+                </div>
+
+                <h4 class="font-bold text-xl mt-6 mb-2">리스트 요소 수정</h4>
+                <p class="text-gray-700 mb-2">인덱스를 이용하여 특정 위치의 값을 다른 값으로 '덮어쓰기' 할 수 있습니다.</p>
+                <div class="p-4 bg-gray-50 rounded-md">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <label for="modifyIndex" class="font-semibold">수정할 인덱스:</label>
+                        <input type="number" id="modifyIndex" value="0" min="0" class="w-20 p-2 border rounded-md">
+                        <label for="newValue" class="font-semibold">새로운 값:</label>
+                        <input type="text" id="newValue" value="치즈떡" class="w-32 p-2 border rounded-md">
+                        <button id="modifyListBtn" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">수정하기</button>
+                    </div>
+                    <p>현재 리스트: <span id="modifiedList" class="font-semibold text-teal-600">["봄", "여름", "가을", "겨울"]</span></p>
+                </div>
+
+                <h3 class="text-2xl font-bold mt-8 mb-4 text-green-700">2차원 리스트 (Nested Lists)</h3>
+                <p class="text-gray-700 mb-4">
+                    리스트 안에 또 다른 리스트가 들어있는 형태로, 마치 표(행과 열)처럼 데이터를 구조화하여 저장할 때 사용합니다. 
+                    복잡한 데이터를 체계적으로 관리하는 데 매우 유용합니다. (예: 구구단 전체, 메뉴판 등)
+                </p>
+                <div class="teacher-quote max-w-full text-left">
+                    <p>"이게 진짜 실기 시험에 나온다니까~ 2차원 리스트는 진짜 중요해요~"</p>
+                </div>
+
+                <h4 class="font-bold text-xl mt-6 mb-2">2차원 리스트 예시: 메뉴판</h4>
+                <div class="p-4 bg-gray-50 rounded-md">
+                    <p class="font-bold mb-2">`menu = [["라볶이", 4000], ["순대", 3000], ["튀김", 2000]]`</p>
+                    <table class="w-full text-left border-collapse mt-4">
+                        <thead>
+                            <tr>
+                                <th class="border px-4 py-2 bg-gray-200">인덱스 (행)</th>
+                                <th class="border px-4 py-2 bg-gray-200">인덱스 (열 0: 이름)</th>
+                                <th class="border px-4 py-2 bg-gray-200">인덱스 (열 1: 가격)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="menuTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+
+                    <h5 class="font-bold text-lg mt-6 mb-2">2차원 리스트에서 값 가져오기</h5>
+                    <p class="text-gray-700 mb-4">`list[행_인덱스][열_인덱스]` 형식으로 접근합니다.</p>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <label for="rowIdx" class="font-semibold">행 인덱스:</label>
+                        <input type="number" id="rowIdx" value="0" min="0" class="w-20 p-2 border rounded-md">
+                        <label for="colIdx" class="font-semibold">열 인덱스:</label>
+                        <input type="number" id="colIdx" value="0" min="0" class="w-20 p-2 border rounded-md">
+                        <button id="get2DValueBtn" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">값 가져오기</button>
+                    </div>
+                    <p>결과: <span id="twoDValue" class="font-bold text-purple-700"></span></p>
+                    <div class="teacher-quote max-w-full text-left mt-6">
+                        <p>"문제에 변수명 떡볶이재료 나오면 그 spelling 한 글자라도 틀리면 채점 안 돼요! 조심!"</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-3xl font-bold text-center mb-2 mt-12">6월 9일 핵심 개념 퀴즈</h2>
+            <p class="text-center text-gray-500 mb-12">오늘 배운 내용을 잘 이해했는지 간단한 퀴즈로 확인해 보세요!</p>
+            <div class="space-y-6 max-w-3xl mx-auto">
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. 리스트에서 특정 요소의 위치를 나타내는 번호를 무엇이라고 하며, 몇 번부터 시작할까요?</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. 인덱스, 0번부터 시작합니다.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. `my_list = ["사과", "바나나", "체리", "딸기"]` 일 때, `my_list[1:3]`의 결과는 무엇일까요?</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. `["바나나", "체리"]` (끝 인덱스 3은 포함되지 않습니다.)</p>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+                    <p class="font-bold text-lg mb-4">Q. `menu = [["라면", 3000], ["김밥", 2000]]` 이라는 2차원 리스트에서 '김밥'의 가격인 `2000`을 가져오려면 어떻게 접근해야 할까요?</p>
+                    <button class="quiz-btn bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition">정답 확인</button>
+                    <p class="quiz-answer hidden mt-4 text-green-700 bg-green-50 p-4 rounded-md">A. `menu[1][1]` (두 번째 행의 두 번째 열)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 공통 푸터 (선택적) -->
+        <footer class="text-center py-8 border-t">
+             <h3 class="text-2xl font-bold mb-4">다음 시간 예고</h3>
+             <p class="text-gray-600">다음 시간에는 '조건문 if'와 '반복문 while'에 진입하며, 배운 변수와 연산자를 활용한 실습 문제들을 직접 풀어보게 될 것입니다.</p>
+             <div class="teacher-quote max-w-3xl mx-auto mt-8 text-left">
+                <p>"양식 잘 알아둬야 돼요~ 나중에 수행평가 이 코드 문제로 바로 나올 수 있어요~"</p>
+            </div>
+             <p class="text-lg text-gray-700 font-bold mt-8 max-w-3xl mx-auto">
+                 "얘들아~ 보고서에도 이 문법 다 나와요. 이거 모르면 그냥 못 써요~ 이번 주 안에 변수, 자료형, 입력, 출력, 연산자 완벽 정리해 둬야 합니다~"
+            </p>
+        </footer>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            // Function to show a specific content section
+            function showContent(targetId) {
+                contentSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(targetId).classList.add('active');
+                // Scroll to top of the content section
+                document.getElementById(targetId).scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            // Event listeners for navigation buttons
+            navButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetId = this.dataset.target;
+                    showContent(targetId);
+                });
+            });
+
+            // Set default active section (e.g., 5월 26일)
+            showContent('content-0526');
+
+            // Quiz button functionality (re-usable for all quizzes)
+            const quizBtns = document.querySelectorAll('.quiz-btn');
+            quizBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const answer = this.nextElementSibling;
+                    answer.classList.toggle('hidden');
+                });
+            });
+
+            // Chart.js for 5월 26일
+            const ctx = document.getElementById('executionChart').getContext('2d');
+            const executionChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['실행 속도', '개발 편의성 (오류 수정)'],
+                    datasets: [{
+                        label: '인터프리터',
+                        data: [60, 90],
+                        backgroundColor: 'rgba(20, 184, 166, 0.6)',
+                        borderColor: 'rgba(15, 118, 110, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: '컴파일러',
+                        data: [95, 40],
+                        backgroundColor: 'rgba(248, 113, 113, 0.6)',
+                        borderColor: 'rgba(220, 38, 38, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                             ticks: {
+                                callback: function(value) {
+                                    return value + '%'
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '인터프리터와 컴파일러 특징 비교',
+                            font: {
+                                size: 18
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.x !== null) {
+                                        label += context.parsed.x + ' (상대적 수치)';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Accordion functionality
+            const accordionButtons = document.querySelectorAll('.accordion-button');
+            accordionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const contentId = this.dataset.target;
+                    const content = document.getElementById(contentId);
+                    content.classList.toggle('active');
+                    this.querySelector('.arrow').textContent = content.classList.contains('active') ? '▲' : '▼';
+                });
+            });
+
+            // 5월 28일: Arithmetic Calculator
+            const numAInput = document.getElementById('numA');
+            const numBInput = document.getElementById('numB');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const addResult = document.getElementById('addResult');
+            const subResult = document.getElementById('subResult');
+            const mulResult = document.getElementById('mulResult');
+            const divResult = document.getElementById('divResult');
+            const floorDivResult = document.getElementById('floorDivResult');
+            const modResult = document.getElementById('modResult');
+            const powResult = document.getElementById('powResult');
+
+            function calculateResults() {
+                const a = parseFloat(numAInput.value);
+                const b = parseFloat(numBInput.value);
+
+                if (isNaN(a) || isNaN(b)) {
+                    addResult.textContent = subResult.textContent = mulResult.textContent = divResult.textContent = 
+                    floorDivResult.textContent = modResult.textContent = powResult.textContent = '유효하지 않은 입력';
+                    return;
+                }
+
+                addResult.textContent = a + b;
+                subResult.textContent = a - b;
+                mulResult.textContent = a * b;
+                divResult.textContent = a / b;
+                floorDivResult.textContent = Math.floor(a / b);
+                modResult.textContent = a % b;
+                powResult.textContent = Math.pow(a, b);
+            }
+            calculateBtn.addEventListener('click', calculateResults);
+            calculateResults();
+
+            // 5월 29일: String Operations
+            const stringAInput = document.getElementById('stringA');
+            const stringBInput = document.getElementById('stringB');
+            const repeatNumInput = document.getElementById('repeatNum');
+            const stringOpBtn = document.getElementById('stringOpBtn');
+            const stringAddResult = document.getElementById('stringAddResult');
+            const stringMulResult = document.getElementById('stringMulResult');
+
+            function calculateStringResults() {
+                const strA = stringAInput.value;
+                const strB = stringBInput.value;
+                const repeatN = parseInt(repeatNumInput.value);
+
+                stringAddResult.textContent = strA + strB;
+                stringMulResult.textContent = isNaN(repeatN) ? "유효하지 않은 반복 횟수" : (strA + strB).repeat(repeatN);
+            }
+            stringOpBtn.addEventListener('click', calculateStringResults);
+            calculateStringResults();
+
+            // 5월 29일: Input/Output Example
+            const userNameInput = document.getElementById('userName');
+            const userAgeInput = document.getElementById('userAge');
+            const ioExampleBtn = document.getElementById('ioExampleBtn');
+            const ioResult = document.getElementById('ioResult');
+
+            ioExampleBtn.addEventListener('click', function() {
+                const name = userNameInput.value;
+                const age = parseInt(userAgeInput.value);
+
+                if (name === "" || isNaN(age)) {
+                    ioResult.textContent = "이름과 유효한 나이를 입력해주세요.";
+                    return;
+                }
+                const nextYearAge = age + 1;
+                ioResult.textContent = `안녕하세요, ${name}님! 내년이면 ${nextYearAge}살이 되시겠네요!`;
+            });
+
+            // 6월 2일: Average Calculator
+            const score1Input = document.getElementById('score1');
+            const score2Input = document.getElementById('score2');
+            const score3Input = document.getElementById('score3');
+            const calcAvgBtn = document.getElementById('calcAvgBtn');
+            const averageResult = document.getElementById('averageResult');
+
+            calcAvgBtn.addEventListener('click', function() {
+                const s1 = parseFloat(score1Input.value);
+                const s2 = parseFloat(score2Input.value);
+                const s3 = parseFloat(score3Input.value);
+
+                if (isNaN(s1) || isNaN(s2) || isNaN(s3)) {
+                    averageResult.textContent = "모든 점수를 정확히 입력해주세요.";
+                    return;
+                }
+
+                const avg = (s1 + s2 + s3) / 3;
+                averageResult.textContent = `평균은 ${avg.toFixed(2)}입니다.`;
+            });
+
+            // 6월 2일: BMI Calculator
+            const userHeightInput = document.getElementById('userHeight');
+            const userWeightInput = document.getElementById('userWeight');
+            const calcBMIBtn = document.getElementById('calcBMIBtn');
+            const bmiResult = document.getElementById('bmiResult');
+
+            calcBMIBtn.addEventListener('click', function() {
+                const heightCm = parseFloat(userHeightInput.value);
+                const weightKg = parseFloat(userWeightInput.value);
+
+                if (isNaN(heightCm) || isNaN(weightKg) || heightCm <= 0 || weightKg <= 0) {
+                    bmiResult.textContent = "키와 몸무게를 정확히 입력해주세요.";
+                    return;
+                }
+
+                const heightM = heightCm / 100;
+                const bmi = weightKg / (heightM * heightM);
+                bmiResult.textContent = `BMI는 ${bmi.toFixed(2)}입니다.`;
+            });
+
+            // 6월 9일: List Interaction
+            const myList = ["봄", "여름", "가을", "겨울"];
+            const currentListSpan = document.getElementById('currentList');
+            const indexedValueSpan = document.getElementById('indexedValue');
+            const slicedValueSpan = document.getElementById('slicedValue');
+            const modifiedListSpan = document.getElementById('modifiedList');
+
+            function updateListDisplays() {
+                currentListSpan.textContent = JSON.stringify(myList);
+                modifiedListSpan.textContent = JSON.stringify(myList);
+            }
+            updateListDisplays();
+
+            const getIndexBtn = document.getElementById('getIndexBtn');
+            getIndexBtn.addEventListener('click', function() {
+                const index = parseInt(document.getElementById('listIndex').value);
+                if (isNaN(index) || index < 0 || index >= myList.length) {
+                    indexedValueSpan.textContent = "유효하지 않은 인덱스입니다.";
+                } else {
+                    indexedValueSpan.textContent = `my_list[${index}] → "${myList[index]}"`;
+                }
+            });
+
+            const getSliceBtn = document.getElementById('getSliceBtn');
+            getSliceBtn.addEventListener('click', function() {
+                let start = parseInt(document.getElementById('sliceStart').value);
+                let end = parseInt(document.getElementById('sliceEnd').value);
+
+                start = isNaN(start) ? 0 : start;
+                end = isNaN(end) ? myList.length : end;
+
+                if (start < 0 || end > myList.length || start > end) {
+                     slicedValueSpan.textContent = "유효하지 않은 슬라이싱 범위입니다.";
+                } else {
+                    const sliced = myList.slice(start, end);
+                    slicedValueSpan.textContent = `my_list[${start}:${end}] → ${JSON.stringify(sliced)}`;
+                }
+            });
+
+            const modifyListBtn = document.getElementById('modifyListBtn');
+            modifyListBtn.addEventListener('click', function() {
+                const index = parseInt(document.getElementById('modifyIndex').value);
+                const newValue = document.getElementById('newValue').value;
+                if (isNaN(index) || index < 0 || index >= myList.length) {
+                    console.error("Invalid index for modification.");
+                    modifiedListSpan.textContent = "수정 실패: 유효하지 않은 인덱스입니다.";
+                } else {
+                    myList[index] = newValue;
+                    updateListDisplays();
+                    modifiedListSpan.textContent = JSON.stringify(myList);
+                }
+            });
+
+            // 6월 9일: 2D List Interaction
+            const menuList = [["라볶이", 4000], ["순대", 3000], ["튀김", 2000]];
+            const menuTableBody = document.getElementById('menuTableBody');
+
+            function populateMenuTable() {
+                menuTableBody.innerHTML = '';
+                menuList.forEach((row, rowIndex) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="border px-4 py-2">${rowIndex}</td>
+                        <td class="border px-4 py-2">${row[0]}</td>
+                        <td class="border px-4 py-2">${row[1]}</td>
+                    `;
+                    menuTableBody.appendChild(tr);
+                });
+            }
+            populateMenuTable();
+
+            const get2DValueBtn = document.getElementById('get2DValueBtn');
+            const rowIdxInput = document.getElementById('rowIdx');
+            const colIdxInput = document.getElementById('colIdx');
+            const twoDValueSpan = document.getElementById('twoDValue');
+
+            get2DValueBtn.addEventListener('click', function() {
+                const row = parseInt(rowIdxInput.value);
+                const col = parseInt(colIdxInput.value);
+
+                if (isNaN(row) || isNaN(col) || row < 0 || row >= menuList.length || col < 0 || col >= menuList[row].length) {
+                    twoDValueSpan.textContent = "유효하지 않은 행/열 인덱스입니다.";
+                } else {
+                    twoDValueSpan.textContent = `menu[${row}][${col}] → "${menuList[row][col]}"`;
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정보 수업 핵심 요약 (5월 28일)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony Neutrals -->
+    <!-- Application Structure Plan: A single-page application with logical sections for variables, operators, and a practical application. The structure guides the user from understanding basic concepts (variables, memory) to practical application (arithmetic, comparison, logical operators) and finally, reinforcing the overall importance of variables. Interactive elements like expandable sections for operator details and a dynamic calculator for arithmetic operations are integrated to promote active learning and immediate feedback. -->
+    <!-- Visualization & Content Choices:
+        - Report Info: Variable definition and memory concept -> Goal: Inform -> Viz/Presentation: Text explanations with a conceptual box diagram (HTML/CSS) -> Interaction: None, clear static explanation. -> Justification: Visualizing the 'named box' and memory relationship helps clarify an abstract concept. -> Library/Method: HTML/Tailwind.
+        - Report Info: Arithmetic, Comparison, Logical Operators -> Goal: Inform, Practice -> Viz/Presentation: Expandable sections for each operator type, followed by an interactive calculator for arithmetic and example outputs for others -> Interaction: Click to expand/collapse, input values into calculator for dynamic results. -> Justification: Breaking down operators into categories with interactive examples promotes hands-on learning and reduces cognitive load. -> Library/Method: HTML/Tailwind/JS.
+        - Report Info: Importance of variables -> Goal: Inform, Synthesize -> Viz/Presentation: Dedicated text section emphasizing efficiency and reusability -> Interaction: None. -> Justification: Reinforces why these fundamental concepts are crucial in programming. -> Library/Method: HTML/Tailwind.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .teacher-quote {
+            background-color: #fffbeb;
+            border-left: 4px solid #facc15;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: #78350f;
+        }
+        .accordion-button {
+            width: 100%;
+            text-align: left;
+            padding: 1rem;
+            background-color: #f3f4f6;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 1rem;
+        }
+        .accordion-content.active {
+            max-height: 500px; /* Adjust as needed */
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3">
+            <div class="flex justify-between items-center">
+                <div class="text-xl font-bold text-teal-600">정보 수업 핵심정리 (5/28)</div>
+                <div class="hidden md:flex space-x-6">
+                    <a href="#intro" class="text-gray-600 hover:text-teal-600 transition">소개</a>
+                    <a href="#variables" class="text-gray-600 hover:text-teal-600 transition">변수와 메모리</a>
+                    <a href="#operators" class="text-gray-600 hover:text-teal-600 transition">연산자</a>
+                    <a href="#importance" class="text-gray-600 hover:text-teal-600 transition">변수의 중요성</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        
+        <section id="intro" class="text-center mb-24">
+            <h1 class="text-4xl font-bold mb-4">코딩의 진짜 시작: 변수와 연산자</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                오늘은 프로그램의 가장 기본적인 구성 요소인 '변수'와 데이터를 다루는 '연산자'에 대해 깊이 있게 알아봅니다. 
+                메모리 개념부터 사칙연산, 논리 연산까지 직접 실습하며 코딩의 기초를 탄탄히 다져보세요.
+            </p>
+            <div class="teacher-quote max-w-xl mx-auto mt-8 text-left">
+                <p>"얘들아~ 오늘부터 진짜 코딩 시작이야! 이거 헷갈리면 뒤에 while if 다 꼬여요~"</p>
+            </div>
+        </section>
+
+        <section id="variables" class="mb-24">
+            <h2 class="text-3xl font-bold text-center mb-2">변수란 무엇인가?</h2>
+            <p class="text-center text-gray-500 mb-12">변수는 데이터를 저장하는 공간이자, 마치 '이름 붙인 상자'와 같습니다.</p>
+            <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100 max-w-3xl mx-auto">
+                <h3 class="text-2xl font-bold mb-4 text-teal-700">변수: 데이터를 저장하는 '이름 붙인 상자'</h3>
+                <p class="text-gray-700 mb-4">
+                    프로그램에서 자주 사용하거나 변동될 수 있는 데이터를 메모리에 저장해 놓고, 그 데이터를 이름으로 불러서 사용하기 위해 변수를 사용합니다.
+                    복잡한 메모리 주소 대신 사람이 기억하기 쉬운 '이름'으로 데이터를 관리하는 것이죠.
+                </p>
+                <div class="teacher-quote max-w-full text-left">
+                    <p>"이름만 기억하면 값은 자동! 변수 없으면 사람 뇌가 터져요~"</p>
+                </div>
+
+                <h4 class="font-bold text-xl mt-8 mb-4">변수 이름 붙이기 규칙</h4>
+                <ul class="list-disc list-inside text-gray-700 space-y-2">
+                    <li>반드시 영문자로 시작해야 합니다.</li>
+                    <li>숫자는 변수 이름의 뒤에만 붙일 수 있습니다. (예: `a1`, `num2`는 가능, `1a`, `2num`은 불가능)</li>
+                    <li>특수문자(언더스코어 `_` 제외), 띄어쓰기는 사용할 수 없습니다.</li>
+                </ul>
+                <div class="teacher-quote max-w-full text-left mt-6">
+                    <p>"숫자로 시작하면? 파이썬은 계산식인 줄 안다니까~"</p>
+                </div>
+
+                <h4 class="font-bold text-xl mt-8 mb-4">변수와 메모리의 관계</h4>
+                <p class="text-gray-700 mb-4">
+                    컴퓨터는 모든 데이터를 **메모리(RAM)**에 저장합니다. 하지만 메모리 주소는 복잡한 숫자로 이루어져 있어 사람이 외우기 어렵습니다.
+                    변수는 이 메모리 주소에 사람이 이해하기 쉬운 '이름'을 붙여주는 역할을 합니다.
+                </p>
+                <div class="flex flex-col items-center justify-center space-y-4 md:space-y-0 md:flex-row md:space-x-8 bg-gray-50 p-6 rounded-lg shadow-inner">
+                    <div class="flex flex-col items-center">
+                        <div class="w-24 h-24 bg-blue-200 rounded-lg flex items-center justify-center text-blue-800 font-mono text-sm shadow">0xAF12B3C4</div>
+                        <p class="mt-2 text-sm text-gray-600">복잡한 메모리 주소</p>
+                    </div>
+                    <div class="text-4xl text-teal-500">→</div>
+                    <div class="flex flex-col items-center">
+                        <div class="w-24 h-24 bg-teal-200 rounded-lg flex items-center justify-center text-teal-800 font-bold text-2xl shadow">A</div>
+                        <p class="mt-2 text-sm text-gray-600">변수 이름</p>
+                    </div>
+                    <div class="text-4xl text-teal-500">→</div>
+                    <div class="flex flex-col items-center">
+                        <div class="w-24 h-24 bg-purple-200 rounded-lg flex items-center justify-center text-purple-800 font-bold text-2xl shadow">10</div>
+                        <p class="mt-2 text-sm text-gray-600">변수에 저장된 값</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="operators" class="mb-24">
+            <h2 class="text-3xl font-bold text-center mb-2">사칙연산과 연산자</h2>
+            <p class="text-center text-gray-500 mb-12">데이터를 가지고 다양한 계산을 하기 위해 '연산자'를 사용합니다.</p>
+            <div class="max-w-3xl mx-auto space-y-6">
+
+                <!-- Arithmetic Operators -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                    <button class="accordion-button flex justify-between items-center" data-target="arithmetic-content">
+                        <span>기본 사칙연산자</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div id="arithmetic-content" class="accordion-content">
+                        <ul class="list-disc list-inside text-gray-700 mt-4 space-y-1">
+                            <li>`+`: 더하기</li>
+                            <li>`-`: 빼기</li>
+                            <li>`*`: 곱하기</li>
+                            <li>`/`: 나누기 (결과는 실수)</li>
+                        </ul>
+                        <h4 class="font-bold text-xl mt-6 mb-2">특수 연산자 (중요!)</h4>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1">
+                            <li>`//`: 몫만 구함 (정수)</li>
+                            <li>`%`: 나머지 구함</li>
+                            <li>`**`: 제곱 (a**b = a의 b제곱)</li>
+                        </ul>
+                        <div class="teacher-quote max-w-full text-left mt-6">
+                            <p>"슬래시 두 번! 퍼센트! 별표 두 개! 이건 진짜 많이 나와요!"</p>
+                        </div>
+                        <div class="mt-6 p-4 bg-gray-50 rounded-md">
+                            <h5 class="font-bold mb-2">직접 계산해보기!</h5>
+                            <div class="flex items-center space-x-2 mb-4">
+                                <input type="number" id="numA" value="9" class="w-24 p-2 border rounded-md">
+                                <span class="font-bold">와</span>
+                                <input type="number" id="numB" value="4" class="w-24 p-2 border rounded-md">
+                                <span class="font-bold">의 연산 결과</span>
+                            </div>
+                            <div class="space-y-2 text-gray-700">
+                                <p>더하기 (`+`): <span id="addResult" class="font-semibold text-teal-600"></span></p>
+                                <p>빼기 (`-`): <span id="subResult" class="font-semibold text-teal-600"></span></p>
+                                <p>곱하기 (`*`): <span id="mulResult" class="font-semibold text-teal-600"></span></p>
+                                <p>나누기 (`/`): <span id="divResult" class="font-semibold text-teal-600"></span></p>
+                                <p>몫 (`//`): <span id="floorDivResult" class="font-semibold text-teal-600"></span></p>
+                                <p>나머지 (`%`): <span id="modResult" class="font-semibold text-teal-600"></span></p>
+                                <p>제곱 (`**`): <span id="powResult" class="font-semibold text-teal-600"></span></p>
+                            </div>
+                            <button id="calculateBtn" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">계산하기</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparison Operators -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                    <button class="accordion-button flex justify-between items-center" data-target="comparison-content">
+                        <span>비교 연산자</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div id="comparison-content" class="accordion-content">
+                        <p class="text-gray-700 mt-4 mb-2">두 값이 '크다', '작다', '같다' 등을 비교하여 참(True) 또는 거짓(False)을 반환합니다.</p>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1">
+                            <li>`>`: 크다</li>
+                            <li>`<`: 작다</li>
+                            <li>`>=`: 크거나 같다</li>
+                            <li>`<=`: 작거나 같다</li>
+                            <li>`==`: 같다 (⚠️ 등호 두 개! `=`는 값을 넣는 것!)</li>
+                            <li>`!=`: 같지 않다</li>
+                        </ul>
+                        <div class="mt-4 p-4 bg-gray-50 rounded-md text-gray-700">
+                            <p class="font-bold">예시:</p>
+                            <p>`a = 9`, `b = 4` 일 때</p>
+                            <p>`a > 10` 의 결과: <span class="font-semibold text-teal-600">False</span></p>
+                            <p>`a == 9` 의 결과: <span class="font-semibold text-teal-600">True</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logical Operators -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                    <button class="accordion-button flex justify-between items-center" data-target="logical-content">
+                        <span>논리 연산자</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div id="logical-content" class="accordion-content">
+                        <p class="text-gray-700 mt-4 mb-2">여러 조건을 조합하여 논리적인 판단을 할 때 사용하며, 결과는 참(True) 또는 거짓(False)입니다.</p>
+                        <ul class="list-disc list-inside text-gray-700 space-y-1">
+                            <li>`and`: 그리고 (모든 조건이 참일 때만 True)</li>
+                            <li>`or`: 또는 (하나라도 조건이 참이면 True)</li>
+                        </ul>
+                         <div class="teacher-quote max-w-full text-left mt-6">
+                            <p>"논리는 일상에서도 쓰는 거랑 똑같아요~ 조건문 if에 들어가면 여기부터 쓰게 돼요~"</p>
+                        </div>
+                        <div class="mt-4 p-4 bg-gray-50 rounded-md text-gray-700">
+                            <p class="font-bold">예시:</p>
+                            <p>`a = 9`, `b = 4` 일 때</p>
+                            <p>`a > 10 and b > 3` 의 결과: <span class="font-semibold text-teal-600">False</span></p>
+                            <p>`a < 10 or b < 2` 의 결과: <span class="font-semibold text-teal-600">True</span></p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="importance" class="mb-24 bg-teal-50 py-16 rounded-2xl text-center">
+            <h2 class="text-3xl font-bold mb-2">왜 변수가 중요할까?</h2>
+            <p class="text-gray-500 mb-8 max-w-2xl mx-auto">변수를 사용하면 프로그램이 훨씬 효율적이고 유연해집니다.</p>
+            <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100 max-w-3xl mx-auto">
+                <p class="text-gray-700 mb-4">
+                    프로그램은 기본적으로 '데이터 저장', '조건 판단', '반복 처리', '결과 출력' 등의 과정을 거칩니다.
+                    만약 변수를 사용하지 않고 모든 값을 직접 프로그램 안에 '박아 넣는다면', 값이 바뀔 때마다 코드를 일일이 수정해야 합니다. 
+                    이는 매우 비효율적이며, 대규모 프로그램에서는 거의 불가능합니다.
+                </p>
+                <p class="text-gray-700 font-bold mb-4">
+                    변수를 사용하면 값을 변수에 저장해두고, 필요할 때 그 변수 이름만 불러서 사용하면 되므로, 
+                    수정, 재활용, 확장이 훨씬 쉬워집니다.
+                </p>
+                <div class="teacher-quote max-w-full text-left mt-6">
+                    <p>"변수 안 쓰고 값을 박아넣는다? 그건 1990년대 스타일이에요~"</p>
+                </div>
+            </div>
+        </section>
+        
+        <footer class="text-center py-8 border-t">
+             <h3 class="text-2xl font-bold mb-4">다음 시간 예고: 조건문과 반복문</h3>
+             <p class="text-gray-600">다음 시간에는 '조건문 if'와 '반복문 while'에 진입하며, 배운 변수와 연산자를 활용한 실습 문제들을 직접 풀어보게 될 것입니다.</p>
+             <div class="teacher-quote max-w-3xl mx-auto mt-8 text-left">
+                <p>"양식 잘 알아둬야 돼요~ 나중에 수행평가 이 코드 문제로 바로 나올 수 있어요~"</p>
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('header nav a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+
+            const accordionButtons = document.querySelectorAll('.accordion-button');
+            accordionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const contentId = this.dataset.target;
+                    const content = document.getElementById(contentId);
+                    content.classList.toggle('active');
+                    this.querySelector('.arrow').textContent = content.classList.contains('active') ? '▲' : '▼';
+                });
+            });
+
+            const numAInput = document.getElementById('numA');
+            const numBInput = document.getElementById('numB');
+            const calculateBtn = document.getElementById('calculateBtn');
+
+            const addResult = document.getElementById('addResult');
+            const subResult = document.getElementById('subResult');
+            const mulResult = document.getElementById('mulResult');
+            const divResult = document.getElementById('divResult');
+            const floorDivResult = document.getElementById('floorDivResult');
+            const modResult = document.getElementById('modResult');
+            const powResult = document.getElementById('powResult');
+
+            function calculateResults() {
+                const a = parseFloat(numAInput.value);
+                const b = parseFloat(numBInput.value);
+
+                if (isNaN(a) || isNaN(b)) {
+                    addResult.textContent = subResult.textContent = mulResult.textContent = divResult.textContent = 
+                    floorDivResult.textContent = modResult.textContent = powResult.textContent = '유효하지 않은 입력';
+                    return;
+                }
+
+                addResult.textContent = a + b;
+                subResult.textContent = a - b;
+                mulResult.textContent = a * b;
+                divResult.textContent = a / b;
+                floorDivResult.textContent = Math.floor(a / b);
+                modResult.textContent = a % b;
+                powResult.textContent = Math.pow(a, b);
+            }
+
+            calculateBtn.addEventListener('click', calculateResults);
+            // Initial calculation on load with default values
+            calculateResults();
+        });
+    </script>
+
+</body>
+</html>

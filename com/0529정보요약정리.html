@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>파이썬 핵심: 변수, 문자열, 입출력 (5월 29일 수업)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals with Accent Blues -->
+    <!-- Application Structure Plan: A single-page, vertically scrolling interactive learning application focused specifically on the 2025-05-29 lesson. It is structured into: an introduction to Variables & String Operations with an interactive sandbox, a section on Standard Input/Output & Type Conversion with its own simulator, a concise Summary of key points, and a comprehensive Quiz section at the very end to reinforce all concepts. This linear progression allows for focused learning and immediate application, culminating in robust self-assessment. -->
+    <!-- Visualization & Content Choices: 1. Variables & String Operations: Interactive inputs for strings and a number, with buttons for concatenation (+) and repetition (*). Displays dynamic code and results, including error handling messages. Goal: Explore, Interact, Inform on string types and operations. 2. Standard Input/Output & Type Conversion: Interactive inputs for name (string) and age (number). A button simulates `print()` output, demonstrating type conversion necessity and comma usage. Displays dynamic code and results. Goal: Explore, Interact, Inform on I/O mechanics and type handling. 3. Summary: Bullet points for key takeaways and styled blocks for teacher's direct quotes. Goal: Summarize, Reinforce. 4. Quiz Section: Multiple-choice, fill-in-the-blank, and code output prediction questions. Uses input fields and check buttons, providing immediate correct/incorrect feedback. Goal: Assess, Memorize. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #fcfaf8; /* A light, warm neutral */
+            color: #333;
+        }
+        .section-title {
+            color: #4a5568; /* Darker slate/blue for headings */
+        }
+        .code-block {
+            background-color: #2d3748; /* Dark blue-grey */
+            color: #e2e8f0; /* Light text */
+            font-family: monospace;
+            white-space: pre-wrap; /* Ensures code wraps */
+            overflow-x: auto; /* Allows horizontal scrolling for long lines */
+        }
+        .teacher-quote {
+            background-color: #fffbeb; /* Light yellow background */
+            border-left: 4px solid #fbd38d; /* Orange-yellow border */
+            color: #9c6e31; /* Darker yellow text */
+        }
+        .btn-primary {
+            background-color: #4299e1; /* Blue */
+            color: white;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #3182ce;
+        }
+        .btn-secondary {
+            background-color: #f56565; /* Red */
+            color: white;
+            transition: background-color 0.2s;
+        }
+        .btn-secondary:hover {
+            background-color: #e53e3e;
+        }
+        .result-box {
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            padding: 0.5rem;
+            word-break: break-all;
+        }
+        .error-message {
+            color: #e53e3e; /* Red */
+            font-weight: bold;
+        }
+        .quiz-feedback {
+            min-height: 24px;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+        .quiz-feedback-correct {
+            color: #22c55e; /* Green 500 */
+        }
+        .quiz-feedback-incorrect {
+            color: #ef4444; /* Red 500 */
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
+
+        <header class="text-center mb-12">
+            <h1 class="text-3xl md:text-4xl font-bold mb-2 section-title">2025년 5월 29일 정보 수업 정리</h1>
+            <p class="text-lg text-gray-600">변수, 문자열 연산, 표준 입출력 완전 마스터!</p>
+        </header>
+
+        <main class="space-y-12">
+
+            <!-- 1. 변수 활용 심화 & 문자열 연산 -->
+            <section id="string-ops" class="p-6 bg-white rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold mb-4 section-title">1. 변수 활용 심화 및 문자열 연산</h2>
+                <p class="mb-6 text-gray-700">이 섹션에서는 변수가 숫자뿐만 아니라 문자(문자열)도 저장할 수 있다는 것을 배우고, 문자열끼리 어떻게 더하고 곱하는지 직접 실험해 봅니다. '안녕'과 '하세요'가 만나면 어떻게 될까요?</p>
+
+                <div class="teacher-quote p-4 rounded-md mb-6">
+                    <p class="font-bold">선생님 말씀! 📢</p>
+                    <p class="mt-2">"얘들아~ 변수에 숫자만 넣는 줄 알았지? 문자도 넣고 더하고 곱하고 다 된다~"</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-bold text-xl mb-3 text-gray-700">문자열 연산 시뮬레이터</h3>
+                        <div class="mb-4">
+                            <label for="str-a" class="block text-sm font-medium text-gray-700">문자열 A:</label>
+                            <input type="text" id="str-a" value="나는 " class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div class="mb-4">
+                            <label for="str-b" class="block text-sm font-medium text-gray-700">문자열 B:</label>
+                            <input type="text" id="str-b" value="바보입니다." class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div class="mb-4">
+                            <label for="num-repeat" class="block text-sm font-medium text-gray-700">반복 횟수 (곱하기용):</label>
+                            <input type="number" id="num-repeat" value="3" min="0" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <div class="flex space-x-4 mb-4">
+                            <button id="add-strings" class="btn-primary py-2 px-4 rounded-md flex-1">문자열 더하기 (+) 실행</button>
+                            <button id="multiply-strings" class="btn-primary py-2 px-4 rounded-md flex-1">문자열 곱하기 (*) 실행</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl mb-3 text-gray-700">실행 결과 및 코드</h3>
+                        <div class="code-block p-4 rounded-md text-sm mb-4">
+                            <p id="code-display">a = "나는 "<br>b = "바보입니다."<br><br># 이곳에 실행 코드가 나타납니다.</p>
+                        </div>
+                        <div class="result-box bg-gray-50 font-mono text-gray-900 text-sm">
+                            <span id="result-display">여기에 결과가 표시됩니다.</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2">선생님: "문자 * 숫자? 돼요! 세 번 반복되게! 근데 문자 + 숫자는 안 돼요~ 에러나요!"</p>
+                        <div class="teacher-quote p-3 rounded-md mt-4 text-sm">
+                            <p class="font-bold">복합 대입 연산자 (`+=`, `*=`) </p>
+                            <p class="mt-1">변수 값에 연산을 더해서 다시 변수에 저장하는 방식! 실기 시험에도 자주 나와요~</p>
+                            <p class="font-mono mt-1">a += 3 # a = a + 3<br>b *= 2 # b = b * 2</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. 표준 입출력 및 형변환 -->
+            <section id="io-type-conversion" class="p-6 bg-white rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold mb-4 section-title">2. 표준 입출력 및 형변환</h2>
+                <p class="mb-6 text-gray-700">사용자로부터 입력을 받고(input), 결과를 화면에 보여주는(print) 방법을 배웁니다. 특히, `input()`으로 받은 값은 항상 '문자열'이라는 점! 숫자로 계산하려면 반드시 '형변환'이 필요하다는 것을 기억해야 해요.</p>
+                
+                <div class="teacher-quote p-4 rounded-md mb-6">
+                    <p class="font-bold">선생님 말씀! 📢</p>
+                    <p class="mt-2">"input은 다 문자야! 정수 계산하려면 꼭 int()로 싸줘야 돼요~ 문자랑 숫자랑 같이 출력할 땐 콤마(,)로 구분해줘요! + 쓰면 에러 나요!"</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-bold text-xl mb-3 text-gray-700">입력 및 출력 시뮬레이터</h3>
+                        <div class="mb-4">
+                            <label for="input-name" class="block text-sm font-medium text-gray-700">이름을 입력하세요:</label>
+                            <input type="text" id="input-name" placeholder="김철수" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <div class="mb-4">
+                            <label for="input-age" class="block text-sm font-medium text-gray-700">나이를 입력하세요 (숫자):</label>
+                            <input type="number" id="input-age" placeholder="17" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        <button id="run-io" class="btn-primary py-2 px-4 rounded-md w-full">결과 출력 실행</button>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl mb-3 text-gray-700">실행 코드 및 출력</h3>
+                        <div class="code-block p-4 rounded-md text-sm mb-4">
+                            <p id="io-code-display">name = input("이름을 입력하세요: ")<br>age = int(input("나이를 입력하세요: "))<br>print("안녕하세요,", name, "님! 내년이면", age+1, "살이 되시겠네요!")</p>
+                        </div>
+                        <div class="result-box bg-gray-50 font-mono text-gray-900 text-sm">
+                            <span id="io-result-display">여기에 출력 결과가 표시됩니다.</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-2">`input()`은 사용자 입력 전까지 프로그램이 멈추는 '대기 상태'가 됩니다. 커서가 깜빡깜빡하면 입력 대기 중이에요!</p>
+                        <div class="teacher-quote p-3 rounded-md mt-4 text-sm">
+                            <p class="font-bold">형변환 함수:</p>
+                            <p class="mt-1">`int()`: 정수형으로 변환<br>`float()`: 실수형으로 변환</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. 오늘의 핵심 요약 및 실기 팁 -->
+            <section id="summary-tips" class="p-6 bg-white rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold mb-4 section-title">3. 오늘의 핵심 요약 및 실기 팁 ✨</h2>
+                <p class="mb-6 text-gray-700">오늘 배운 내용을 최종적으로 정리하고, 실기 시험에 대비하기 위한 선생님의 특급 조언을 확인하세요. 이 부분은 정말 중요하니, 꼭 몸에 익히고 다음 수업에 참여해야 합니다!</p>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-bold text-xl mb-3 text-gray-700">핵심 요약 포인트</h3>
+                        <ul class="list-disc list-inside space-y-2 text-gray-800">
+                            <li>변수에는 숫자뿐만 아니라 **문자열도 저장**할 수 있습니다.</li>
+                            <li>문자열도 **더하기(+), 곱하기(*) 연산**이 가능합니다. (단, 문자 + 숫자는 에러!)</li>
+                            <li>`input()` 함수로 입력받은 값은 항상 **문자열(str) 형태**이므로, 숫자로 계산하려면 반드시 `int()`나 `float()`로 **형변환**해야 합니다.</li>
+                            <li>`print()` 함수는 여러 값을 콤마(`,`)로 구분하여 출력할 수 있습니다. (문자열 `+` 문자열은 가능, 문자열 `+` 숫자는 에러!)</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl mb-3 text-gray-700">실기 시험 대비 꿀팁! 🍯</h3>
+                        <div class="teacher-quote p-4 rounded-md">
+                            <p class="font-bold">선생님 마무리! 💯</p>
+                            <p class="mt-2">"이거 따라쓰고 실행까지 해봐야 돼요~ 다음 시간에 이거 문제로 본다~ 수행평가 대비도 여기서 나가요~"</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. 퀴즈 섹션 (추가됨) -->
+            <section id="quiz" class="p-6 bg-white rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold mb-4 section-title">4. 파이썬 기초 실력 점검 퀴즈 🧠 (대따 많이!)</h2>
+                <p class="mb-6 text-gray-700">이제 배운 내용을 바탕으로 퀴즈를 풀어보며 실력을 점검해 보세요! 정답을 입력하고 '정답 확인' 버튼을 눌러보세요.</p>
+
+                <div class="space-y-8">
+                    <!-- Quiz Question 1 -->
+                    <div class="quiz-item p-4 border rounded-md bg-slate-50">
+                        <p class="font-semibold text-lg mb-2">Q1. 다음 중 파이썬 변수에 저장할 수 없는 데이터는 무엇일까요?</p>
+                        <div class="flex flex-col space-y-2">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="q1" value="숫자" class="form-radio text-blue-600 h-4 w-4">
+                                <span class="ml-2">숫자 (예: 10, 3.14)</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="q1" value="문자열" class="form-radio text-blue-600 h-4 w-4">
+                                <span class="ml-2">문자열 (예: "안녕", 'Python')</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="q1" value="불리언" class="form-radio text-blue-600 h-4 w-4">
+                                <span class="ml-2">불리언 (예: True, False)</span>
+                            </label>
+                             <label class="inline-flex items-center">
+                                <input type="radio" name="q1" value="변수 자체가 데이터" class="form-radio text-blue-600 h-4 w-4">
+                                <span class="ml-2">변수 자체가 데이터 (예: var = variable_name)</span>
+                            </label>
+                        </div>
+                        <button class="quiz-check-btn btn-primary py-2 px-4 rounded-md mt-4" data-question="1">정답 확인</button>
+                        <p id="quiz1-feedback" class="quiz-feedback"></p>
+                    </div>
+
+                    <!-- Quiz Question 2 -->
+                    <div class="quiz-item p-4 border rounded-md bg-slate-50">
+                        <p class="font-semibold text-lg mb-2">Q2. 다음 코드의 실행 결과는 무엇일까요?</p>
+                        <div class="code-block p-3 rounded-md text-sm mb-3">
+                            <p>text1 = "파이"</p>
+                            <p>text2 = "썬"</p>
+                            <p>print(text1 + text2)</p>
+                        </div>
+                        <input type="text" id="quiz2-answer" placeholder="예: 안녕하세요" class="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <button class="quiz-check-btn btn-primary py-2 px-4 rounded-md mt-2" data-question="2">정답 확인</button>
+                        <p id="quiz2-feedback" class="quiz-feedback"></p>
+                    </div>
+
+                    <!-- Quiz Question 3 -->
+                    <div class="quiz-item p-4 border rounded-md bg-slate-50">
+                        <p class="font-semibold text-lg mb-2">Q3. 다음 코드의 실행 결과는 무엇일까요?</p>
+                        <div class="code-block p-3 rounded-md text-sm mb-3">
+                            <p>word = "에러"</p>
+                            <p>print(word * 3)</p>
+                        </div>
+                        <input type="text" id="quiz3-answer" placeholder="예: 오답오답" class="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <button class="quiz-check-btn btn-primary py-2 px-4 rounded-md mt-2" data-question="3">정답 확인</button>
+                        <p id="quiz3-feedback" class="quiz-feedback"></p>
+                    </div>
+
+                     <!-- Quiz Question 4 -->
+                    <div class="quiz-item p-4 border rounded-md bg-slate-50">
+                        <p class="font-semibold text-lg mb-2">Q4. 문자열과 숫자를 `+` 연산자로 직접 더하려고 할 때 발생하는 현상은 무엇일까요?</p>
+                        <input type="text" id="quiz4-answer" placeholder="예: 정상적으로 계산된다" class="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <button class="quiz-check-btn btn-primary py-2 px-4 rounded-md mt-2" data-question="4">정답 확인</button>
+                        <p id="quiz4-feedback" class="quiz-feedback"></p>
+                    </div>
+
+                    <!-- Quiz Question 5 -->
+                    <div class="quiz-item p-4 border rounded-md bg-slate-50">
+                        <p class="font-semibold text-lg mb-2">Q5. `input()` 함수로 사용자로부터 나이를 입력받았을 때, 이 나이 값을 숫자로 계산하기 위해 사용해야 할 형변환 함수는 무엇일까요?</p>
+                        <input type="text" id="quiz5-answer" placeholder="예: str()" class="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <button class="quiz-check-btn btn-primary py-2 px-4 rounded-md mt-2" data-question="5">정답 확인</button>
+                        <p id="quiz5-feedback" class="quiz-feedback"></p>
+                    </div>
+
+                    <!-- Quiz Question 6 -->
+                    <div class="quiz-item p-4 border rounded-md bg-slate-50">
+                        <p class="font-semibold text-lg mb-2">Q6. 다음 코드의 실행 결과로 올바른 것은 무엇일까요?</p>
+                        <div class="code-block p-3 rounded-md text-sm mb-3">
+                            <p>num1 = "5"</p>
+                            <p>num2 = int("3")</p>
+                            <p>print(num1 + str(num2))</p>
+                        </div>
+                        <input type="text" id="quiz6-answer" placeholder="예: 8" class="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <button class="quiz-check-btn btn-primary py-2 px-4 rounded-md mt-2" data-question="6">정답 확인</button>
+                        <p id="quiz6-feedback" class="quiz-feedback"></p>
+                    </div>
+
+                    <!-- Quiz Question 7 -->
+                    <div class="quiz-item p-4 border rounded-md bg-slate-50">
+                        <p class="font-semibold text-lg mb-2">Q7. `print()` 함수로 여러 개의 값(`"이름:", name, "나이:", age`)을 출력할 때, 값들 사이에 사용하는 구분자는 무엇일까요?</p>
+                        <input type="text" id="quiz7-answer" placeholder="예: 더하기(+)" class="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <button class="quiz-check-btn btn-primary py-2 px-4 rounded-md mt-2" data-question="7">정답 확인</button>
+                        <p id="quiz7-feedback" class="quiz-feedback"></p>
+                    </div>
+
+                    <!-- Quiz Question 8 -->
+                    <div class="quiz-item p-4 border rounded-md bg-slate-50">
+                        <p class="font-semibold text-lg mb-2">Q8. 다음 코드를 실행했을 때, `total` 변수의 최종 값은 무엇일까요?</p>
+                        <div class="code-block p-3 rounded-md text-sm mb-3">
+                            <p>total = 10</p>
+                            <p>total += 5</p>
+                            <p>print(total)</p>
+                        </div>
+                        <input type="number" id="quiz8-answer" placeholder="숫자 입력" class="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <button class="quiz-check-btn btn-primary py-2 px-4 rounded-md mt-2" data-question="8">정답 확인</button>
+                        <p id="quiz8-feedback" class="quiz-feedback"></p>
+                    </div>
+
+                     <!-- Quiz Question 9 -->
+                    <div class="quiz-item p-4 border rounded-md bg-slate-50">
+                        <p class="font-semibold text-lg mb-2">Q9. 다음 코드의 실행 결과는 무엇일까요?</p>
+                        <div class="code-block p-3 rounded-md text-sm mb-3">
+                            <p>msg = "파이"</p>
+                            <p>msg *= 2</p>
+                            <p>print(msg)</p>
+                        </div>
+                        <input type="text" id="quiz9-answer" placeholder="예: 썬썬" class="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500">
+                        <button class="quiz-check-btn btn-primary py-2 px-4 rounded-md mt-2" data-question="9">정답 확인</button>
+                        <p id="quiz9-feedback" class="quiz-feedback"></p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="text-center mt-12 py-4 border-t border-gray-200">
+            <p class="text-gray-500">윤서야, 이번 내용은 진짜 실기랑 연결되는 부분이라 더 중요해. 문자열 계산, 입력-출력 로직, 형변환까지 이제 딱 정리됐어. 다음 시간 if문 들어가기 전에, 이건 완전히 몸에 익히고 가야 해.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- String Operations Section ---
+            const strAInput = document.getElementById('str-a');
+            const strBInput = document.getElementById('str-b');
+            const numRepeatInput = document.getElementById('num-repeat');
+            const addStringsBtn = document.getElementById('add-strings');
+            const multiplyStringsBtn = document.getElementById('multiply-strings');
+            const codeDisplay = document.getElementById('code-display');
+            const resultDisplay = document.getElementById('result-display');
+
+            function updateResult(code, result, isError = false) {
+                codeDisplay.innerHTML = code;
+                resultDisplay.textContent = result;
+                if (isError) {
+                    resultDisplay.classList.add('error-message');
+                } else {
+                    resultDisplay.classList.remove('error-message');
+                }
+            }
+
+            addStringsBtn.addEventListener('click', () => {
+                const valA = strAInput.value;
+                const valB = strBInput.value;
+                const code = `a = "${valA}"\nb = "${valB}"\n\nprint(a + b)`;
+                updateResult(code, `"${valA + valB}"`);
+            });
+
+            multiplyStringsBtn.addEventListener('click', () => {
+                const valA = strAInput.value;
+                const repeatNum = parseInt(numRepeatInput.value);
+                
+                if (isNaN(repeatNum) || repeatNum < 0) {
+                    updateResult(`a = "${valA}"\nnum = ${numRepeatInput.value}\n\nprint(a * num)`, "오류: 반복 횟수가 유효하지 않습니다.", true);
+                    return;
+                }
+                const code = `a = "${valA}"\nnum = ${repeatNum}\n\nprint(a * num)`;
+                updateResult(code, `"${valA.repeat(repeatNum)}"`);
+            });
+
+            // --- Standard I/O Section ---
+            const inputName = document.getElementById('input-name');
+            const inputAge = document.getElementById('input-age');
+            const runIoBtn = document.getElementById('run-io');
+            const ioCodeDisplay = document.getElementById('io-code-display');
+            const ioResultDisplay = document.getElementById('io-result-display');
+
+            runIoBtn.addEventListener('click', () => {
+                const name = inputName.value.trim();
+                const ageStr = inputAge.value.trim();
+                let age;
+                let printMessage = "";
+                let hasError = false;
+
+                if (!name) {
+                    printMessage += "오류: 이름을 입력하세요.\n";
+                    hasError = true;
+                }
+
+                try {
+                    age = parseInt(ageStr);
+                    if (isNaN(age)) {
+                        printMessage += "오류: 나이를 숫자로 입력하세요.\n";
+                        hasError = true;
+                    }
+                } catch (e) {
+                    printMessage += "오류: 나이 형변환에 실패했습니다.\n";
+                    hasError = true;
+                }
+
+                if (!hasError) {
+                    printMessage = `안녕하세요, ${name} 님! 내년이면 ${age + 1} 살이 되시겠네요!`;
+                }
+
+                ioResultDisplay.textContent = printMessage;
+                if (hasError) {
+                    ioResultDisplay.classList.add('error-message');
+                } else {
+                    ioResultDisplay.classList.remove('error-message');
+                }
+            });
+
+            // --- Quiz Section ---
+            const quizQuestions = {
+                1: {
+                    type: 'radio',
+                    correctAnswer: '변수 자체가 데이터',
+                    feedbackId: 'quiz1-feedback',
+                    name: 'q1'
+                },
+                2: {
+                    type: 'text',
+                    correctAnswer: '파이썬',
+                    feedbackId: 'quiz2-feedback'
+                },
+                3: {
+                    type: 'text',
+                    correctAnswer: '에러에러에러',
+                    feedbackId: 'quiz3-feedback'
+                },
+                4: {
+                    type: 'text',
+                    correctAnswer: '에러가 발생한다',
+                    feedbackId: 'quiz4-feedback'
+                },
+                5: {
+                    type: 'text',
+                    correctAnswer: 'int()',
+                    feedbackId: 'quiz5-feedback'
+                },
+                6: {
+                    type: 'text',
+                    correctAnswer: '53',
+                    feedbackId: 'quiz6-feedback'
+                },
+                7: {
+                    type: 'text',
+                    correctAnswer: '콤마(,)',
+                    feedbackId: 'quiz7-feedback'
+                },
+                8: {
+                    type: 'number',
+                    correctAnswer: 15,
+                    feedbackId: 'quiz8-feedback'
+                },
+                9: {
+                    type: 'text',
+                    correctAnswer: '파이파이',
+                    feedbackId: 'quiz9-feedback'
+                }
+            };
+
+            document.querySelectorAll('.quiz-check-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const questionNum = e.target.dataset.question;
+                    const question = quizQuestions[questionNum];
+                    const feedbackElement = document.getElementById(question.feedbackId);
+                    let userAnswer;
+                    let isCorrect = false;
+
+                    if (question.type === 'radio') {
+                        const selectedRadio = document.querySelector(`input[name="${question.name}"]:checked`);
+                        userAnswer = selectedRadio ? selectedRadio.value : '';
+                        isCorrect = userAnswer === question.correctAnswer;
+                    } else {
+                        const inputElement = document.getElementById(`quiz${questionNum}-answer`);
+                        userAnswer = inputElement.value.trim();
+
+                        if (question.type === 'text') {
+                            const correctNormalized = question.correctAnswer.toLowerCase().replace(/\s/g, '');
+                            const userNormalized = userAnswer.toLowerCase().replace(/\s/g, '');
+                            // Basic check for inclusion for some flexibility
+                            isCorrect = correctNormalized.includes(userNormalized) || userNormalized.includes(correctNormalized);
+                            if (questionNum === '4') { // Specific check for error variations
+                                const commonErrors = ['에러', '오류', '계산되지않는다', '타입에러', 'typeerror'];
+                                isCorrect = commonErrors.some(err => userNormalized.includes(err));
+                            } else if (questionNum === '5') { // int() or float()
+                                isCorrect = ['int()', 'float()', 'int', 'float'].some(ans => userNormalized.includes(ans.replace(/\s/g, '')));
+                            } else if (questionNum === '7') { // comma variations
+                                isCorrect = ['콤마', ',', 'comma'].some(ans => userNormalized.includes(ans.replace(/\s/g, '')));
+                            }
+
+                        } else if (question.type === 'number') {
+                            isCorrect = parseInt(userAnswer) === question.correctAnswer;
+                        }
+                    }
+
+                    if (isCorrect) {
+                        feedbackElement.textContent = '정답입니다! 🎉';
+                        feedbackElement.classList.add('quiz-feedback-correct');
+                        feedbackElement.classList.remove('quiz-feedback-incorrect');
+                    } else {
+                        feedbackElement.textContent = `오답입니다. 정답은 '${question.correctAnswer}' 입니다.`;
+                        feedbackElement.classList.add('quiz-feedback-incorrect');
+                        feedbackElement.classList.remove('quiz-feedback-correct');
+                    }
+                });
+            });
+
+            // Initial state setup for interactive elements
+            addStringsBtn.click(); // Simulate initial click to show default string concat
+        });
+    </script>
+</body>
+</html>

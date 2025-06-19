@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>파이썬 리스트 대화형 학습</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: A single-page, vertically scrolling layout designed as a learning path. It starts with the basic concept of a list (the "closet" analogy), moves to an interactive 1D list simulation (Cafe Inventory), then to an interactive 2D list visualization (Heart Grid), then to key takeaways and teacher's tips, and finally a quiz section to test understanding. This structure transforms the static summary into a hands-on lab and a self-assessment tool, allowing students to "learn by doing" and directly connecting abstract code to visual, interactive results, which is optimal for reinforcing programming concepts. -->
+    <!-- Visualization & Content Choices: 1. List Concept: Presented with styled divs to visually represent the "closet" metaphor, making it intuitive. 2. 1D List Practice: An interactive system with input fields and buttons simulates the Python cafe inventory example. This allows users to actively use 'append' and 'remove' concepts, rather than passively reading about them. All logic is handled by vanilla JS updating the DOM. 3. 2D List Practice: A clickable 7x7 grid built with HTML divs. Users can toggle cells, which updates both the visual grid and a real-time display of the underlying 2D array data. This provides a clear, interactive link between the data structure and its visual output. 4. Key Points/Quotes: Styled text blocks for clear, memorable summarization. 5. Quiz Section: Multiple-choice or short-answer questions with input fields, a check answer button, and dynamic feedback to assess user understanding of list operations, indexing, and 2D lists. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .section-title {
+            color: #4A4A4A;
+        }
+        .concept-box {
+            background-color: #FFFBEB;
+            border-left: 4px solid #FBBF24;
+        }
+        .code-block {
+            background-color: #2D3748;
+            color: #E2E8F0;
+            font-family: monospace;
+        }
+        .interactive-grid-cell {
+            transition: all 0.2s ease-in-out;
+            border: 1px solid #E2E8F0;
+        }
+        .interactive-grid-cell.on {
+            background-color: #EF4444;
+            transform: scale(1.1);
+        }
+        .teacher-quote {
+            background-color: #F3F4F6;
+            border-left: 4px solid #60A5FA;
+        }
+        .btn-primary {
+            background-color: #3B82F6;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #2563EB;
+        }
+        .btn-secondary {
+            background-color: #EF4444;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .btn-secondary:hover {
+            background-color: #DC2626;
+        }
+        .quiz-feedback-correct {
+            color: #22C55E; /* Green 500 */
+        }
+        .quiz-feedback-incorrect {
+            color: #EF4444; /* Red 500 */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-2 section-title">2025년 6월 11일 정보 수업 정리</h1>
+            <p class="text-lg text-gray-600">제어 구조와 리스트 핵심 개념 완전 정복 🚀</p>
+        </header>
+
+        <main>
+            <!-- Section 1: 제어 구조와 리스트 개념 -->
+            <section id="concept" class="mb-12 p-6 bg-white rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-4 section-title">1. 제어 구조와 리스트란?</h2>
+                <p class="mb-4 text-gray-700">이 섹션에서는 프로그램의 기본 동작 원리인 제어 구조와, 데이터를 효율적으로 관리하는 도구인 리스트의 핵심 개념을 소개합니다. 선생님의 '정리된 옷장' 비유를 통해 리스트가 왜 중요한지 직관적으로 이해해 보세요.</p>
+                <div class="concept-box p-4 rounded-md">
+                    <h3 class="font-bold text-lg text-yellow-800">제어 구조의 핵심</h3>
+                    <p class="text-yellow-700 mt-1">프로그램은 특정 조건에 따라 "실행하고, 반복하고, 멈추는" 동작을 합니다. 이것이 바로 '제어 구조'입니다.</p>
+                    <h3 class="font-bold text-lg text-yellow-800 mt-4">리스트: 정리된 옷장!</h3>
+                    <p class="text-yellow-700 mt-1">리스트는 데이터를 체계적으로 보관하는 '정리된 옷장'과 같습니다. 물건(데이터)을 순서대로 넣어두고, 필요할 때 쉽게 찾거나, 새 물건을 추가하고, 필요 없는 물건은 뺄 수 있죠. 제어 구조를 다룰 때 가장 많이 쓰이는 필수 도구입니다.</p>
+                </div>
+            </section>
+
+            <!-- Section 2: 카페 재고 관리 시스템 -->
+            <section id="interactive-cafe" class="mb-12 p-6 bg-white rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-4 section-title">2. 직접 해보는 리스트 실습: 카페 재고 관리</h2>
+                 <p class="mb-6 text-gray-700">여기서는 `append()`(추가)와 `remove()`(삭제)를 이용해 리스트를 직접 조작하는 '카페 재고 및 주문 시스템'을 체험합니다. 아래 입력창에 간식 이름을 넣고 버튼을 클릭해 보세요. 리스트가 실시간으로 어떻게 변하는지, 그리고 그에 해당하는 코드는 무엇인지 눈으로 직접 확인할 수 있습니다.</p>
+                
+                <div class="lg:flex lg:space-x-6">
+                    <!-- Interactive UI -->
+                    <div class="lg:w-1/2">
+                        <h3 class="font-bold text-lg mb-2">현재 재고 목록 🥨</h3>
+                        <div id="snack-list" class="flex flex-wrap gap-2 p-4 bg-gray-100 rounded-md min-h-[80px]"></div>
+                        
+                        <div class="mt-4">
+                            <label for="order-input" class="font-semibold">주문할 간식 (삭제):</label>
+                            <div class="flex mt-1">
+                                <input type="text" id="order-input" placeholder="케이크" class="w-full p-2 border rounded-l-md focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                                <button id="order-btn" class="btn-secondary font-bold py-2 px-4 rounded-r-md">주문</button>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <label for="add-input" class="font-semibold">새로 들어온 간식 (추가):</label>
+                            <div class="flex mt-1">
+                                <input type="text" id="add-input" placeholder="마카롱" class="w-full p-2 border rounded-l-md focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                                <button id="add-btn" class="btn-primary font-bold py-2 px-4 rounded-r-md">추가</button>
+                            </div>
+                        </div>
+                        <p id="status-message" class="mt-4 text-center font-semibold text-blue-600 h-6"></p>
+                    </div>
+
+                    <!-- Code Display -->
+                    <div class="lg:w-1/2 mt-6 lg:mt-0">
+                         <h3 class="font-bold text-lg mb-2">실행되는 파이썬 코드 💻</h3>
+                         <div class="code-block p-4 rounded-md text-sm">
+                            <p><span class="text-green-400"># 초기 리스트</span><br>snacks = <span id="code-snack-list" class="text-yellow-400"></span></p>
+                            <p id="code-line-order" class="mt-2 h-5"></p>
+                            <p id="code-line-add" class="mt-2 h-5"></p>
+                            <p class="mt-2"><span class="text-green-400"># 최종 리스트 출력</span><br><span class="text-purple-400">print</span>(snacks)</p>
+                         </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: 2D 리스트로 하트 그리기 -->
+            <section id="interactive-grid" class="mb-12 p-6 bg-white rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-4 section-title">3. 2차원 리스트 시각화: 하트 그리기</h2>
+                <p class="mb-6 text-gray-700">2차원 리스트는 '리스트 안의 리스트' 형태로, 행과 열을 가집니다. 컴퓨터가 이미지를 표현하는 기본 원리이기도 하죠. 아래 7x7 격자를 클릭해서 픽셀(칸)을 켜거나 꺼보세요. 여러분의 클릭에 따라 격자의 모양과 오른쪽의 2차원 리스트 데이터가 실시간으로 바뀌는 것을 볼 수 있습니다.</p>
+                <div class="lg:flex lg:space-x-6">
+                    <!-- Grid Display -->
+                    <div class="lg:w-1/2">
+                        <h3 class="font-bold text-lg mb-2 text-center">하트 그리기 ❤️ (클릭해보세요!)</h3>
+                        <div id="heart-grid" class="grid grid-cols-7 gap-1 mx-auto w-full max-w-[280px] bg-gray-200 p-2 rounded-md">
+                        </div>
+                    </div>
+                    <!-- Data Display -->
+                    <div class="lg:w-1/2 mt-6 lg:mt-0">
+                        <h3 class="font-bold text-lg mb-2">2차원 리스트 데이터 📊</h3>
+                        <div id="heart-data" class="code-block p-4 rounded-md text-xs leading-5"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: 수행평가 팁 -->
+            <section id="tips" class="mb-12 p-6 bg-white rounded-lg shadow-md">
+                 <h2 class="text-2xl font-bold mb-4 section-title">4. 수행평가 핵심 포인트 & 선생님 조언</h2>
+                 <p class="mb-6 text-gray-700">마지막으로, 수행평가에서 좋은 점수를 받기 위해 꼭 기억해야 할 핵심 내용과 선생님의 특별 조언을 정리했습니다. 이 부분만은 꼭 암기해서 시험에 대비하세요!</p>
+                 <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-bold text-lg mb-3">✅ 꼭 기억할 것!</h3>
+                        <ul class="list-disc list-inside space-y-2 text-gray-800">
+                            <li>리스트 기본 구조, <code class="bg-gray-200 px-1 rounded">append()</code>/<code class="bg-gray-200 px-1 rounded">remove()</code> 사용법 암기</li>
+                            <li><code class="bg-gray-200 px-1 rounded">input()</code>을 이용한 사용자 입력 처리</li>
+                            <li>2차원 리스트에서 행/열 정확하게 지정하기</li>
+                            <li class="font-bold text-red-600">하트 그리기 → 실제 수행 출제 가능성 높음!</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-3">🗣️ 선생님의 리듬 요약</h3>
+                        <div class="space-y-3">
+                            <div class="teacher-quote p-3 rounded-md">"리스트는 그냥 데이터 박스야! 정리된 옷장이라고 생각해~"</div>
+                            <div class="teacher-quote p-3 rounded-md">"append는 넣는 거! remove는 빼는 거! 이걸 못 외우면 주문도 못 받아!"</div>
+                            <div class="teacher-quote p-3 rounded-md">"0부터 시작! 인덱스 실수해서 딴 거 지우지 마~"</div>
+                        </div>
+                    </div>
+                 </div>
+            </section>
+
+            <!-- Section 5: 퀴즈 -->
+            <section id="quiz" class="mb-12 p-6 bg-white rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-4 section-title">5. 리스트 실력 점검 퀴즈 🧠</h2>
+                <p class="mb-6 text-gray-700">이제 배운 내용을 바탕으로 퀴즈를 풀어보며 실력을 점검해 보세요! 정답을 입력하고 '정답 확인' 버튼을 눌러보세요.</p>
+
+                <div class="space-y-8">
+                    <!-- Quiz Question 1 -->
+                    <div class="quiz-item">
+                        <p class="font-semibold text-lg mb-2">Q1. 다음 파이썬 코드의 실행 결과는 무엇일까요?</p>
+                        <div class="code-block p-3 rounded-md text-sm mb-3">
+                            <p>snacks = ["사과", "바나나", "오렌지"]</p>
+                            <p>snacks.remove("바나나")</p>
+                            <p>snacks.append("포도")</p>
+                            <p>print(snacks)</p>
+                        </div>
+                        <input type="text" id="quiz1-answer" placeholder='예: ["사과", "포도", "오렌지"]' class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                        <button class="quiz-check-btn btn-primary font-bold py-2 px-4 rounded-md mt-2" data-question="1">정답 확인</button>
+                        <p id="quiz1-feedback" class="quiz-feedback mt-2 font-semibold"></p>
+                    </div>
+
+                    <!-- Quiz Question 2 -->
+                    <div class="quiz-item">
+                        <p class="font-semibold text-lg mb-2">Q2. 리스트의 인덱스는 몇부터 시작할까요?</p>
+                        <input type="text" id="quiz2-answer" placeholder="숫자를 입력하세요" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                        <button class="quiz-check-btn btn-primary font-bold py-2 px-4 rounded-md mt-2" data-question="2">정답 확인</button>
+                        <p id="quiz2-feedback" class="quiz-feedback mt-2 font-semibold"></p>
+                    </div>
+
+                    <!-- Quiz Question 3 -->
+                    <div class="quiz-item">
+                        <p class="font-semibold text-lg mb-2">Q3. 2차원 리스트 <code class="bg-gray-200 px-1 rounded">grid = [[1, 2], [3, 4]]</code>에서 숫자 <code class="bg-gray-200 px-1 rounded">4</code>에 접근하려면 어떻게 코드를 작성해야 할까요?</p>
+                        <input type="text" id="quiz3-answer" placeholder="예: grid[0][1]" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none">
+                        <button class="quiz-check-btn btn-primary font-bold py-2 px-4 rounded-md mt-2" data-question="3">정답 확인</button>
+                        <p id="quiz3-feedback" class="quiz-feedback mt-2 font-semibold"></p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="text-center mt-12 py-4 border-t">
+            <p class="text-gray-500">이 정도만 확실히 정리하면 수행평가는 문제없을 거예요. 화이팅!</p>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Cafe Inventory System ---
+            const snackListEl = document.getElementById('snack-list');
+            const orderInput = document.getElementById('order-input');
+            const orderBtn = document.getElementById('order-btn');
+            const addInput = document.getElementById('add-input');
+            const addBtn = document.getElementById('add-btn');
+            const statusMessageEl = document.getElementById('status-message');
+            const codeSnackListEl = document.getElementById('code-snack-list');
+            const codeLineOrderEl = document.getElementById('code-line-order');
+            const codeLineAddEl = document.getElementById('code-line-add');
+
+            let snacks = ["케이크", "샌드위치", "초코쿠키", "바나나컵"];
+
+            function renderSnackList() {
+                snackListEl.innerHTML = '';
+                snacks.forEach(snack => {
+                    const snackEl = document.createElement('div');
+                    snackEl.className = 'bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full';
+                    snackEl.textContent = snack;
+                    snackListEl.appendChild(snackEl);
+                });
+                codeSnackListEl.textContent = `[${snacks.map(s => `"${s}"`).join(', ')}]`;
+            }
+
+            function showStatusMessage(message, type = 'info') {
+                statusMessageEl.textContent = message;
+                statusMessageEl.className = `mt-4 text-center font-semibold h-6 ${type === 'error' ? 'text-red-600' : 'text-blue-600'}`;
+                setTimeout(() => {
+                    statusMessageEl.textContent = '';
+                }, 2000);
+            }
+            
+            function showCodeLine(el, text) {
+                el.innerHTML = text;
+                setTimeout(() => {
+                    el.innerHTML = '';
+                }, 2000);
+            }
+
+            orderBtn.addEventListener('click', () => {
+                const order = orderInput.value.trim();
+                if (!order) {
+                    showStatusMessage("주문할 간식을 입력하세요!", 'error');
+                    return;
+                }
+                const index = snacks.indexOf(order);
+                if (index > -1) {
+                    snacks.splice(index, 1);
+                    renderSnackList();
+                    orderInput.value = '';
+                    showStatusMessage(`'${order}' 주문 완료! (삭제)`);
+                    showCodeLine(codeLineOrderEl, `snacks.<span class="text-red-400">remove</span>("${order}")`);
+                } else {
+                    showStatusMessage(`'${order}'는 재고에 없습니다.`, 'error');
+                }
+            });
+
+            addBtn.addEventListener('click', () => {
+                const itemToAdd = addInput.value.trim();
+                if (!itemToAdd) {
+                    showStatusMessage("추가할 간식을 입력하세요!", 'error');
+                    return;
+                }
+                snacks.push(itemToAdd);
+                renderSnackList();
+                addInput.value = '';
+                showStatusMessage(`'${itemToAdd}' 재고 추가 완료!`);
+                showCodeLine(codeLineAddEl, `snacks.<span class="text-green-400">append</span>("${itemToAdd}")`);
+            });
+
+            // --- 2D Heart Grid System ---
+            const heartGridEl = document.getElementById('heart-grid');
+            const heartDataEl = document.getElementById('heart-data');
+
+            let heartData = [
+                [0,1,1,0,1,1,0],
+                [1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1],
+                [1,1,1,1,1,1,1],
+                [0,1,1,1,1,1,0],
+                [0,0,1,1,1,0,0],
+                [0,0,0,1,0,0,0]
+            ];
+
+
+            function renderHeartGrid() {
+                heartGridEl.innerHTML = '';
+                heartData.forEach((row, rowIndex) => {
+                    row.forEach((cell, colIndex) => {
+                        const cellEl = document.createElement('div');
+                        cellEl.className = 'interactive-grid-cell w-full aspect-square flex items-center justify-center cursor-pointer';
+                        if (cell === 1) {
+                            cellEl.classList.add('on');
+                        }
+                        cellEl.dataset.row = rowIndex;
+                        cellEl.dataset.col = colIndex;
+                        heartGridEl.appendChild(cellEl);
+                    });
+                });
+            }
+
+            function renderHeartData() {
+                heartDataEl.innerHTML = 'heart = [<br>';
+                heartData.forEach((row, index) => {
+                    heartDataEl.innerHTML += `&nbsp;&nbsp;[${row.join(',')}]${index === heartData.length -1 ? '' : ','}<br>`;
+                });
+                heartDataEl.innerHTML += ']';
+            }
+
+            heartGridEl.addEventListener('click', (e) => {
+                if (e.target.classList.contains('interactive-grid-cell')) {
+                    const row = e.target.dataset.row;
+                    const col = e.target.dataset.col;
+                    heartData[row][col] = heartData[row][col] === 1 ? 0 : 1;
+                    renderHeartGrid();
+                    renderHeartData();
+                }
+            });
+
+            // --- Quiz System ---
+            const quizQuestions = {
+                1: {
+                    answer: '["사과", "오렌지", "포도"]',
+                    feedbackId: 'quiz1-feedback'
+                },
+                2: {
+                    answer: '0',
+                    feedbackId: 'quiz2-feedback'
+                },
+                3: {
+                    answer: 'grid[1][1]',
+                    feedbackId: 'quiz3-feedback'
+                }
+            };
+
+            document.querySelectorAll('.quiz-check-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const questionNum = e.target.dataset.question;
+                    const question = quizQuestions[questionNum];
+                    const inputElement = document.getElementById(`quiz${questionNum}-answer`);
+                    const feedbackElement = document.getElementById(question.feedbackId);
+
+                    let userAnswer = inputElement.value.trim();
+                    let isCorrect = false;
+
+                    if (questionNum === '1') {
+                        // For list string comparison, normalize the input (remove spaces, etc.)
+                        const expectedAnswer = JSON.parse(question.answer);
+                        try {
+                             // Attempt to parse user's answer as JSON to compare arrays
+                            const parsedUserAnswer = JSON.parse(userAnswer.replace(/'/g, '"')); // Replace single quotes with double quotes for valid JSON
+                            if (Array.isArray(parsedUserAnswer) && expectedAnswer.length === parsedUserAnswer.length) {
+                                isCorrect = expectedAnswer.every((val, idx) => val === parsedUserAnswer[idx]);
+                            }
+                        } catch (e) {
+                            isCorrect = false; // Not a valid JSON array
+                        }
+                    } else if (questionNum === '2') {
+                        isCorrect = userAnswer === question.answer;
+                    } else if (questionNum === '3') {
+                         // Normalize comparison for code strings
+                        isCorrect = userAnswer.replace(/\s/g, '') === question.answer.replace(/\s/g, '');
+                    }
+
+                    if (isCorrect) {
+                        feedbackElement.textContent = '정답입니다! 🎉';
+                        feedbackElement.className = 'quiz-feedback mt-2 font-semibold quiz-feedback-correct';
+                    } else {
+                        feedbackElement.textContent = `오답입니다. 정답은 '${question.answer}' 입니다.`;
+                        feedbackElement.className = 'quiz-feedback mt-2 font-semibold quiz-feedback-incorrect';
+                    }
+                });
+            });
+
+
+            // Initial Renders
+            renderSnackList();
+            renderHeartGrid();
+            renderHeartData();
+        });
+    </script>
+</body>
+</html>

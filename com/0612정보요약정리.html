@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정보 수업 대화형 요약</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The application is structured into three main, switchable sections: 'Python Practice', 'AI Project Guide', and 'Quiz', controlled by a top navigation bar. This thematic separation allows users to focus on either interactive learning (Python), informational content (AI Project), or self-assessment (Quiz). The Python section features a hands-on widget for 2D list indexing. The AI Project section uses an infographic-style layout. The new Quiz section presents multiple-choice questions with immediate feedback and a final score, designed to reinforce learning. This structure was chosen to transform a static text document into a dynamic and user-friendly learning tool that caters to different modes of engagement (practical, informational, assessment). -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Python 2D List -> Goal: Practice -> Viz/Presentation: Interactive 'Character Selection' UI with buttons -> Interaction: Click a character button to update weapon and code display -> Justification: Provides immediate, hands-on feedback, reinforcing the mapping between character and weapon via indexing. -> Library/Method: Vanilla JS.
+        - Report Info: Python Key Points -> Goal: Reinforce -> Viz/Presentation: Highlighted 'Key Takeaways' card -> Interaction: Static, but placed contextually next to the interactive widget. -> Justification: Connects theoretical points directly to the practical example. -> Library/Method: HTML/Tailwind.
+        - Report Info: Generative AI Project -> Goal: Inform & Motivate -> Viz/Presentation: Infographic-style cards with icons (e.g., 🚀, 💡, 🏫) -> Interaction: Static content blocks. -> Justification: Breaks down information into scannable, visually appealing chunks, making the announcement more engaging than plain text. -> Library/Method: HTML/Tailwind with Unicode characters.
+        - Report Info: All content -> Goal: Assess & Reinforce -> Viz/Presentation: Interactive Quiz with multiple-choice questions -> Interaction: Select an answer, receive feedback, proceed to next question, view final score -> Justification: Provides a direct assessment of understanding across key topics, encouraging active recall. -> Library/Method: Vanilla JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #F8F7F4;
+            color: #333;
+        }
+        .nav-button {
+            transition: all 0.3s;
+        }
+        .nav-button.active {
+            background-color: #4A5568;
+            color: white;
+            font-weight: 700;
+        }
+        .nav-button:not(.active):hover {
+            background-color: #E2E8F0;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .code-block {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .quiz-option-button {
+            width: 100%;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            background-color: #E0F2F7; /* Light Blue */
+            color: #2D3748; /* Dark Grey */
+            font-weight: 500;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .quiz-option-button:hover {
+            background-color: #B2EBF2; /* Lighter Blue */
+            transform: translateY(-2px);
+        }
+        .quiz-option-button.correct {
+            background-color: #A7F3D0; /* Green */
+            color: #065F46; /* Dark Green */
+        }
+        .quiz-option-button.incorrect {
+            background-color: #FEE2E2; /* Red */
+            color: #991B1B; /* Dark Red */
+        }
+        .quiz-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .quiz-button.primary {
+            background-color: #4A5568;
+            color: white;
+        }
+        .quiz-button.primary:hover {
+            background-color: #2D3748;
+        }
+        .quiz-button.secondary {
+            background-color: #CBD5E0;
+            color: #4A5568;
+        }
+        .quiz-button.secondary:hover {
+            background-color: #A0AEC0;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-800 mb-2">2025.06.12 정보 수업 핵심 정리</h1>
+            <p class="text-slate-600">선생님 말씀 그대로, 인터랙티브하게 복습해봐요!</p>
+        </header>
+
+        <nav class="flex justify-center bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-md mb-8 sticky top-4 z-10">
+            <button id="nav-python" class="nav-button active px-4 py-2 md:px-6 rounded-lg text-sm md:text-base font-semibold text-slate-700">🚀 파이썬 실습</button>
+            <button id="nav-ai" class="nav-button px-4 py-2 md:px-6 rounded-lg text-sm md:text-base font-semibold text-slate-700">💡 AI 프로젝트 안내</button>
+            <button id="nav-quiz" class="nav-button px-4 py-2 md:px-6 rounded-lg text-sm md:text-base font-semibold text-slate-700">🤔 퀴즈 풀기</button>
+        </nav>
+
+        <main>
+            <!-- Python Section -->
+            <section id="section-python" class="content-section active">
+                <div class="text-center mb-8 p-6 bg-amber-100/50 rounded-xl border-l-4 border-amber-400">
+                    <p class="font-bold text-lg text-amber-800">"얘들아~ 이건 진짜 실습에 나와요! 선택한 인덱스를 기반으로 정확히 출력할 수 있어야 돼~"</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Interactive Part -->
+                    <div class="card p-6">
+                        <h3 class="text-xl font-bold mb-4 text-slate-700">용병과 필살 무기 매칭 실습</h3>
+                        <p class="mb-4 text-slate-600">아래 용병 이름을 클릭하면, 해당 용병의 필살 무기와 그 결과를 출력하는 파이썬 코드를 확인할 수 있어요.</p>
+                        
+                        <div id="character-buttons" class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                            <!-- Buttons will be generated by JS -->
+                        </div>
+
+                        <div id="result-display" class="bg-slate-100 p-4 rounded-lg min-h-[180px]">
+                            <p class="text-slate-800 font-semibold mb-2">결과:</p>
+                            <p id="weapon-output" class="text-lg text-indigo-600 font-bold mb-4">용병을 선택해주세요.</p>
+                            <p class="text-slate-800 font-semibold mb-2">실행 코드:</p>
+                            <div class="code-block">
+                                <code id="code-output"># 코드가 여기에 표시됩니다.</code>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Key Points Part -->
+                    <div class="card p-6 bg-indigo-50">
+                        <h3 class="text-xl font-bold mb-4 text-indigo-800">⭐️ 실습 핵심 포인트 ⭐️</h3>
+                        <ul class="space-y-4 text-slate-700">
+                            <li class="flex items-start">
+                                <span class="text-indigo-500 font-bold mr-3">1.</span>
+                                <div>
+                                    <strong class="text-indigo-700">입력값 형 변환 필수!</strong><br>
+                                    <code class="text-sm bg-indigo-200/50 rounded px-1 py-0.5">input()</code>으로 받은 값은 문자열이에요. 인덱스로 사용하려면 <code class="text-sm bg-indigo-200/50 rounded px-1 py-0.5">int()</code>로 꼭 바꿔줘야 해요.
+                                </div>
+                            </li>
+                             <li class="flex items-start">
+                                <span class="text-indigo-500 font-bold mr-3">2.</span>
+                                <div>
+                                    <strong class="text-indigo-700">인덱싱은 0부터!</strong><br>
+                                    리스트의 첫 번째 항목은 인덱스 0번이에요. 그래서 사용자가 1번을 입력하면 코드는 <code class="text-sm bg-indigo-200/50 rounded px-1 py-0.5">[select - 1]</code>처럼 1을 빼서 접근해야 해요.
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-indigo-500 font-bold mr-3">3.</span>
+                                <div>
+                                    <strong class="text-indigo-700">정확한 출력 확인!</strong><br>
+                                    "용병의 필살 무기는 %s입니다." 형식처럼, 문제에서 요구하는 출력과 똑같이 나와야 정답이에요. 띄어쓰기, 문장 부호 하나까지 꼼꼼하게!
+                                </div>
+                            </li>
+                        </ul>
+                         <div class="mt-6 p-4 bg-red-100/70 text-red-800 rounded-lg text-center font-semibold">
+                            "인덱스 헷갈리면 끝장남. 안 외우면 실습에서 멘붕 온다~ 진짜다."
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Project Section -->
+            <section id="section-ai" class="content-section">
+                 <div class="text-center mb-8 p-6 bg-sky-100/50 rounded-xl border-l-4 border-sky-400">
+                    <p class="font-bold text-lg text-sky-800">"얘들아~ 이제는 누구나 프로그램을 만들 수 있어. 생성형 AI로도 게임을 만들고 앱도 만든다~"</p>
+                </div>
+
+                <div class="space-y-8">
+                    <div class="card p-6 grid md:grid-cols-3 gap-6 items-center">
+                        <div class="md:col-span-2">
+                            <h3 class="text-2xl font-bold text-slate-800 mb-2">🚀 생성형 AI 활용 프로젝트</h3>
+                            <p class="text-slate-600">이제 코딩 실력보다 중요한 것은 '아이디어를 실현하는 능력'입니다. 생성형 AI를 활용하면, 복잡한 코드를 몰라도 누구나 자신만의 앱과 웹 서비스를 만들 수 있습니다. 이 프로젝트는 여러분의 기획력과 문제 해결력을 키우는 최고의 기회가 될 것입니다.</p>
+                        </div>
+                        <div class="text-center text-6xl md:text-8xl">
+                            💡
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="card p-6">
+                            <h3 class="text-xl font-bold text-slate-700 mb-4">핵심 역량: '질문력'</h3>
+                            <p class="text-slate-600 mb-4">AI 시대의 핵심은 원하는 기능을 명확하게 표현하고, AI에게 정확한 지시를 내리는 '프롬프트 설계 능력'입니다.</p>
+                             <ul class="space-y-3">
+                                <li class="flex items-center"><span class="text-xl mr-3">🎯</span> 명확한 목표 설정 능력</li>
+                                <li class="flex items-center"><span class="text-xl mr-3">✍️</span> 구체적인 기능 서술 능력</li>
+                                <li class="flex items-center"><span class="text-xl mr-3">🔄</span> 결과물을 보고 개선하는 능력</li>
+                            </ul>
+                            <p class="mt-4 text-sm text-slate-500">*실제 고등학생이 AI로 월 15억 수익을 낸 사례도 있습니다!</p>
+                        </div>
+                         <div class="card p-6">
+                            <h3 class="text-xl font-bold text-slate-700 mb-4">🏫 학교 연계 해커톤</h3>
+                            <p class="text-slate-600 mb-4">방학 중 2일간, 서원고/원고 등 일부 학교 학생들과 함께 AI 프로젝트를 진행합니다.</p>
+                             <ul class="space-y-3">
+                                <li class="flex items-start"><span class="text-xl mr-3">📚</span> AI 활용 기획 강의 수강</li>
+                                <li class="flex items-start"><span class="text-xl mr-3">👥</span> 모둠 구성 및 주제 선정</li>
+                                <li class="flex items-start"><span class="text-xl mr-3">💻</span> 앱/웹/수익 모델 직접 제작</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="card p-8 bg-gradient-to-tr from-teal-50 to-cyan-100 text-center">
+                         <h3 class="text-2xl font-bold text-teal-800 mb-3">✨ 생기부 기재 가능! ✨</h3>
+                         <p class="text-teal-700 max-w-2xl mx-auto">이 활동은 '진로 활동' 또는 '세부 능력 특기사항'에 기재 가능합니다. 파이썬, 생성형 AI, 실무형 프로젝트 경험은 대입과 실무 모두에서 매우 중요한 스펙이 됩니다. 문과/이과 상관없이 '기획력'과 '문제 해결력'을 보여줄 절호의 기회를 놓치지 마세요!</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quiz Section -->
+            <section id="section-quiz" class="content-section">
+                <div class="text-center mb-8 p-6 bg-purple-100/50 rounded-xl border-l-4 border-purple-400">
+                    <p class="font-bold text-lg text-purple-800">"수업 내용을 얼마나 잘 이해했는지 퀴즈로 확인해봐요!"</p>
+                </div>
+
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold mb-4 text-slate-700">정보 수업 퀴즈</h3>
+                    
+                    <div id="quiz-container">
+                        <p id="question-text" class="text-lg font-semibold text-slate-800 mb-4"></p>
+                        <div id="options-container" class="grid gap-3 mb-6">
+                            <!-- Quiz options will be generated here -->
+                        </div>
+                        <p id="feedback-message" class="text-center text-md font-bold mb-4 min-h-[24px]"></p>
+                        <div class="flex justify-center gap-4">
+                            <button id="next-question-button" class="quiz-button primary">다음 문제</button>
+                            <button id="restart-quiz-button" class="quiz-button secondary" style="display:none;">퀴즈 다시 시작</button>
+                        </div>
+                    </div>
+
+                    <div id="quiz-results" class="text-center mt-8 p-6 bg-green-100 rounded-lg" style="display:none;">
+                        <h3 class="text-2xl font-bold text-green-800 mb-2">🎉 퀴즈 결과 🎉</h3>
+                        <p id="final-score" class="text-xl text-green-700 font-bold mb-4"></p>
+                        <p class="text-green-600">수고했어요! 복습을 통해 더욱 성장할 수 있을 거예요.</p>
+                        <button id="restart-quiz-button-final" class="quiz-button primary mt-4">퀴즈 다시 시작</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const pythonData = {
+                characters: ["암살자", "광전사", "수정자", "마법사", "사냥꾼"],
+                weapons: ["단검", "도끼", "활", "지팡이", "채찍"]
+            };
+
+            const quizQuestions = [
+                {
+                    question: "다음 파이썬 2차원 리스트에서 '활'에 올바르게 접근하는 방법은 무엇인가요?\nsoliders = [['암살자', '광전사', '수정자', '마법사', '사냥꾼'], ['단검', '도끼', '활', '지팡이', '채찍']]",
+                    options: ["soliders[1][2]", "soliders[2][3]", "soliders[0][2]", "soliders[1][3]"],
+                    correct: 0
+                },
+                {
+                    question: "사용자로부터 '번호'를 입력받아 리스트의 인덱스로 사용하려면, 입력받은 문자열을 어떤 함수로 변환해야 하나요?",
+                    options: ["str()", "float()", "int()", "list()"],
+                    correct: 2
+                },
+                {
+                    question: "생성형 AI 활용 프로젝트에서 가장 강조하는 핵심 역량은 무엇인가요?",
+                    options: ["코딩 실력", "단순 암기", "질문력", "그림 그리기"],
+                    correct: 2
+                },
+                {
+                    question: "생성형 AI 프로젝트 활동은 생활기록부의 어떤 항목에 기재될 수 있나요?",
+                    options: ["봉사 활동", "독서 활동", "진로 활동", "동아리 활동"],
+                    correct: 2
+                }
+            ];
+
+            let currentQuestionIndex = 0;
+            let score = 0;
+            let quizActive = false;
+
+            const navPython = document.getElementById('nav-python');
+            const navAi = document.getElementById('nav-ai');
+            const navQuiz = document.getElementById('nav-quiz');
+            const sectionPython = document.getElementById('section-python');
+            const sectionAi = document.getElementById('section-ai');
+            const sectionQuiz = document.getElementById('section-quiz');
+            
+            const characterButtonsContainer = document.getElementById('character-buttons');
+            const weaponOutput = document.getElementById('weapon-output');
+            const codeOutput = document.getElementById('code-output');
+
+            const quizContainer = document.getElementById('quiz-container');
+            const questionText = document.getElementById('question-text');
+            const optionsContainer = document.getElementById('options-container');
+            const feedbackMessage = document.getElementById('feedback-message');
+            const nextQuestionButton = document.getElementById('next-question-button');
+            const restartQuizButton = document.getElementById('restart-quiz-button'); // In-quiz restart
+            const quizResults = document.getElementById('quiz-results');
+            const finalScoreDisplay = document.getElementById('final-score');
+            const restartQuizButtonFinal = document.getElementById('restart-quiz-button-final'); // Final results restart
+
+            function switchTab(activeTab) {
+                navPython.classList.remove('active');
+                navAi.classList.remove('active');
+                navQuiz.classList.remove('active');
+                sectionPython.classList.remove('active');
+                sectionAi.classList.remove('active');
+                sectionQuiz.classList.remove('active');
+
+                if (activeTab === 'python') {
+                    navPython.classList.add('active');
+                    sectionPython.classList.add('active');
+                } else if (activeTab === 'ai') {
+                    navAi.classList.add('active');
+                    sectionAi.classList.add('active');
+                } else if (activeTab === 'quiz') {
+                    navQuiz.classList.add('active');
+                    sectionQuiz.classList.add('active');
+                    if (!quizActive) { // Start quiz only if not already active
+                        startQuiz();
+                    }
+                }
+            }
+
+            // Python Section Functions
+            function showPythonResult(index) {
+                const characterName = pythonData.characters[index];
+                const weaponName = pythonData.weapons[index];
+                const userSelection = index + 1;
+
+                weaponOutput.textContent = `선택한 용병 '${characterName}'의 필살 무기는 '${weaponName}'입니다.`;
+                codeOutput.textContent = `soliders = [["암살자", "광전사", "수정자", "마법사", "사냥꾼"], ["단검", "도끼", "활", "지팡이", "채찍"]]\n\n# 사용자가 ${userSelection}번을 선택했다고 가정\nselect = ${userSelection}\n\nprint("용병의 필살 무기는 %s입니다." % soliders[1][select - 1])`;
+            }
+
+            // Quiz Section Functions
+            function startQuiz() {
+                currentQuestionIndex = 0;
+                score = 0;
+                quizActive = true;
+                quizContainer.style.display = 'block';
+                quizResults.style.display = 'none';
+                restartQuizButton.style.display = 'none'; // Hide in-quiz restart at start
+                nextQuestionButton.textContent = '다음 문제';
+                nextQuestionButton.style.display = 'block'; // Ensure it's visible
+                feedbackMessage.textContent = ''; // Clear previous feedback
+                loadQuestion();
+            }
+
+            function loadQuestion() {
+                if (currentQuestionIndex < quizQuestions.length) {
+                    const q = quizQuestions[currentQuestionIndex];
+                    questionText.textContent = `${currentQuestionIndex + 1}. ${q.question}`;
+                    optionsContainer.innerHTML = '';
+                    feedbackMessage.textContent = ''; // Clear feedback for new question
+                    nextQuestionButton.style.display = 'none'; // Hide next button until answer is chosen
+
+                    q.options.forEach((option, i) => {
+                        const button = document.createElement('button');
+                        button.textContent = option;
+                        button.className = 'quiz-option-button';
+                        button.dataset.index = i;
+                        button.addEventListener('click', () => selectAnswer(i));
+                        optionsContainer.appendChild(button);
+                    });
+                } else {
+                    displayResults();
+                }
+            }
+
+            function selectAnswer(selectedIndex) {
+                if (!quizActive) return; // Prevent interaction after quiz ends or answer already chosen for this question
+
+                const q = quizQuestions[currentQuestionIndex];
+                const optionButtons = Array.from(optionsContainer.children);
+
+                // Disable all options after selection
+                optionButtons.forEach(button => {
+                    button.removeEventListener('click', () => selectAnswer(parseInt(button.dataset.index)));
+                    button.disabled = true;
+                });
+
+                if (selectedIndex === q.correct) {
+                    feedbackMessage.textContent = "정답입니다! 🎉";
+                    feedbackMessage.style.color = '#065F46'; // green
+                    score++;
+                    optionButtons[selectedIndex].classList.add('correct');
+                } else {
+                    feedbackMessage.textContent = "오답입니다. 🥲";
+                    feedbackMessage.style.color = '#991B1B'; // red
+                    optionButtons[selectedIndex].classList.add('incorrect');
+                    optionButtons[q.correct].classList.add('correct'); // Show correct answer
+                }
+                
+                nextQuestionButton.style.display = 'block'; // Show next button
+                if (currentQuestionIndex === quizQuestions.length - 1) {
+                    nextQuestionButton.textContent = '결과 보기';
+                }
+            }
+
+            function displayResults() {
+                quizActive = false;
+                quizContainer.style.display = 'none';
+                quizResults.style.display = 'block';
+                finalScoreDisplay.textContent = `총 ${quizQuestions.length}문제 중 ${score}문제 정답!`;
+            }
+
+            // Event Listeners for Quiz
+            nextQuestionButton.addEventListener('click', () => {
+                currentQuestionIndex++;
+                loadQuestion();
+            });
+
+            restartQuizButton.addEventListener('click', startQuiz);
+            restartQuizButtonFinal.addEventListener('click', startQuiz);
+
+
+            // Initial Setup
+            function initializeApp() {
+                // Set default tab
+                switchTab('python');
+
+                // Create character buttons for Python section
+                pythonData.characters.forEach((char, index) => {
+                    const button = document.createElement('button');
+                    button.textContent = char;
+                    button.className = 'w-full text-center p-3 rounded-lg bg-slate-200 hover:bg-slate-300 font-semibold text-slate-700 transition-colors';
+                    button.addEventListener('click', () => {
+                        showPythonResult(index);
+                        Array.from(characterButtonsContainer.children).forEach(btn => btn.classList.remove('bg-indigo-500', 'text-white'));
+                        button.classList.add('bg-indigo-500', 'text-white');
+                    });
+                    characterButtonsContainer.appendChild(button);
+                });
+
+                // Add event listeners for navigation
+                navPython.addEventListener('click', () => switchTab('python'));
+                navAi.addEventListener('click', () => switchTab('ai'));
+                navQuiz.addEventListener('click', () => switchTab('quiz'));
+            }
+
+            initializeApp();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>독립협회 vs. 대한제국: 대화형 역사 탐구</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals & Subtle Accents -->
+    <!-- Application Structure Plan: A comparative tab-based layout is chosen to directly contrast the Independence Club and the Korean Empire, which is the core theme of the source document. The structure flows from a high-level selection (Club vs. Empire), to detailed exploration via cards, to a direct visual comparison with a chart, followed by a chronological timeline, a concise exam summary, and finally a knowledge check quiz. This guides the user from broad understanding to detailed knowledge and reinforcement, making it highly effective for educational content. -->
+    <!-- Visualization & Content Choices: 
+        - Comparison Chart: Report Info (Constitutional vs. Absolute Monarchy) -> Goal (Compare) -> Viz (Dynamic Bar Chart) -> Interaction (Update on tab click) -> Justification (Visually highlights the key political difference, the central thesis of the lesson) -> Library (Chart.js).
+        - Key Activities: Report Info (Various reforms and activities) -> Goal (Inform/Organize) -> Viz (Styled HTML/CSS Cards) -> Interaction (Hover effects, clear grouping) -> Justification (Breaks down text-heavy info into digestible, thematic chunks) -> Library/Method (Tailwind CSS).
+        - Timeline: Report Info (Sequence of historical events) -> Goal (Show Change/Sequence) -> Viz (Clickable horizontal timeline) -> Interaction (Clicking event highlights relevant content card) -> Justification (Helps users grasp the chronological flow and context) -> Library/Method (HTML/Tailwind/JS).
+        - Exam Summary: Report Info (Key exam points) -> Goal (Reinforce/Summarize) -> Viz (Bullet points with bolded text and special emphasis) -> Interaction (Static text summary) -> Justification (Provides quick review of most critical facts for exam preparation) -> Library/Method (HTML/Tailwind).
+        - All choices confirm to the NO SVG/Mermaid rule.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #F8F7F1;
+            color: #3D3B30;
+        }
+        .tab-active {
+            border-color: #A0522D;
+            background-color: #A0522D;
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+        .tab-inactive {
+            border-color: #D3CBB8;
+            background-color: #F8F7F1;
+            color: #A0522D;
+        }
+        .content-card {
+            background-color: #FFFFFF;
+            border: 1px solid #EAE6DA;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .timeline-item {
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .timeline-item:hover .timeline-dot {
+            transform: scale(1.2);
+            background-color: #A0522D;
+        }
+        .timeline-dot {
+            transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+        }
+        .highlight {
+            animation: highlight-anim 2s ease-out;
+        }
+        @keyframes highlight-anim {
+            0% { background-color: #FFFBEB; transform: scale(1); }
+            25% { background-color: #FFFBEB; transform: scale(1.02); }
+            100% { background-color: #FFFFFF; transform: scale(1); }
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-5xl font-bold text-[#2C3A47]">독립협회 vs. 대한제국</h1>
+            <p class="text-lg md:text-xl mt-3 text-gray-600">두 개의 근대 국가 구상, 대화형으로 탐구하기</p>
+        </header>
+
+        <main>
+            <!-- Tabs Navigation -->
+            <div class="flex justify-center border-b-2 border-gray-200 mb-8">
+                <button id="tab-club" class="tab-active text-lg py-3 px-6 md:px-12 border-b-4 transition-colors duration-300">
+                    <span class="text-2xl mr-2">🏛️</span>독립협회
+                </button>
+                <button id="tab-empire" class="tab-inactive text-lg py-3 px-6 md:px-12 border-b-4 transition-colors duration-300">
+                    <span class="text-2xl mr-2">👑</span>대한제국
+                </button>
+            </div>
+
+            <!-- Content Area -->
+            <div id="content-area">
+                <!-- Independence Club Content -->
+                <div id="content-club">
+                    <div class="text-center mb-8 px-4">
+                        <h2 class="text-3xl font-bold text-[#006266]">국민의 꿈: 자주독립과 입헌군주제</h2>
+                        <p class="mt-2 text-gray-600 max-w-3xl mx-auto">
+                            독립협회는 외세의 간섭에서 벗어나 국민이 주인이 되는 근대 국가를 만들고자 했습니다. 백성의 참여를 통해 나라의 힘을 키우고, 황제의 권력을 법으로 제한하는 '입헌 군주제'를 꿈꿨습니다.
+                        </p>
+                    </div>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div id="event-sinmun" class="content-card">
+                            <h3 class="font-bold text-xl mb-2 text-[#006266]">독립신문 창간 (1896) <span class="text-red-600">★시험 포인트★</span></h3>
+                            <p class="text-gray-700">우리나라 최초의 민간 신문. 모두가 쉽게 읽을 수 있도록 **한글**로, 외국에 소식을 알리기 위해 **영어**로도 발행했습니다. 국민을 계몽하고 정부와 소통하는 창구 역할을 했습니다.</p>
+                        </div>
+                        <div id="event-gate" class="content-card">
+                            <h3 class="font-bold text-xl mb-2 text-[#006266]">독립문 건립 <span class="text-red-600">★시험 포인트★</span></h3>
+                            <p class="text-gray-700">청나라 사신을 맞이하던 영은문을 허물고 그 자리에 세운 **자주독립의 상징**입니다. 국민들의 성금으로 만들어져 더욱 의미가 깊습니다.</p>
+                        </div>
+                        <div id="event-manmin" class="content-card">
+                            <h3 class="font-bold text-xl mb-2 text-[#006266]">만민공동회 개최 <span class="text-red-600">★시험 포인트★</span></h3>
+                            <p class="text-gray-700">누구나 참여할 수 있었던 공개 토론회입니다. **러시아의 이권 침탈(절영도 조차 요구 등)을 국민의 힘으로 막아내는** 성공을 거두었습니다.</p>
+                        </div>
+                        <div id="event-heonui" class="content-card lg:col-span-2">
+                            <h3 class="font-bold text-xl mb-2 text-[#006266]">관민공동회와 헌의 6조 (1898) <span class="text-red-600">★시험 포인트★</span></h3>
+                            <p class="text-gray-700">정부 관료와 함께 연 회의에서 헌의 6조를 발표했습니다. 재정 투명화, 국민의 참정권 **보장** 등을 내용으로 하는 **입헌 군주제**를 지향했습니다.</p>
+                        </div>
+                        <div class="content-card bg-red-50 border-red-200">
+                            <h3 class="font-bold text-xl mb-2 text-red-700">강제 해산</h3>
+                            <p class="text-gray-700">보수 세력의 '공화정을 추구한다'는 모함으로 인해 고종의 명령으로 강제 해산되었습니다. 국민 주권의 꿈은 잠시 좌절되었습니다.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Korean Empire Content -->
+                <div id="content-empire" class="hidden">
+                    <div class="text-center mb-8 px-4">
+                        <h2 class="text-3xl font-bold text-[#8B4513]">황제의 비전: 부국강병과 전제군주제</h2>
+                        <p class="mt-2 text-gray-600 max-w-3xl mx-auto">
+                            대한제국은 혼란한 정세 속에서 황제권을 강화하여 나라를 안정시키고 빠르게 근대화를 이루려 했습니다. '옛것을 근본으로 새것을 참고한다'는 원칙 아래 강력한 황제의 힘으로 위기를 극복하고자 했습니다.
+                        </p>
+                    </div>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div id="event-proclamation" class="content-card">
+                            <h3 class="font-bold text-xl mb-2 text-[#8B4513]">대한제국 선포 (1897) <span class="text-red-600">★시험 포인트★</span></h3>
+                            <p class="text-gray-700">고종이 러시아 공사관에서 환궁 후, 황제로 즉위하며 대한제국을 선포했습니다. 연호를 **광무(光武)**로 정하고, 자주독립 국가임을 천명했습니다.</p>
+                        </div>
+                        <div id="event-gukje" class="content-card">
+                            <h3 class="font-bold text-xl mb-2 text-[#8B4513]">대한국 국제 반포 <span class="text-red-600">★시험 포인트★</span></h3>
+                            <p class="text-gray-700">대한제국의 헌법과 같은 문서입니다. 황제에게 군사, 외교, 입법 등 모든 권한이 집중된 강력한 **전제 군주제**를 명시했습니다.</p>
+                        </div>
+                         <div id="event-gubon" class="content-card">
+                            <h3 class="font-bold text-xl mb-2 text-[#8B4513]">광무개혁: 구본신참(舊本新參) <span class="text-red-600">★시험 포인트★</span></h3>
+                            <p class="text-gray-700">**"옛 제도를 근본으로 새로운 제도를 참고한다"**는 원칙 아래 점진적인 개혁을 추진했습니다. 전통을 지키면서 서양의 기술과 제도를 받아들이고자 했습니다.</p>
+                        </div>
+                        <div class="content-card">
+                            <h3 class="font-bold text-xl mb-2 text-[#8B4513]">군사 개혁 <span class="text-red-600">★시험 포인트★</span></h3>
+                            <p class="text-gray-700">황제가 군 통수권을 직접 장악하기 위해 **원수부**를 설치하고, 군사력을 강화하여 황권을 뒷받침하려 했습니다.</p>
+                        </div>
+                        <div id="event-jigye" class="content-card">
+                            <h3 class="font-bold text-xl mb-2 text-[#8B4513]">경제 개혁: 양전과 지계 <span class="text-red-600">★시험 포인트★</span></h3>
+                            <p class="text-gray-700">전국의 토지를 측량하는 양전 사업을 실시하고, 근대적 토지 소유권 문서인 **지계**를 발급하여 국가 재정을 확보하고 소유권을 명확히 했습니다.</p>
+                        </div>
+                        <div id="event-industry" class="content-card">
+                            <h3 class="font-bold text-xl mb-2 text-[#8B4513]">산업 & 교육 근대화</h3>
+                            <p class="text-gray-700">철도(경인선), 전차, 전화 등 근대 시설을 도입하고, 은행과 회사를 설립했습니다. 실용 학문을 가르치는 기술학교를 세워 인재를 양성했습니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparison Chart Section -->
+            <section class="mt-16 bg-white py-12 rounded-xl shadow-md">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-[#2C3A47]">핵심 비교: 누가 권력을 가졌나?</h2>
+                    <p class="mt-2 text-gray-600">두 세력이 추구한 정치 체제의 가장 큰 차이점을 시각적으로 비교해 보세요.</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </section>
+            
+            <!-- Timeline Section -->
+            <section class="mt-16">
+                 <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-[#2C3A47]">주요 사건 타임라인</h2>
+                    <p class="mt-2 text-gray-600">아래 사건을 클릭하여 해당 내용으로 이동할 수 있습니다.</p>
+                </div>
+                <div class="relative w-full px-4">
+                    <div class="absolute left-1/2 h-full w-0.5 bg-gray-300 transform -translate-x-1/2"></div>
+                    <div class="space-y-12">
+                        <div class="timeline-item flex justify-center items-center" data-target="event-sinmun">
+                            <div class="w-5/12 text-right pr-8">
+                                <p class="text-lg font-bold">독립신문 창간</p>
+                                <p class="text-sm text-gray-500">1896년</p>
+                            </div>
+                            <div class="timeline-dot w-6 h-6 rounded-full bg-gray-400 border-4 border-white z-10"></div>
+                            <div class="w-5/12"></div>
+                        </div>
+                         <div class="timeline-item flex justify-center items-center" data-target="event-proclamation">
+                            <div class="w-5/12"></div>
+                            <div class="timeline-dot w-6 h-6 rounded-full bg-gray-400 border-4 border-white z-10"></div>
+                            <div class="w-5/12 pl-8">
+                                <p class="text-lg font-bold">대한제국 선포</p>
+                                <p class="text-sm text-gray-500">1897년</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item flex justify-center items-center" data-target="event-manmin">
+                             <div class="w-5/12 text-right pr-8">
+                                <p class="text-lg font-bold">만민공동회 활성화</p>
+                                <p class="text-sm text-gray-500">1898년 초</p>
+                            </div>
+                            <div class="timeline-dot w-6 h-6 rounded-full bg-gray-400 border-4 border-white z-10"></div>
+                            <div class="w-5/12"></div>
+                        </div>
+                         <div class="timeline-item flex justify-center items-center" data-target="event-heonui">
+                            <div class="w-5/12"></div>
+                            <div class="timeline-dot w-6 h-6 rounded-full bg-gray-400 border-4 border-white z-10"></div>
+                            <div class="w-5/12 pl-8">
+                                <p class="text-lg font-bold">헌의 6조 발표</p>
+                                <p class="text-sm text-gray-500">1898년 10월</p>
+                            </div>
+                        </div>
+                         <div class="timeline-item flex justify-center items-center" data-target="event-gukje">
+                             <div class="w-5/12 text-right pr-8">
+                                <p class="text-lg font-bold">대한국 국제 반포</p>
+                                <p class="text-sm text-gray-500">1899년</p>
+                            </div>
+                            <div class="timeline-dot w-6 h-6 rounded-full bg-gray-400 border-4 border-white z-10"></div>
+                            <div class="w-5/12"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Exam Summary Section -->
+            <section class="mt-16 bg-blue-50 py-12 rounded-xl shadow-md border border-blue-200">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-[#2C3A47]">✨ 시험 대비 핵심 요약! ✨</h2>
+                    <p class="mt-2 text-gray-600">"선생님이 강조하는 시험에 꼭 나오는 핵심만 다시 정리했어요! 이거만 봐도 합격!"</p>
+                </div>
+                <div class="max-w-3xl mx-auto px-4 text-gray-800 leading-relaxed">
+                    <ul class="list-disc list-inside space-y-3 md:text-lg">
+                        <li>**독립협회**: 서재필 주도! <span class="font-bold text-[#006266]">독립신문 (한글+영어)</span>, <span class="font-bold text-[#006266]">독립문</span>, <span class="font-bold text-[#006266]">만민공동회</span> (러시아 이권 저지!) 활동. 궁극적으로 <span class="font-bold text-[#006266]">★입헌 군주제★</span> 지향 (헌의 6조).</li>
+                        <li>**대한제국**: 고종 황제 즉위 후 선포, 연호 <span class="font-bold text-[#8B4513]">★광무★</span>. <span class="font-bold text-[#8B4513]">대한국 국제</span> 반포로 <span class="font-bold text-[#8B4513]">★전제 군주제★</span> 명시.</li>
+                        <li>**광무개혁**: 원칙은 <span class="font-bold text-[#8B4513]">★구본신참★</span> (옛것을 근본으로, 새것을 참고). <span class="font-bold text-[#8B4513]">원수부</span> 설치 (황제 군통수권), <span class="font-bold text-[#8B4513]">양전 사업</span> 및 <span class="font-bold text-[#8B4513]">지계</span> 발급 (토지 소유권), 경인선 철도 등 근대 시설 도입.</li>
+                        <li class="font-bold text-lg text-red-700 mt-6">✨ 가장 중요한 포인트: 독립협회는 **입헌 군주제**, 대한제국은 **전제 군주제**! 이 둘의 차이를 명확히 기억하세요! ✨</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Quiz Section -->
+            <section class="mt-16 bg-white py-12 rounded-xl shadow-md">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-[#2C3A47]">★핵심 퀴즈★</h2>
+                    <p class="mt-2 text-gray-600">"얘들아~ 오늘 배운 거 잘 기억하고 있는지 확인해볼까?"</p>
+                </div>
+                <div class="max-w-2xl mx-auto px-4">
+                    <div id="quiz-container"></div>
+                    <div class="text-center mt-6">
+                        <button id="submit-quiz" class="bg-[#A0522D] text-white font-bold py-2 px-6 rounded-lg hover:bg-opacity-90 transition-colors">채점하기</button>
+                        <p id="quiz-result" class="mt-4 font-bold text-lg"></p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabClub = document.getElementById('tab-club');
+            const tabEmpire = document.getElementById('tab-empire');
+            const contentClub = document.getElementById('content-club');
+            const contentEmpire = document.getElementById('content-empire');
+
+            const data = {
+                club: {
+                    label: '독립협회 (입헌 군주제)',
+                    power: {
+                        emperor: 40,
+                        people: 80
+                    },
+                    bgColor: 'rgba(0, 98, 102, 0.6)',
+                    borderColor: 'rgba(0, 98, 102, 1)'
+                },
+                empire: {
+                    label: '대한제국 (전제 군주제)',
+                    power: {
+                        emperor: 100,
+                        people: 10
+                    },
+                    bgColor: 'rgba(139, 69, 19, 0.6)',
+                    borderColor: 'rgba(139, 69, 19, 1)'
+                }
+            };
+
+            const chartCtx = document.getElementById('comparisonChart').getContext('2d');
+            let comparisonChart = new Chart(chartCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['황제 권력', '국민/의회 권력'],
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.x !== null) {
+                                        label += context.parsed.x + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            function updateChart(entity) {
+                const chartData = data[entity];
+                comparisonChart.data.datasets = [{
+                    label: chartData.label,
+                    data: [chartData.power.emperor, chartData.power.people],
+                    backgroundColor: chartData.bgColor,
+                    borderColor: chartData.borderColor,
+                    borderWidth: 1
+                }];
+                comparisonChart.update();
+            }
+
+            function switchTab(activeTab) {
+                if (activeTab === 'club') {
+                    tabClub.classList.remove('tab-inactive');
+                    tabClub.classList.add('tab-active');
+                    tabEmpire.classList.remove('tab-active');
+                    tabEmpire.classList.add('tab-inactive');
+                    contentClub.classList.remove('hidden');
+                    contentEmpire.classList.add('hidden');
+                    updateChart('club');
+                } else {
+                    tabEmpire.classList.remove('tab-inactive');
+                    tabEmpire.classList.add('tab-active');
+                    tabClub.classList.remove('tab-active');
+                    tabClub.classList.add('tab-inactive');
+                    contentEmpire.classList.remove('hidden');
+                    contentClub.classList.add('hidden');
+                    updateChart('empire');
+                }
+            }
+
+            tabClub.addEventListener('click', () => switchTab('club'));
+            tabEmpire.addEventListener('click', () => switchTab('empire'));
+
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const targetId = item.dataset.target;
+                    const targetElement = document.getElementById(targetId);
+                    
+                    if (targetElement) {
+                        const parentContent = targetElement.closest('#content-club, #content-empire');
+                        if(parentContent.id === 'content-club'){
+                            switchTab('club');
+                        } else {
+                            switchTab('empire');
+                        }
+                        
+                        setTimeout(() => {
+                           targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                           targetElement.classList.add('highlight');
+                           setTimeout(() => targetElement.classList.remove('highlight'), 2000);
+                        }, 100);
+                    }
+                });
+            });
+
+            const quizQuestions = [
+                {
+                    type: "multiple-choice",
+                    question: "1. 독립협회가 추구했던 정치 체제는 무엇일까요?",
+                    options: ["전제 군주제", "입헌 군주제", "공화정"],
+                    answer: "입헌 군주제"
+                },
+                {
+                    type: "fill-in-the-blank",
+                    question: "2. 대한제국 광무개혁의 원칙은 '옛것을 근본으로 삼고 새로운 제도를 참고한다'는 뜻의 네 글자 한자어인 (        )입니다.",
+                    answer: "구본신참"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "3. 대한제국이 황제 중심의 군사 통수권 강화를 위해 설치한 기구는 무엇일까요?",
+                    options: ["궁내부", "군부", "원수부"],
+                    answer: "원수부"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "4. 대한제국이 토지 소유권을 명확히 하기 위해 발급한 문서는 무엇일까요?",
+                    options: ["호패", "공명첩", "지계"],
+                    answer: "지계"
+                },
+                {
+                    type: "fill-in-the-blank",
+                    question: "5. 대한제국이 '대한국 국제'를 통해 명시한 정치 체제는 황제에게 모든 권한이 집중된 (        )입니다.",
+                    answer: "전제 군주제"
+                },
+                {
+                    type: "multiple-choice",
+                    question: "6. 만민공동회가 처음 개최된 주요 목적 중 하나는 어느 나라의 이권 침탈을 규탄하기 위해서였나요?",
+                    options: ["일본", "러시아", "청"],
+                    answer: "러시아"
+                }
+            ];
+
+            const quizContainer = document.getElementById('quiz-container');
+            quizQuestions.forEach((q, index) => {
+                const questionEl = document.createElement('div');
+                questionEl.className = 'mb-6';
+                let contentHtml = '';
+
+                if (q.type === "multiple-choice") {
+                    let optionsHtml = '';
+                    q.options.forEach(option => {
+                        optionsHtml += `
+                            <label class="block bg-gray-100 p-3 rounded-lg mt-2 cursor-pointer hover:bg-gray-200 transition-colors">
+                                <input type="radio" name="question${index}" value="${option}" class="mr-3">
+                                ${option}
+                            </label>
+                        `;
+                    });
+                    contentHtml = `<p class="font-bold mb-2">${q.question}</p>${optionsHtml}`;
+                } else if (q.type === "fill-in-the-blank") {
+                    const parsedQuestion = q.question.replace("(        )", `<input type="text" id="blank-${index}" class="border border-gray-300 rounded-md px-3 py-2 w-40 inline-block align-middle text-center" placeholder="정답 입력">`);
+                    contentHtml = `<p class="font-bold mb-2">${parsedQuestion}</p>`;
+                }
+                
+                questionEl.innerHTML = contentHtml;
+                quizContainer.appendChild(questionEl);
+            });
+
+            document.getElementById('submit-quiz').addEventListener('click', () => {
+                let score = 0;
+                quizQuestions.forEach((q, index) => {
+                    if (q.type === "multiple-choice") {
+                        const selected = document.querySelector(`input[name="question${index}"]:checked`);
+                        const labels = document.querySelectorAll(`input[name="question${index}"]`);
+                        labels.forEach(label => {
+                            label.parentElement.style.backgroundColor = '#f3f4f6'; // Reset color
+                            label.parentElement.style.border = 'none';
+                        });
+
+                        if (selected) {
+                            const label = selected.parentElement;
+                            if (selected.value === q.answer) {
+                                score++;
+                                label.style.backgroundColor = '#D1FAE5'; // Green
+                                label.style.border = '2px solid #10B981';
+                            } else {
+                                label.style.backgroundColor = '#FEE2E2'; // Red
+                                label.style.border = '2px solid #EF4444';
+                                // Highlight correct answer
+                                labels.forEach(label => {
+                                    if(label.querySelector('input').value === q.answer) {
+                                        label.style.backgroundColor = '#E0F2F7'; // Light blue for correct
+                                        label.style.border = '2px solid #0284C7';
+                                    }
+                                });
+                            }
+                        }
+                    } else if (q.type === "fill-in-the-blank") {
+                        const inputElement = document.getElementById(`blank-${index}`);
+                        if (inputElement) {
+                            const userAnswer = inputElement.value.trim();
+                            const correctAnswer = q.answer.trim();
+
+                            inputElement.style.border = '1px solid #ccc'; // Reset border
+
+                            if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                                score++;
+                                inputElement.style.border = '2px solid #10B981'; // Green border
+                                inputElement.style.backgroundColor = '#D1FAE5';
+                            } else {
+                                inputElement.style.border = '2px solid #EF4444'; // Red border
+                                inputElement.style.backgroundColor = '#FEE2E2';
+                                inputElement.value = correctAnswer; // Show correct answer
+                            }
+                        }
+                    }
+                });
+                const resultEl = document.getElementById('quiz-result');
+                resultEl.textContent = `결과: ${quizQuestions.length}문제 중 ${score}문제 정답! 참 잘했어요!`;
+                 if (score === quizQuestions.length) {
+                    resultEl.textContent += " 💯";
+                }
+            });
+
+            // Initial setup
+            switchTab('club');
+
+        });
+    </script>
+</body>
+</html>

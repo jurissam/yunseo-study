@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한국사 핵심 정리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Neutral Harmony -->
+    <!-- Application Structure Plan: The application is structured into four main thematic sections accessible via a top navigation bar: '조선 후기의 사상과 문화' (Late Joseon Thought & Culture), '서양 세력의 접근과 제국주의' (Western Powers & Imperialism), '조선의 대응' (Joseon's Response), and '핵심 요약 퀴즈' (Core Summary Quiz). This thematic and chronological structure was chosen to logically group related historical periods and concepts, making the complex timeline easier to navigate and understand for students. Key interactions include tab-based navigation for thematic section switching, interactive cards for exploring specific concepts/examples, and interactive flashcards with fill-in-the-blank questions for memorization. This design aims to break down the historical narrative into digestible, interactive components, supporting active learning and exam preparation. -->
+    <!-- Visualization & Content Choices: 
+    1. Silhak Schools (경세치용, 이용후생) -> Goal: Compare/Inform -> Viz: Side-by-side cards -> Interaction: Static text -> Justification: Clearly contrasts the focus of each school visually, which is effective for understanding differences. -> Library/Method: HTML/Tailwind CSS.
+    2. Key Events/Concepts (e.g., Opium War, Unequal Treaties) -> Goal: Inform -> Viz: Detailed text within cards/sections -> Interaction: Expandable sections for treaty details -> Justification: Provides concentrated information for major historical events, allowing users to drill down into specifics like treaty articles. -> Library/Method: HTML/Tailwind CSS + Vanilla JS for expansion.
+    3. Quiz Section -> Goal: Memorize/Assess -> Viz: Interactive Flashcards & Fill-in-the-blank -> Interaction: Click to flip card, type and check answer, next/random question, score tracking -> Justification: Active recall methods are highly effective for memorization and self-assessment, crucial for historical facts and definitions. Added gamification elements enhance engagement. -> Library/Method: Vanilla JS + HTML/CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+        .nav-btn { transition: all 0.3s ease; }
+        .nav-btn.active { color: #0d9488; border-bottom-color: #0d9488; font-weight: 700; }
+        .nav-btn:not(.active) { border-bottom-color: transparent; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .flashcard-container { perspective: 1000px; }
+        .flashcard { position: relative; transform-style: preserve-3d; transition: transform 0.6s; cursor: pointer; }
+        .flashcard.flipped { transform: rotateY(180deg); }
+        .flashcard-face, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            text-align: center;
+        }
+        .flashcard-face {
+            background-color: #0d9488;
+            color: white;
+        }
+        .flashcard-back {
+            background-color: white;
+            color: #3b3b3b;
+            border: 2px solid #0d9488;
+            transform: rotateY(180deg);
+        }
+        .quiz-input {
+            border: 1px solid #ccc;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        .quiz-feedback {
+            margin-top: 0.5rem;
+            font-weight: bold;
+        }
+        .correct { color: #0d9488; }
+        .incorrect { color: #dc2626; }
+        .quiz-question-container {
+            min-height: 120px; /* To prevent layout shift when questions change */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-teal-700">한국사 핵심 정리</h1>
+            <p class="text-stone-600 mt-2">조선 후기부터 서양 세력의 접근까지</p>
+        </header>
+
+        <nav class="flex justify-center border-b-2 border-stone-200 mb-8">
+            <button data-target="joseon-culture" class="nav-btn active text-lg px-6 py-3 border-b-2">조선 후기의 사상과 문화</button>
+            <button data-target="western-imperialism" class="nav-btn text-lg px-6 py-3 border-b-2">서양 세력의 접근과 제국주의</button>
+            <button data-target="joseon-response" class="nav-btn text-lg px-6 py-3 border-b-2">조선의 대응</button>
+            <button data-target="summary-quiz" class="nav-btn text-lg px-6 py-3 border-b-2">핵심 요약 퀴즈</button>
+        </nav>
+
+        <main>
+            <!-- Section 1: 조선 후기의 사상과 문화 -->
+            <section id="joseon-culture" class="content-section active">
+                <div class="p-6 bg-white rounded-xl shadow-md mb-8">
+                    <h2 class="text-2xl font-bold text-teal-700 mb-4">조선 후기 사상과 문화의 변화</h2>
+                    <p class="text-stone-600">임진왜란과 병자호란 이후, 조선 사회의 변화에 대응하기 위해 새로운 학문과 문화가 등장했습니다. 실학의 두 학파, 서민 문화의 발달, 그리고 서양 학문의 유입에 대해 알아봅니다.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                    <div class="card bg-white rounded-xl shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-3 text-teal-700">✓ 실학의 등장 배경과 특징</h3>
+                        <p>왜란과 호란 이후의 <span class="font-bold text-teal-600">사회·경제적 변화</span>에 기존 성리학으로는 현실 문제 해결이 어렵다는 인식에서 출발했습니다. 현실 문제 해결을 위한 <span class="font-bold text-teal-600">실용 학문</span>입니다.</p>
+                    </div>
+                    <div class="card bg-white rounded-xl shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-3 text-teal-700">✓ 실학의 두 학파</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                            <div>
+                                <h4 class="font-semibold text-lg text-teal-600">1. 경세치용 학파 (정약용 중심)</h4>
+                                <ul class="list-disc list-inside text-sm text-stone-700">
+                                    <li>농업과 토지 제도 개혁 중요시</li>
+                                    <li>자영농 육성, 토지 소유 제한 주장 (땅 나눔)</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-teal-600">2. 이용후생·북학파 (박지원 등 중심)</h4>
+                                <ul class="list-disc list-inside text-sm text-stone-700">
+                                    <li>상공업 발전, 기술 혁신, 학문 개혁 중시</li>
+                                    <li>청나라와의 교류 강조 (선진 문물 수용)</li>
+                                    <li>나중에 개화사상으로 이어짐</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                     <div class="card bg-white rounded-xl shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-3 text-teal-700">✓ 조선 후기 문화 변화: 전통 문화 연구</h3>
+                        <p>전쟁 이후 우리 고유의 전통과 문화를 되돌아보려는 흐름이 강화되었습니다. 역사, 지리, 언어, 문학에 대한 관심이 높아졌습니다.</p>
+                        <ul class="list-disc list-inside mt-2 space-y-1 text-stone-700">
+                            <li>**역사서**: 동사강목, 발해고 (신라 중심 역사관 탈피, 발해 재인식)</li>
+                            <li>**지도**: 대동여지도 (김정호 제작, 정밀한 지도)</li>
+                        </ul>
+                    </div>
+                    <div class="card bg-white rounded-xl shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-3 text-teal-700">✓ 천주교와 동학의 등장</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="font-semibold text-lg text-teal-600">천주교</h4>
+                                <ul class="list-disc list-inside text-sm text-stone-700">
+                                    <li>'신 앞에서 모든 인간 평등' 사상으로 하층민에게 매력적</li>
+                                    <li><span class="font-bold text-red-600">문제점</span>: 제사 거부로 유교 사회와 충돌, 정부의 탄압 받음</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-teal-600">동학 (1860년대 초, 최제우 창시)</h4>
+                                <ul class="list-disc list-inside text-sm text-stone-700">
+                                    <li>기존 종교의 역할 부재로 백성들의 의지처 역할</li>
+                                    <li><span class="font-bold text-teal-600">핵심 사상</span>: 시천주(侍天主) - '모든 인간은 존엄하고 평등하다'</li>
+                                    <li>나중에 동학 농민 운동으로 이어짐</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="md:col-span-2 card bg-white rounded-xl shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-3 text-teal-700">✓ 서민 문화의 발달</h3>
+                        <p>농업과 상업의 발달로 경제적 여유가 생기고, 서당 교육 확대로 한글 문학 향유가 가능해지면서 서민층이 주도하는 문화가 발달했습니다.</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                            <div>
+                                <h4 class="font-semibold text-lg text-teal-600">주요 예시</h4>
+                                <ul class="list-disc list-inside text-sm text-stone-700">
+                                    <li>**한글 소설**: 홍길동전(최초), 심청전, 춘향전 등</li>
+                                    <li>**공연**: 판소리, 탈춤 (현실 풍자, 감정 표현)</li>
+                                    <li>**시**: 시조(사설시조) (형식에 얽매이지 않는 자유로운 감정 표현)</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-teal-600">미술</h4>
+                                <ul class="list-disc list-inside text-sm text-stone-700">
+                                    <li>**진경산수화**: 실제 자연 풍경 묘사 (이인상, 정선)</li>
+                                    <li>**풍속화**: 김홍도, 신윤복 (일상생활 묘사)</li>
+                                    <li>**민화**: 호랑이, 동물 등 서민 취향 반영 (집 장식용)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: 서양 세력의 접근과 제국주의 -->
+            <section id="western-imperialism" class="content-section">
+                <div class="p-6 bg-white rounded-xl shadow-md mb-8">
+                    <h2 class="text-2xl font-bold text-teal-700 mb-4">국제 정세의 변화: 서양 세력의 팽창과 제국주의</h2>
+                    <p class="text-stone-600">19세기 중반, 서양 강대국들이 산업혁명을 바탕으로 세계 각지를 식민지화하던 제국주의 시대가 도래했습니다. 아편전쟁과 불평등 조약의 확산을 중심으로 알아봅니다.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="card bg-white rounded-xl shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-3 text-teal-700">✓ 제국주의 시대 (1860년대 전후)</h3>
+                        <ul class="list-disc list-inside mt-2 space-y-1 text-stone-700">
+                            <li>**배경**: 서양 강대국들의 산업혁명 이후 <span class="font-bold text-teal-600">대량 생산 → 시장 확보 및 자원 확보 필요</span></li>
+                            <li>**결과**: 아프리카, 동남아시아 등 <span class="font-bold text-red-600">식민지 침략 및 확대</span></li>
+                        </ul>
+                    </div>
+                    <div class="card bg-white rounded-xl shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-3 text-teal-700">✓ 청나라와 아편전쟁</h3>
+                        <p class="text-stone-700 mb-2">영국이 무역 적자를 메꾸기 위해 인도산 아편을 청에 밀수출하며 발생한 전쟁입니다.</p>
+                        <ul class="list-disc list-inside mt-2 space-y-1 text-stone-700">
+                            <li>**제1차 아편전쟁 (1840)**: 청 관리 임칙서의 아편 몰수 및 폐기 → 영국 무력 침공</li>
+                            <li>**결과**: 청나라 패배, <span class="font-bold text-red-600">난징 조약 체결</span> (최초의 불평등 조약)</li>
+                            <li>**난징 조약 내용**: 항구 5개 개방, 치외법권 허용, 관세 자율권 상실</li>
+                        </ul>
+                    </div>
+                    <div class="card bg-white rounded-xl shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-3 text-teal-700">✓ 일본과 함포 외교</h3>
+                        <ul class="list-disc list-inside mt-2 space-y-1 text-stone-700">
+                            <li>**일본의 쇄국 정책**: 나가사키 항만 개방 (네덜란드 한정)</li>
+                            <li>**미국의 개항 요구 (1853)**: 페리 제독의 군함 시위 → <span class="font-bold text-teal-600">미·일 화친 조약 체결</span></li>
+                            <li>**함포 외교 (포함외교)**: 군사력을 앞세워 강압적으로 외교 관계를 맺는 방식</li>
+                        </ul>
+                    </div>
+                    <div class="card bg-white rounded-xl shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-3 text-teal-700">✓ 불평등 조약의 3대 조항</h3>
+                        <ul class="list-disc list-inside mt-2 space-y-1 text-stone-700">
+                            <li><span class="font-bold text-red-600">1. 영사재판권(치외법권)</span>: 외국인 범죄 시 자국 법으로 자국 영사관에서 재판받음 (<span class="font-bold text-red-600">주권 침해</span>)</li>
+                            <li><span class="font-bold text-red-600">2. 최혜국 대우</span>: 다른 나라와 더 좋은 조건의 조약 체결 시, 자동으로 그 혜택을 받음</li>
+                            <li><span class="font-bold text-red-600">3. 협정 관세</span>: 관세 자율권 상실 (자국이 세금 마음대로 못 정함) (<span class="font-bold text-red-600">경제 주권 상실</span>)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: 조선의 대응 -->
+            <section id="joseon-response" class="content-section">
+                <div class="p-6 bg-white rounded-xl shadow-md mb-8">
+                    <h2 class="text-2xl font-bold text-teal-700 mb-4">위기의 조선, 흥선대원군의 통상 수교 거부 정책</h2>
+                    <p class="text-stone-600">서양 세력의 위협이 고조되던 시기, 흥선대원군은 어떤 선택을 했을까요? 조선의 위기의식과 통상 수교 거부 정책의 배경, 내용에 대해 알아봅니다.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="card bg-white rounded-xl shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-3 text-teal-700">✓ 조선의 위기의식 고조</h3>
+                        <ul class="list-disc list-inside mt-2 space-y-1 text-stone-700">
+                            <li>아편전쟁 패배 소식, 서양 군대의 베이징 점령</li>
+                            <li>러시아가 연해주를 차지하며 조선과 국경 맞닿음</li>
+                            <li><span class="font-bold text-teal-600">이양선(異樣船)</span> 출몰: 조선 해안에 서양 배들이 나타나 조사 및 무역 요구</li>
+                        </ul>
+                    </div>
+                    <div class="card bg-white rounded-xl shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-3 text-teal-700">✓ 흥선대원군의 통상 수교 거부 정책</h3>
+                        <ul class="list-disc list-inside mt-2 space-y-1 text-stone-700">
+                            <li>**집권자**: 흥선대원군</li>
+                            <li>**정책**: "서양 세력 절대 안 된다!"는 입장으로 무역(통상)과 외교(수교)를 모두 거부</li>
+                            <li>**목표**: 서양의 침략으로부터 <span class="font-bold text-teal-600">주권 수호 및 전통 사회 유지</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: 핵심 요약 퀴즈 -->
+            <section id="summary-quiz" class="content-section">
+                <div class="p-6 bg-white rounded-xl shadow-md mb-8">
+                    <h2 class="text-2xl font-bold text-teal-700 mb-4">핵심 요약 & 최종 점검 퀴즈</h2>
+                    <p class="text-stone-600">지금까지 공부한 내용 중 시험에 꼭 나오는 핵심 키워드들을 모았습니다. 카드를 클릭해서 뒷면에 있는 설명을 확인하거나, 빈칸을 채우며 자신의 암기 상태를 점검해 보세요. 완벽하게 숙지했다면 시험에 대한 자신감도 올라갈 거예요!</p>
+                </div>
+
+                <nav class="flex justify-center border-b-2 border-stone-200 mb-8">
+                    <button data-quiz-target="flashcards" class="quiz-nav-btn active text-lg px-6 py-3 border-b-2">플래시카드 퀴즈</button>
+                    <button data-quiz-target="fill-in-the-blank" class="quiz-nav-btn text-lg px-6 py-3 border-b-2">빈칸 채우기 퀴즈</button>
+                </nav>
+
+                <div id="flashcards-quiz" class="quiz-content active">
+                    <div class="mb-4 text-center">
+                        <span class="text-xl font-bold text-teal-700">플래시카드: <span id="currentFlashcardNum">1</span> / <span id="totalFlashcards">12</span></span>
+                    </div>
+                    <div class="grid grid-cols-1 gap-6">
+                        <!-- Flashcards will be dynamically managed here -->
+                        <div class="flashcard-container h-48 w-full mx-auto" id="flashcard-display">
+                            <!-- Active flashcard will be injected here by JS -->
+                        </div>
+                    </div>
+                    <div class="flex justify-center space-x-4 mt-6">
+                        <button id="next-flashcard-btn" class="px-6 py-3 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition font-bold">다음 플래시카드</button>
+                        <button id="random-flashcard-btn" class="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition font-bold">랜덤 플래시카드</button>
+                        <button id="shuffle-flashcards-btn" class="px-6 py-3 bg-stone-500 text-white rounded-lg hover:bg-stone-600 transition font-bold">모두 섞기</button>
+                    </div>
+                </div>
+
+                <div id="fill-in-the-blank-quiz" class="quiz-content hidden">
+                    <div class="mb-4 text-center">
+                        <span class="text-xl font-bold text-teal-700">문제: <span id="currentFillInBlankNum">1</span> / <span id="totalFillInBlankQuestions">13</span></span>
+                        <span class="text-xl font-bold text-blue-700 ml-4">점수: <span id="quiz-score">0</span> / <span id="max-score">0</span></span>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-6 quiz-question-container mb-6">
+                        <p class="text-lg mb-2" id="fill-in-the-blank-question-text"></p>
+                        <input type="text" class="quiz-input" id="fill-in-the-blank-answer-input" placeholder="여기에 정답 입력">
+                        <p class="quiz-feedback mt-2" id="fill-in-the-blank-feedback"></p>
+                    </div>
+                    <div class="flex justify-center space-x-4">
+                        <button id="check-fill-in-blank-btn" class="px-6 py-3 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition font-bold">정답 확인</button>
+                        <button id="next-fill-in-blank-btn" class="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition font-bold hidden">다음 문제</button>
+                        <button id="reset-fill-in-blank-btn" class="px-6 py-3 bg-stone-500 text-white rounded-lg hover:bg-stone-600 transition font-bold">처음부터 다시</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navButtons = document.querySelectorAll('.nav-btn');
+            const contentSections = document.querySelectorAll('.content-section');
+            const quizNavButtons = document.querySelectorAll('.quiz-nav-btn');
+            const quizContents = document.querySelectorAll('.quiz-content');
+
+            // Flashcard Quiz Elements
+            const flashcardDisplay = document.getElementById('flashcard-display');
+            const nextFlashcardBtn = document.getElementById('next-flashcard-btn');
+            const randomFlashcardBtn = document.getElementById('random-flashcard-btn');
+            const shuffleFlashcardsBtn = document.getElementById('shuffle-flashcards-btn');
+            const currentFlashcardNumSpan = document.getElementById('currentFlashcardNum');
+            const totalFlashcardsSpan = document.getElementById('totalFlashcards');
+
+            const allFlashcardData = [
+                {
+                    front: "실학 등장 배경",
+                    back: "왜란과 호란 이후 사회 변화에 성리학이 현실 문제 해결에 한계가 있었기 때문."
+                },
+                {
+                    front: "경세치용 학파",
+                    back: "정약용 중심. 농업과 토지 제도 개혁, 자영농 육성, 토지 소유 제한 주장."
+                },
+                {
+                    front: "이용후생·북학파",
+                    back: "박지원 등 중심. 상공업 발전, 기술 혁신, 청나라와의 교류 강조."
+                },
+                {
+                    front: "동사강목 / 발해고",
+                    back: "조선 후기 전통 문화 연구의 역사서. 특히 발해의 중요성을 재인식."
+                },
+                {
+                    front: "대동여지도",
+                    back: "김정호 제작. 조선 후기 정밀한 지도의 대표적 사례."
+                },
+                {
+                    front: "천주교 박해 이유",
+                    back: "'제사 거부'가 유교 사회와 충돌했기 때문. 정부의 탄압으로 이어짐."
+                },
+                {
+                    front: "동학의 핵심 사상",
+                    back: "시천주(侍天主): '모든 사람의 마음속에 신이 있다' = '모든 인간은 존엄하고 평등하다'."
+                },
+                {
+                    front: "서민 문화 발달 배경",
+                    back: "농업/상업 발달로 경제적 여유 증가, 서당 교육 확대로 문학 향유 가능."
+                },
+                {
+                    front: "제1차 아편전쟁 결과",
+                    back: "청 패배, 난징 조약 체결 (불평등 조약의 시작). 항구 5개 개방, 치외법권, 관세 자율권 상실."
+                },
+                {
+                    front: "불평등 조약 3대 조항",
+                    back: "영사재판권(치외법권), 최혜국 대우, 협정 관세."
+                },
+                {
+                    front: "함포 외교",
+                    back: "군사력을 앞세워 강압적으로 외교 관계를 맺는 방식. (예: 미국 페리 제독의 일본 개항 요구)"
+                },
+                {
+                    front: "통상 수교 거부 정책",
+                    back: "흥선대원군이 서양 세력의 위협에 맞서 무역과 외교를 모두 거부한 정책. 주권 수호 및 전통 사회 유지 목적."
+                }
+            ];
+
+            let shuffledFlashcardIndices = [];
+            let currentFlashcardIndex = 0;
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            function initializeFlashcards() {
+                shuffledFlashcardIndices = Array.from({ length: allFlashcardData.length }, (_, i) => i);
+                shuffleArray(shuffledFlashcardIndices);
+                currentFlashcardIndex = 0;
+                totalFlashcardsSpan.textContent = allFlashcardData.length;
+                renderFlashcard();
+            }
+
+            function renderFlashcard() {
+                if (shuffledFlashcardIndices.length === 0) {
+                    flashcardDisplay.innerHTML = '<p class="text-xl text-stone-600">모든 플래시카드를 보셨습니다!</p>';
+                    currentFlashcardNumSpan.textContent = 0;
+                    return;
+                }
+                const dataIndex = shuffledFlashcardIndices[currentFlashcardIndex];
+                const flashcard = allFlashcardData[dataIndex];
+
+                flashcardDisplay.innerHTML = `
+                    <div class="flashcard w-full h-full" data-index="${dataIndex}">
+                        <div class="flashcard-face">
+                            <h3 class="text-2xl font-bold text-center">${flashcard.front}</h3>
+                        </div>
+                        <div class="flashcard-back">
+                            <p class="text-center text-sm">${flashcard.back}</p>
+                        </div>
+                    </div>
+                `;
+                currentFlashcardNumSpan.textContent = currentFlashcardIndex + 1;
+
+                // Add event listener to the newly rendered flashcard
+                const currentFlashcardElement = flashcardDisplay.querySelector('.flashcard');
+                if (currentFlashcardElement) {
+                    currentFlashcardElement.addEventListener('click', () => {
+                        currentFlashcardElement.classList.toggle('flipped');
+                    });
+                }
+            }
+
+            nextFlashcardBtn.addEventListener('click', () => {
+                currentFlashcardIndex = (currentFlashcardIndex + 1) % shuffledFlashcardIndices.length;
+                renderFlashcard();
+            });
+
+            randomFlashcardBtn.addEventListener('click', () => {
+                currentFlashcardIndex = Math.floor(Math.random() * shuffledFlashcardIndices.length);
+                renderFlashcard();
+            });
+
+            shuffleFlashcardsBtn.addEventListener('click', () => {
+                initializeFlashcards();
+            });
+
+
+            // Fill-in-the-Blank Quiz Elements
+            const fillInTheBlankQuestionText = document.getElementById('fill-in-the-blank-question-text');
+            const fillInTheBlankAnswerInput = document.getElementById('fill-in-the-blank-answer-input');
+            const fillInTheBlankFeedback = document.getElementById('fill-in-the-blank-feedback');
+            const checkFillInBlankBtn = document.getElementById('check-fill-in-blank-btn');
+            const nextFillInBlankBtn = document.getElementById('next-fill-in-blank-btn');
+            const resetFillInBlankBtn = document.getElementById('reset-fill-in-blank-btn');
+            const currentFillInBlankNumSpan = document.getElementById('currentFillInBlankNum');
+            const totalFillInBlankQuestionsSpan = document.getElementById('totalFillInBlankQuestions');
+            const quizScoreSpan = document.getElementById('quiz-score');
+            const maxScoreSpan = document.getElementById('max-score');
+
+            const fillInTheBlankQuestions = [
+                {
+                    question: "조선 후기에는 왜란과 호란 이후, 기존 성리학으로는 해결할 수 없는 현실 문제들을 해결하려는 학문인 ______이 등장했습니다.",
+                    answer: "실학"
+                },
+                {
+                    question: "실학 학파 중 농업과 토지 제도 개혁을 가장 중요하게 보며 정약용이 중심이 된 학파는 ______ 학파입니다.",
+                    answer: "경세치용"
+                },
+                {
+                    question: "실학 학파 중 상공업 발전과 기술 혁신, 청나라와의 교류를 강조하며 박지원 등이 중심이 된 학파는 ______·북학파입니다.",
+                    answer: "이용후생"
+                },
+                {
+                    question: "조선 후기에는 우리 고유의 전통과 문화를 되돌아보려는 흐름이 생겼는데, 특히 발해를 중요한 나라로 재인식한 역사서는 ______와 발해고 등이 있습니다.",
+                    answer: "동사강목"
+                },
+                {
+                    question: "김정호가 만들었으며, 정밀한 지도 제작 방식으로 높게 평가되는 조선 후기 지도는 ______입니다.",
+                    answer: "대동여지도"
+                },
+                {
+                    question: "천주교가 조선 사회에서 박해를 받은 주된 이유는 ______를 거부했기 때문입니다.",
+                    answer: "제사"
+                },
+                {
+                    question: "1860년대 초 최제우가 창시한 종교로 '시천주' 사상을 통해 모든 인간의 존엄과 평등을 강조한 것은 ______입니다.",
+                    answer: "동학"
+                },
+                {
+                    question: "조선 후기 경제적 여유 증가와 서당 교육 확대로 ______층이 즐길 수 있는 문화가 많이 발달했습니다. 홍길동전, 판소리, 탈춤 등이 대표적입니다.",
+                    answer: "서민"
+                },
+                {
+                    question: "1840년 영국과 청나라 사이에 발발하여 청이 패배하고 난징 조약이 체결된 전쟁은 ______ 전쟁입니다.",
+                    answer: "아편"
+                },
+                {
+                    question: "불평등 조약의 3대 조항 중 외국인이 범죄를 저질러도 자국 법으로 자국 영사관에서 재판받는 권한은 ______입니다.",
+                    answer: "영사재판권"
+                },
+                {
+                    question: "불평등 조약 3대 조항 중 어떤 나라와 더 좋은 조건의 조약을 체결하면 그 혜택을 자동으로 받는다는 규정은 ______ 대우입니다.",
+                    answer: "최혜국"
+                },
+                {
+                    question: "미국 페리 제독이 군함을 몰고 와서 일본의 개항을 요구했던 것처럼, 군사력을 앞세워 강압적으로 외교하는 것을 ______ 외교라고 합니다.",
+                    answer: "함포"
+                },
+                {
+                    question: "흥선대원군은 서양 세력의 접근에 맞서 무역과 외교를 모두 거부하는 ______ 정책을 펼쳤습니다.",
+                    answer: "통상수교거부"
+                }
+            ];
+
+            let currentFillInBlankIndex = 0;
+            let quizScore = 0;
+            let answeredCorrectly = false; // Flag to prevent multiple correct answers for one question
+
+            function initializeFillInTheBlankQuiz() {
+                currentFillInBlankIndex = 0;
+                quizScore = 0;
+                answeredCorrectly = false;
+                totalFillInBlankQuestionsSpan.textContent = fillInTheBlankQuestions.length;
+                maxScoreSpan.textContent = fillInTheBlankQuestions.length;
+                updateScoreDisplay();
+                renderFillInTheBlankQuestion();
+                nextFillInBlankBtn.classList.add('hidden');
+                checkFillInBlankBtn.classList.remove('hidden');
+            }
+
+            function renderFillInTheBlankQuestion() {
+                if (currentFillInBlankIndex >= fillInTheBlankQuestions.length) {
+                    fillInTheBlankQuestionText.innerHTML = `모든 문제를 푸셨습니다! 최종 점수: <span class="text-teal-700">${quizScore} / ${fillInTheBlankQuestions.length}</span>`;
+                    fillInTheBlankAnswerInput.value = '';
+                    fillInTheBlankAnswerInput.disabled = true;
+                    fillInTheBlankFeedback.textContent = '';
+                    checkFillInBlankBtn.classList.add('hidden');
+                    nextFillInBlankBtn.classList.add('hidden');
+                    return;
+                }
+
+                const q = fillInTheBlankQuestions[currentFillInBlankIndex];
+                fillInTheBlankQuestionText.innerHTML = `${currentFillInBlankIndex + 1}. ${q.question}`;
+                fillInTheBlankAnswerInput.value = '';
+                fillInTheBlankAnswerInput.disabled = false;
+                fillInTheBlankFeedback.textContent = '';
+                fillInTheBlankFeedback.className = 'quiz-feedback mt-2';
+                currentFillInBlankNumSpan.textContent = currentFillInBlankIndex + 1;
+                checkFillInBlankBtn.classList.remove('hidden');
+                nextFillInBlankBtn.classList.add('hidden');
+                answeredCorrectly = false; // Reset flag for new question
+            }
+
+            function updateScoreDisplay() {
+                quizScoreSpan.textContent = quizScore;
+            }
+
+            checkFillInBlankBtn.addEventListener('click', () => {
+                const userAnswer = fillInTheBlankAnswerInput.value.trim();
+                const correctAnswer = fillInTheBlankQuestions[currentFillInBlankIndex].answer;
+
+                if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                    if (!answeredCorrectly) { // Only add score if not already answered correctly
+                        quizScore++;
+                        updateScoreDisplay();
+                        answeredCorrectly = true;
+                    }
+                    fillInTheBlankFeedback.textContent = '✅ 정답입니다!';
+                    fillInTheBlankFeedback.className = 'quiz-feedback correct';
+                    nextFillInBlankBtn.classList.remove('hidden');
+                    checkFillInBlankBtn.classList.add('hidden');
+                } else {
+                    fillInTheBlankFeedback.textContent = `❌ 오답입니다. 정답은 '${correctAnswer}' 입니다.`;
+                    fillInTheBlankFeedback.className = 'quiz-feedback incorrect';
+                    nextFillInBlankBtn.classList.remove('hidden'); // Allow user to move on after incorrect
+                    checkFillInBlankBtn.classList.add('hidden');
+                }
+                fillInTheBlankAnswerInput.disabled = true; // Disable input after checking
+            });
+
+            nextFillInBlankBtn.addEventListener('click', () => {
+                currentFillInBlankIndex++;
+                renderFillInTheBlankQuestion();
+            });
+
+            resetFillInBlankBtn.addEventListener('click', () => {
+                initializeFillInTheBlankQuiz();
+            });
+
+
+            // Main Navigation Logic
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    contentSections.forEach(section => {
+                        if (section.id === targetId) {
+                            section.classList.add('active');
+                            if (targetId === 'summary-quiz') {
+                                // Ensure correct quiz tab content is displayed
+                                const activeQuizTab = document.querySelector('.quiz-nav-btn.active');
+                                if (activeQuizTab) {
+                                    const activeQuizContentId = activeQuizTab.dataset.quizTarget;
+                                    quizContents.forEach(qc => {
+                                        if (qc.id === `${activeQuizContentId}-quiz`) {
+                                            qc.classList.remove('hidden');
+                                        } else {
+                                            qc.classList.add('hidden');
+                                        }
+                                    });
+                                }
+                                // Initialize active quiz
+                                if (document.getElementById('flashcards-quiz').classList.contains('active')) {
+                                    initializeFlashcards();
+                                } else if (document.getElementById('fill-in-the-blank-quiz').classList.contains('active')) {
+                                    initializeFillInTheBlankQuiz();
+                                }
+                            }
+                        } else {
+                            section.classList.remove('active');
+                        }
+                    });
+                });
+            });
+
+            // Quiz Sub-Navigation Logic
+            quizNavButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.quizTarget;
+
+                    quizNavButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    quizContents.forEach(content => {
+                        if (content.id === `${targetId}-quiz`) {
+                            content.classList.remove('hidden');
+                        } else {
+                            content.classList.add('hidden');
+                        }
+                    });
+
+                    // Initialize the quiz type when its tab is clicked
+                    if (targetId === 'flashcards') {
+                        initializeFlashcards();
+                    } else if (targetId === 'fill-in-the-blank') {
+                        initializeFillInTheBlankQuiz();
+                    }
+                });
+            });
+
+            // Initial setup for the first active section and quiz
+            initializeFlashcards(); // Initialize flashcards on load (default active quiz tab)
+            initializeFillInTheBlankQuiz(); // Initialize fill-in-the-blank (will be hidden initially)
+        });
+    </script>
+
+</body>
+</html>

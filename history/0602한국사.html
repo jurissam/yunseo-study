@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>조선의 개항과 개화, 그리고 위정척사 운동</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Warm Neutrals with Teal Accent) -->
+    <!-- Application Structure Plan: A multi-section SPA covering Korea's opening, enlightenment policies, and conservative resistance. A sticky top navigation bar allows quick jumps. Sections include the Kanghwa Treaty, US-Korea Treaty, Envoy Dispatches, Enlightenment Institutions, and the Wi-jeong Cheok-sa movement. This logical flow helps users understand the cause-and-effect of early modern Korean history. Interactive elements like clickable details and a quiz are integrated. -->
+    <!-- Visualization & Content Choices:
+    - Treaties (Kanghwa, US-Korea): Goal=Inform, Method=Styled HTML cards with lists, Interaction=Clickable/hoverable elements for key clauses/impact, Justification=Clearly presents the terms and implications.
+    - Envoys & Institutions: Goal=Inform/Organize, Method=Card layouts, Interaction=Textual explanation, Justification=Organizes diverse information about different groups/agencies.
+    - Wi-jeong Cheok-sa Movement: Goal=Compare/Change, Method=Timeline-like sections with distinct content for each decade, Interaction=Clickable details, Justification=Highlights the evolution of the movement and its arguments over time.
+    - Quiz: Goal=Assess/Memorize, Method=HTML forms with JavaScript logic for both multiple-choice and fill-in-the-blank questions. Interaction=Select/type answers, check, submit, reset. Justification=Provides interactive self-assessment and memorization aid.
+    - Library/Method: No Chart.js/Plotly.js needed for this content. All diagrams and layouts use standard HTML and Tailwind CSS.
+     -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+        .teacher-speech {
+            border-left: 5px solid #0d9488; /* teal-600 */
+            background-color: #f0fdfa; /* teal-50 */
+        }
+        .section-title {
+            font-weight: 900;
+            color: #1e293b; /* slate-800 */
+            letter-spacing: -0.05em;
+        }
+        .card {
+            transition: all 0.3s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .nav-button.active {
+            background-color: #0d9488;
+            color: white;
+        }
+        .quiz-option.correct {
+            background-color: #d1fae5; /* green-100 */
+            border-color: #10b981; /* green-500 */
+        }
+        .quiz-option.incorrect {
+            background-color: #fee2e2; /* red-100 */
+            border-color: #ef4444; /* red-500 */
+        }
+        .quiz-input-feedback {
+            margin-top: 8px;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .quiz-input-feedback.correct {
+            background-color: #d1fae5; /* green-100 */
+            color: #10b981; /* green-500 */
+        }
+        .quiz-input-feedback.incorrect {
+            background-color: #fee2e2; /* red-100 */
+            color: #ef4444; /* red-500 */
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl md:text-3xl font-black text-center text-teal-700">조선의 문호 개방과 개화 정책</h1>
+            <p class="text-center text-stone-500 mt-1">강화도 조약부터 위정척사 운동까지, 핵심 정리!</p>
+            <nav class="flex justify-center items-center space-x-2 sm:space-x-4 mt-4 text-sm sm:text-base">
+                <button onclick="scrollToSection('ganghwa')" class="nav-button px-3 py-2 sm:px-4 font-bold rounded-full transition-all duration-300 bg-white border-2 border-teal-600 text-teal-600 hover:bg-teal-600 hover:text-white">1. 강화도 조약</button>
+                <button onclick="scrollToSection('us_korea_treaty')" class="nav-button px-3 py-2 sm:px-4 font-bold rounded-full transition-all duration-300 bg-white border-2 border-teal-600 text-teal-600 hover:bg-teal-600 hover:text-white">2. 조미수호통상조약</button>
+                <button onclick="scrollToSection('enlightenment')" class="nav-button px-3 py-2 sm:px-4 font-bold rounded-full transition-all duration-300 bg-white border-2 border-teal-600 text-teal-600 hover:bg-teal-600 hover:text-white">3. 개화 정책</button>
+                <button onclick="scrollToSection('wi_jeong_cheok_sa')" class="nav-button px-3 py-2 sm:px-4 font-bold rounded-full transition-all duration-300 bg-white border-2 border-teal-600 text-teal-600 hover:bg-teal-600 hover:text-white">4. 위정척사 운동</button>
+                <button onclick="scrollToSection('quiz')" class="nav-button px-3 py-2 sm:px-4 font-bold rounded-full transition-all duration-300 bg-white border-2 border-teal-600 text-teal-600 hover:bg-teal-600 hover:text-white">5. 퀴즈 풀기!</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- 강화도 조약 섹션 -->
+        <section id="ganghwa" class="mb-16 scroll-mt-24">
+            <h2 class="section-title text-3xl md:text-4xl mb-4 text-center">🚢 강화도 조약 (1876)</h2>
+            <p class="text-center text-lg text-stone-600 mb-8">"얘들아, 강화도 조약은 조선이 서양 근대 방식의 조약을 맺은 최초의 조약이야. 하지만 그 내용을 자세히 들여다보면 조선에게 너무나 불리한 불평등 조약이었다는 사실! 이 조약의 핵심 내용을 파악하는 게 정말 중요해!"</p>
+
+            <div class="space-y-8">
+                <!-- 주요 불평등 조항 -->
+                <div class="card p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-xl text-red-600 mb-3">⚠️ 불평등 조항 (이거 시험에 나온다!)</h3>
+                    <ul class="list-disc list-inside space-y-2 text-stone-700">
+                        <li>**제7조 (해안 측량권 허용)**: 일본이 조선 해안을 자유롭게 측량하고 지도 제작을 허용했어. "이게 나중에 침략에 어떻게 활용될까? 당연히 군사적인 목적으로 쓰일 수 있지!"</li>
+                        <li>**제10조 (영사 재판권)**: 일본인이 조선에서 죄를 지어도 조선 법으로 처벌할 수 없고, 일본 영사가 재판하는 거야. "조선의 사법 주권을 침해하는 가장 대표적인 조항이라고 볼 수 있지!"</li>
+                        <li>**개항장 설정**: 부산 외 원산, 인천 개항</li>
+                    </ul>
+                </div>
+
+                <!-- 후속 조약과 경제적 침탈 -->
+                <div class="card p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-xl text-orange-600 mb-3">💰 후속 조약과 경제적 침탈</h3>
+                    <p class="mt-2 text-stone-700">강화도 조약 이후 체결된 후속 조약들은 일본의 경제적 이득을 극대화했어. 특히 이 두 가지는 꼭 기억해야 해!</p>
+                    <ul class="list-disc list-inside space-y-2 mt-4 text-stone-700">
+                        <li>**일본 화폐 사용 허용**: "조선 화폐 시스템에 혼란을 초래하고, 결국 일본 화폐에 종속될 위험이 커졌지!"</li>
+                        <li>**무제한 곡물 수출 허용 (무관세)**: "조선은 당시 식량이 풍족하지 않았는데, 일본이 쌀을 무제한으로 가져가니 곡물 가격이 폭등하고 백성들 삶은 더 힘들어졌어!"</li>
+                        <li>**관세 납부 면제**: "관세는 국내 산업을 보호하는 건데, 일본은 관세도 안 내고 물건을 파니 조선의 산업은 일본 상품과 경쟁이 안 됐지!"</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 조미수호통상조약 섹션 -->
+        <section id="us_korea_treaty" class="mb-16 scroll-mt-24">
+            <h2 class="section-title text-3xl md:text-4xl mb-4 text-center">🤝 조미수호통상조약 (1882)</h2>
+            <p class="text-center text-lg text-stone-600 mb-8">"얘들아, 이 조약은 조선이 서양 국가 중 최초로 미국과 맺은 거야. 청나라의 알선으로 체결됐는데, 이 배경에는 러시아를 견제하려는 청의 '조선책략'이 있었어. 비록 불평등했지만, 서양과의 새로운 외교 관계를 시작했다는 점에서 의미가 있지!"</p>
+
+            <div class="space-y-8">
+                <!-- 조선책략의 영향 -->
+                <div class="card p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-xl text-blue-600 mb-3">💡 배경: 조선책략</h3>
+                    <p class="mt-2 text-stone-700">김홍집이 일본에서 가져온 '조선책략'은 러시아의 남하를 막기 위해 "친중국(親中國), 결일본(結日本), 연미국(聯美國)"을 주장했어. "이게 바로 미국과의 수교를 추진하게 된 가장 중요한 계기야!"</p>
+                </div>
+
+                <!-- 주요 내용 -->
+                <div class="card p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-xl text-purple-600 mb-3">📜 주요 내용 (중요하다!)</h3>
+                    <div class="space-y-2">
+                        <div class="p-2 bg-purple-50 rounded-md cursor-pointer hover:bg-purple-100" onclick="toggleDetail(this)">
+                            <h4 class="font-bold">제1조: 거중조정</h4>
+                            <p class="detail hidden mt-1 text-sm text-purple-800">"만약 다른 나라와 문제가 생기면 미국이 중간에서 잘 조정해 준다!"는 약속인데... 과연 그랬을까?</p>
+                        </div>
+                        <div class="p-2 bg-purple-50 rounded-md cursor-pointer hover:bg-purple-100" onclick="toggleDetail(this)">
+                            <h4 class="font-bold">제4조: 영사재판권 (치외법권)</h4>
+                            <p class="detail hidden mt-1 text-sm text-purple-800">강화도 조약과 마찬가지로 미국인에게도 영사 재판권이 주어졌어. "이건 역시 주권 침해라고 볼 수 있지!"</p>
+                        </div>
+                        <div class="p-2 bg-purple-50 rounded-md cursor-pointer hover:bg-purple-100" onclick="toggleDetail(this)">
+                            <h4 class="font-bold">제5조: 관세 부과 (일용품 10% 상한선)</h4>
+                            <p class="detail hidden mt-1 text-sm text-purple-800">일본과 달리 관세를 부과할 수 있게 됐어. 하지만 일용품은 10%를 넘지 못한다는 상한선이 있었지.</p>
+                        </div>
+                        <div class="p-2 bg-purple-50 rounded-md cursor-pointer hover:bg-purple-100" onclick="toggleDetail(this)">
+                            <h4 class="font-bold">제14조: 최혜국 대우</h4>
+                            <p class="detail hidden mt-1 text-sm text-purple-800">나중에 다른 나라에게 더 좋은 대우를 해주면, 미국도 자동적으로 그 대우를 받을 수 있게 해준다는 거야. "불평등 조약의 끝판왕이지!"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 개화 정책 추진 섹션 -->
+        <section id="enlightenment" class="mb-16 scroll-mt-24">
+            <h2 class="section-title text-3xl md:text-4xl mb-4 text-center">📈 개화 정책 추진</h2>
+            <p class="text-center text-lg text-stone-600 mb-8">"얘들아, 개화 정책은 나라를 강하게 만들고 서양처럼 발전시키기 위한 노력이야. 정부는 새로운 기구를 만들고, 다른 나라에 사절단을 보내 선진 문물을 배우려 했어! 이거 하나하나가 다 시험 포인트야!"</p>
+
+            <div class="space-y-8">
+                <!-- 개화 총괄 기구 -->
+                <div class="card p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-xl text-green-600 mb-3">🏛️ 개화 총괄 기구</h3>
+                    <p class="mt-2 text-stone-700">**총리 기무아문**: 개화 정책을 총괄하는 기구로 설치되었어. 그 아래 심리사(사무 관장) 등이 있었지.</p>
+                </div>
+
+                <!-- 군사 제도 개편 -->
+                <div class="card p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-xl text-sky-600 mb-3">⚔️ 군사 제도 개편</h3>
+                    <ul class="list-disc list-inside space-y-2 text-stone-700">
+                        <li>**별기군**: 신식 무기와 훈련으로 무장한 근대 군대야. "이 별기군 때문에 구식 군인들이 차별받아서 임오군란이 터진 거야, 알겠지?"</li>
+                        <li>**5군영 → 2영 축소**: 기존의 5군영 체제를 2영(무위영, 장어영)으로 축소했어.</li>
+                    </ul>
+                </div>
+
+                <!-- 근대 문물 수용을 위한 기관 -->
+                <div class="card p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-xl text-yellow-600 mb-3">🛠️ 근대 문물 수용을 위한 기관</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div class="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                            <h4 class="font-bold">기기창</h4>
+                            <p class="text-sm text-stone-600">서양의 신식 무기를 연구하고 제조하던 곳. 영선사들이 배워온 기술을 활용했어.</p>
+                        </div>
+                        <div class="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                            <h4 class="font-bold">박문국</h4>
+                            <p class="text-sm text-stone-600">인쇄 및 출판을 담당. 우리나라 최초의 근대 신문인 **'한성순보'**를 발행했어. "이거 정말 중요해, 꼭 기억해!"</p>
+                        </div>
+                        <div class="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                            <h4 class="font-bold">전환국</h4>
+                            <p class="text-sm text-stone-600">근대적인 화폐(주화)를 만드는 곳. "돈을 찍어내는 곳이지!"</p>
+                        </div>
+                        <div class="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                            <h4 class="font-bold">동문학</h4>
+                            <p class="text-sm text-stone-600">외국어 교육을 담당. 외교관, 통역관 등 근대 외교에 필요한 인재를 양성했어.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 해외 사절단 파견 -->
+                <div class="card p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-xl text-teal-600 mb-3">✈️ 해외 사절단 파견</h3>
+                    <p class="mt-2 text-stone-700">개화 정책 추진을 위한 정보 수집과 외교 업무를 위해 다양한 사절단을 해외로 보냈어. 어디로 누구를 보냈는지 헷갈리면 안 돼!</p>
+                    <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-3 bg-teal-50 rounded-lg border border-teal-200">
+                            <h4 class="font-bold">일본 🇯🇵</h4>
+                            <ul class="list-disc list-inside mt-1 text-sm text-stone-600">
+                                <li>**수신사**: 외교 업무. 김홍집이 2차 수신사로 '조선책략'을 가져왔지.</li>
+                                <li>**조사 시찰단**: 개화 정책에 필요한 정보 수집, 일본 문물 시찰.</li>
+                            </ul>
+                        </div>
+                        <div class="p-3 bg-teal-50 rounded-lg border border-teal-200">
+                            <h4 class="font-bold">청나라 🇨🇳</h4>
+                            <ul class="list-disc list-inside mt-1 text-sm text-stone-600">
+                                <li>**영선사**: 양무운동 시찰, 근대 무기 제조 기술 및 군사 훈련법 습득.</li>
+                            </ul>
+                        </div>
+                        <div class="p-3 bg-teal-50 rounded-lg border border-teal-200">
+                            <h4 class="font-bold">미국 🇺🇸</h4>
+                            <ul class="list-disc list-inside mt-1 text-sm text-stone-600">
+                                <li>**보빙사**: 미국 대통령에게 국서 전달, 선진 문물 시찰.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 위정척사 운동 섹션 -->
+        <section id="wi_jeong_cheok_sa" class="mb-16 scroll-mt-24">
+            <h2 class="section-title text-3xl md:text-4xl mb-4 text-center">🛡️ 위정척사 운동</h2>
+            <p class="text-center text-lg text-stone-600 mb-8">"얘들아, 개화 정책에 반대하고 서양과 일본을 배척하자는 움직임도 있었어. '바른 것을 지키고 사악한 것을 물리친다'는 뜻인데, 시대별로 주장이 조금씩 달랐다는 게 중요해!"</p>
+
+            <div class="space-y-8">
+                <!-- 핵심 사상 -->
+                <div class="card p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-xl text-red-600 mb-3">🔥 핵심 사상: 위정척사 (衛正斥邪)</h3>
+                    <ul class="list-disc list-inside space-y-2 text-stone-700">
+                        <li>**위정 (衛正)**: 성리학적 전통 질서와 사상을 지키자!</li>
+                        <li>**척사 (斥邪)**: 서양 문물과 일본의 침략을 배척하자!</li>
+                    </ul>
+                </div>
+
+                <!-- 시대별 전개 -->
+                <div class="card p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-xl text-orange-600 mb-3">➡️ 시대별 전개 (흐름을 기억해!)</h3>
+                    <div class="space-y-4 mt-4">
+                        <div class="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                            <h4 class="font-bold">1860년대: 통상 반대 (척화주전론)</h4>
+                            <p class="text-sm text-stone-600">흥선대원군 시기. 이항로, 기정진 등이 서양 세력과의 통상을 반대하고 싸우자고 주장. <span class="font-bold text-red-500">'척화비'</span> 세웠던 거 기억나지?</p>
+                        </div>
+                        <div class="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                            <h4 class="font-bold">1870년대: 개항 반대 (왜양일체론)</h4>
+                            <p class="text-sm text-stone-600">최익현 등이 강화도 조약 체결에 반대하며 "일본은 서양 오랑캐와 다를 바 없다!"고 주장. "일본을 통해 서양 문물이 들어올까 봐 걱정한 거야!"</p>
+                        </div>
+                        <div class="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                            <h4 class="font-bold">1880년대: 개화 정책 반대</h4>
+                            <p class="text-sm text-stone-600">'조선책략' 유포에 반대하며 이만손을 중심으로 **영남 만인소** (경상도 유생 만 명의 상소)를 올렸어. 홍재학도 상소문을 올렸지. "미국과의 수교를 막으려고 했던 거야!"</p>
+                        </div>
+                         <div class="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                            <h4 class="font-bold">1890년대 이후: 항일 의병 운동으로 발전</h4>
+                            <p class="text-sm text-stone-600">점점 일본의 침략이 심해지자 위정척사 사상이 항일 의병 운동으로 이어지기도 해. "나라를 지키려는 마음은 같았지!"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 역사적 평가 -->
+                <div class="card p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-xl text-blue-600 mb-3">⚖️ 역사적 평가</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div class="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                            <h4 class="font-bold">긍정적 측면 👍</h4>
+                            <p class="text-sm text-stone-600">서양과 일본의 침략 의도에 대한 저항이자, 나라를 지키려는 자주적인 움직임이었어.</p>
+                        </div>
+                        <div class="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                            <h4 class="font-bold">부정적 측면 👎</h4>
+                            <p class="text-sm text-stone-600">시대 변화에 대한 인식이 부족했고, 개화와 근대화를 지연시켰다는 비판도 있어. 일부는 기득권을 지키기 위함이라는 시각도 있지.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 퀴즈 섹션 -->
+        <section id="quiz" class="mb-16 scroll-mt-24">
+            <h2 class="section-title text-3xl md:text-4xl mb-4 text-center">📝 실력 점검 퀴즈!</h2>
+            <p class="text-center text-lg text-stone-600 mb-8">"윤서야, 이번엔 좀 더 난이도 있는 문제들로 준비했어! 방금 배운 내용들을 얼마나 잘 이해했는지 퀴즈로 확인해 보자!"</p>
+
+            <div id="quiz-container" class="bg-white rounded-xl shadow-lg border border-stone-200 p-6 space-y-6">
+                <!-- Quiz questions will be rendered here by JavaScript -->
+            </div>
+
+            <div id="quiz-results" class="hidden mt-8 p-6 bg-blue-50 rounded-xl shadow-lg border border-blue-200 text-center">
+                <h3 class="text-2xl font-bold text-blue-800 mb-4">⭐ 퀴즈 결과 ⭐</h3>
+                <p id="score-display" class="text-xl font-bold text-blue-700 mb-4"></p>
+                <button onclick="resetQuiz()" class="mt-4 px-6 py-3 bg-teal-600 text-white font-bold rounded-full hover:bg-teal-700 transition-all duration-300">다시 풀기</button>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center p-8 text-stone-500 text-sm">
+        <p>윤서 학생의 역사 시험 만점을 응원합니다! 💯</p>
+    </footer>
+
+    <script>
+        const quizData = [
+            {
+                question: "Q1. 강화도 조약 제7조는 일본의 조선 해안 ____ 허용하는 조항으로, 침략적인 의도를 보여줍니다.",
+                type: "fill_in_the_blank",
+                blankAnswer: "측량권",
+                placeholder: "예) 측량권"
+            },
+            {
+                question: "Q2. 조미수호통상조약에서 '다른 나라에게 더 좋은 대우를 해주면, 미국도 자동적으로 그 대우를 받을 수 있게 한다'는 조항을 무엇이라고 하나요?",
+                type: "multiple_choice",
+                options: [
+                    "거중조정",
+                    "영사재판권",
+                    "관세 부과",
+                    "최혜국 대우"
+                ],
+                answer: 3
+            },
+            {
+                question: "Q3. 다음 중 위정척사 운동의 시대별 주장과 그 시기가 올바르게 연결된 것은 무엇인가요?",
+                type: "multiple_choice",
+                options: [
+                    "1860년대 - 왜양일체론",
+                    "1870년대 - 개화 정책 반대 (영남 만인소)",
+                    "1880년대 - 통상 반대 (척화주전론)",
+                    "1870년대 - 개항 반대 (왜양일체론)"
+                ],
+                answer: 3
+            },
+            {
+                question: "Q4. 우리나라 최초의 근대 신문인 '한성순보'를 발행한 개화기 기관의 이름은 무엇인가요? (빈칸 채우기)",
+                type: "fill_in_the_blank",
+                blankAnswer: "박문국",
+                placeholder: "예) 박문국"
+            },
+            {
+                question: "Q5. 조선이 청나라의 양무운동을 시찰하고 근대 무기 제조 기술을 배우기 위해 파견했던 사절단의 이름은 무엇인가요?",
+                type: "multiple_choice",
+                options: [
+                    "수신사",
+                    "조사 시찰단",
+                    "영선사",
+                    "보빙사"
+                ],
+                answer: 2
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderQuiz();
+            setupScrollSpy();
+        });
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function toggleDetail(element) {
+            const detail = element.querySelector('.detail');
+            detail.classList.toggle('hidden');
+        }
+
+        function renderQuiz() {
+            const quizContainer = document.getElementById('quiz-container');
+            quizContainer.innerHTML = ''; // Clear previous quiz
+
+            quizData.forEach((q, qIndex) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'mb-4 p-4 border border-stone-200 rounded-lg bg-stone-50';
+                questionDiv.dataset.questionIndex = qIndex; // Add data attribute for easier lookup
+
+                const questionText = document.createElement('p');
+                questionText.className = "font-bold text-lg mb-3 text-stone-800";
+                questionText.textContent = q.question;
+                questionDiv.appendChild(questionText);
+
+                if (q.type === "multiple_choice") {
+                    q.options.forEach((option, oIndex) => {
+                        const optionLabel = document.createElement('label');
+                        optionLabel.className = 'block flex items-center mb-2 cursor-pointer p-2 rounded-md hover:bg-stone-100 transition-colors duration-200';
+                        optionLabel.innerHTML = `
+                            <input type="radio" name="question${qIndex}" value="${oIndex}" class="mr-2 text-teal-600 focus:ring-teal-500">
+                            <span class="text-stone-700">${option}</span>
+                        `;
+                        questionDiv.appendChild(optionLabel);
+                    });
+                } else if (q.type === "fill_in_the_blank") {
+                    const inputWrapper = document.createElement('div');
+                    inputWrapper.className = 'flex items-center gap-2 mt-2';
+                    inputWrapper.innerHTML = `
+                        <input type="text" id="blank-q${qIndex}" placeholder="${q.placeholder || '정답 입력'}" class="flex-grow p-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        <button type="button" onclick="checkBlankAnswer(${qIndex})" class="px-4 py-2 bg-teal-500 text-white font-bold rounded-md hover:bg-teal-600 transition-colors duration-200 text-sm whitespace-nowrap">정답 확인</button>
+                    `;
+                    questionDiv.appendChild(inputWrapper);
+                    const feedbackDiv = document.createElement('div');
+                    feedbackDiv.id = `feedback-q${qIndex}`;
+                    feedbackDiv.className = 'quiz-input-feedback hidden';
+                    questionDiv.appendChild(feedbackDiv);
+                }
+                quizContainer.appendChild(questionDiv);
+            });
+
+            const submitButton = document.createElement('button');
+            submitButton.textContent = "최종 결과 확인!";
+            submitButton.className = "w-full py-3 bg-teal-600 text-white font-bold rounded-full hover:bg-teal-700 transition-all duration-300 mt-6";
+            submitButton.onclick = submitQuiz;
+            quizContainer.appendChild(submitButton);
+
+            document.getElementById('quiz-results').classList.add('hidden');
+        }
+
+        function checkBlankAnswer(qIndex) {
+            const questionData = quizData[qIndex];
+            const inputElement = document.getElementById(`blank-q${qIndex}`);
+            const feedbackDiv = document.getElementById(`feedback-q${qIndex}`);
+            const typedAnswer = inputElement.value.trim();
+
+            feedbackDiv.classList.remove('hidden', 'correct', 'incorrect');
+            inputElement.disabled = true; // Disable input after checking
+
+            if (typedAnswer === questionData.blankAnswer) {
+                feedbackDiv.textContent = `정답입니다! '${questionData.blankAnswer}'`;
+                feedbackDiv.classList.add('correct');
+            } else {
+                feedbackDiv.textContent = `오답입니다. 정답은 '${questionData.blankAnswer}' 입니다.`;
+                feedbackDiv.classList.add('incorrect');
+            }
+            // Hide the individual check button
+            inputElement.nextElementSibling.classList.add('hidden');
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            const quizContainer = document.getElementById('quiz-container');
+            const quizResults = document.getElementById('quiz-results');
+            const scoreDisplay = document.getElementById('score-display');
+
+            quizData.forEach((q, qIndex) => {
+                const questionDiv = document.querySelector(`div[data-question-index="${qIndex}"]`);
+
+                if (q.type === "multiple_choice") {
+                    const selectedOption = document.querySelector(`input[name="question${qIndex}"]:checked`);
+
+                    if (selectedOption) {
+                        const selectedValue = parseInt(selectedOption.value);
+                        if (selectedValue === q.answer) {
+                            score++;
+                            selectedOption.closest('label').classList.add('quiz-option', 'correct');
+                        } else {
+                            selectedOption.closest('label').classList.add('quiz-option', 'incorrect');
+                            const correctAnswerLabel = document.querySelector(`input[name="question${qIndex}"][value="${q.answer}"]`).closest('label');
+                            if (correctAnswerLabel) {
+                                correctAnswerLabel.classList.add('quiz-option', 'correct');
+                                correctAnswerLabel.classList.remove('hover:bg-stone-100');
+                                correctAnswerLabel.style.fontWeight = 'bold';
+                            }
+                        }
+                        const options = document.querySelectorAll(`input[name="question${qIndex}"]`);
+                        options.forEach(opt => opt.disabled = true);
+                    } else {
+                        // If no option is selected, mark as incorrect and show correct answer
+                        const correctAnswerLabel = document.querySelector(`input[name="question${qIndex}"][value="${q.answer}"]`).closest('label');
+                        if (correctAnswerLabel) {
+                             correctAnswerLabel.classList.add('quiz-option', 'correct');
+                             correctAnswerLabel.classList.remove('hover:bg-stone-100');
+                             correctAnswerLabel.style.fontWeight = 'bold';
+                        }
+                        const options = document.querySelectorAll(`input[name="question${qIndex}"]`);
+                        options.forEach(opt => opt.disabled = true);
+                    }
+                } else if (q.type === "fill_in_the_blank") {
+                    // Fill-in-the-blank questions are checked individually.
+                    // Just ensure they are disabled and feedback is shown if not already.
+                    const inputElement = document.getElementById(`blank-q${qIndex}`);
+                    const feedbackDiv = document.getElementById(`feedback-q${qIndex}`);
+                    const checkButton = inputElement.nextElementSibling; // Get the check button
+
+                    if (!inputElement.disabled) { // If not already checked
+                         checkBlankAnswer(qIndex);
+                    }
+
+                    if (inputElement.value.trim() === q.blankAnswer) {
+                        score++;
+                    }
+                }
+            });
+
+            scoreDisplay.textContent = `총 ${quizData.length}문제 중 ${score}문제 맞혔어요!`;
+            quizResults.classList.remove('hidden');
+            document.querySelector('#quiz-container button').classList.add('hidden'); // Hide submit button
+            scrollToSection('quiz-results'); // Scroll to results
+        }
+
+        function resetQuiz() {
+            renderQuiz(); // Re-render quiz to reset state
+            document.getElementById('quiz-results').classList.add('hidden');
+        }
+
+        function setupScrollSpy() {
+            const sections = document.querySelectorAll('section[id]');
+            const navButtons = document.querySelectorAll('.nav-button');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navButtons.forEach(button => {
+                            button.classList.remove('active');
+                            if (button.getAttribute('onclick').includes(entry.target.id)) {
+                                button.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px" });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        }
+    </script>
+</body>
+</html>

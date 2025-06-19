@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대화형 한국사 학습: 갑오개혁 완전 정복</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Study -->
+    <!-- Application Structure Plan: The SPA is designed as a thematic dashboard with three main interactive sections: 'Timeline View', 'Reform Comparison', and 'Keyword Quiz'. This structure moves beyond the linear format of the source notes to offer a more flexible and engaging learning experience. Users can start with a chronological overview (Timeline), dive deep into comparative details (Comparison), and then test their knowledge (Quiz). This user-flow is designed for effective exam preparation by reinforcing information through different interactive methods. -->
+    <!-- Visualization & Content Choices: 
+        1. Timeline View (흐름 한눈에 보기): Goal: Show sequence and cause-and-effect. Method: An interactive vertical timeline using HTML/CSS (Flexbox). Interaction: Clicking an event card reveals detailed information. Justification: Visualizing the flow of events is more memorable than reading a list.
+        2. Reform Comparison (개혁 내용 비교하기): Goal: Compare and contrast the reform phases. Method: A tabbed interface with a dynamic bar chart (Chart.js/Canvas) and text content. Interaction: Clicking tabs updates both the descriptive text and the chart, which visualizes the number of key policies in different areas (political, economic, social). Justification: Direct comparison and data visualization clarify the differences and shifting priorities of each reform stage, a common exam topic.
+        3. Keyword Quiz (핵심 용어 퀴즈): Goal: Reinforce key vocabulary. Method: Interactive multiple-choice quiz cards using HTML/JS. Interaction: Users select an answer and receive immediate feedback. Justification: Active recall through quizzing is a highly effective study method.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #F8F5F2; /* Warm Neutral Background */
+        }
+        .nav-btn {
+            transition: all 0.3s ease;
+            border-bottom: 4px solid transparent;
+        }
+        .nav-btn.active {
+            border-bottom-color: #D97706; /* Amber-600 */
+            color: #374151; /* Gray-700 */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 19px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #D1D5DB; /* Gray-300 */
+            z-index: -1;
+        }
+        .timeline-item:last-child::before {
+            display: none;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: 10px;
+            top: 4px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 3px solid #F8F5F2;
+        }
+        .quiz-option:hover {
+            background-color: #FEF3C7; /* Amber-100 */
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">대화형 한국사 학습</h1>
+            <p class="text-lg text-gray-600 mt-2">갑오개혁부터 아관파천까지, 핵심만 쏙쏙!</p>
+        </header>
+
+        <nav class="flex justify-center border-b-2 border-gray-200 mb-8">
+            <button class="nav-btn active text-lg font-bold py-3 px-6 text-gray-500" data-target="timeline">흐름 한눈에 보기</button>
+            <button class="nav-btn text-lg font-bold py-3 px-6 text-gray-500" data-target="comparison">개혁 내용 비교하기</button>
+            <button class="nav-btn text-lg font-bold py-3 px-6 text-gray-500" data-target="quiz">핵심 용어 퀴즈</button>
+        </nav>
+
+        <main>
+            <!-- Section 1: Timeline View -->
+            <section id="timeline" class="content-section active fade-in">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-2xl font-bold mb-2">사건의 흐름 따라가기 🗺️</h2>
+                    <p class="text-gray-600 mb-6">격동의 시기, 갑오개혁부터 아관파천까지 주요 사건의 흐름을 시간 순서대로 따라가 보세요. 각 카드를 클릭하면 자세한 설명이 나타납니다.</p>
+                    <div id="timeline-container" class="relative">
+                        <!-- Timeline items will be injected by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Comparison View -->
+            <section id="comparison" class="content-section fade-in">
+                 <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-2xl font-bold mb-2">갑오・을미개혁 심층 비교 ⚖️</h2>
+                    <p class="text-gray-600 mb-6">1차, 2차, 3차(을미) 개혁의 특징과 주요 내용을 비교해 봅시다. 탭을 눌러 각 개혁의 내용을 확인하고, 아래 차트를 통해 개혁의 성격 변화를 시각적으로 파악해 보세요.</p>
+                    <div class="flex border-b border-gray-300 mb-4">
+                        <button class="comparison-tab active flex-1 py-2 text-center font-semibold" data-reform="1">1차 갑오개혁</button>
+                        <button class="comparison-tab flex-1 py-2 text-center font-semibold text-gray-500" data-reform="2">2차 갑오개혁</button>
+                        <button class="comparison-tab flex-1 py-2 text-center font-semibold text-gray-500" data-reform="3">3차 을미개혁</button>
+                    </div>
+                    <div id="comparison-content" class="mb-6">
+                        <!-- Comparison content will be injected by JavaScript -->
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="reformChart"></canvas>
+                    </div>
+                 </div>
+            </section>
+
+            <!-- Section 3: Quiz View -->
+            <section id="quiz" class="content-section fade-in">
+                 <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-2xl font-bold mb-2">실력 점검! 핵심 퀴즈 ✏️</h2>
+                    <p class="text-gray-600 mb-6">공부한 내용을 잘 기억하고 있는지 퀴즈로 확인해 봅시다. 정답이라고 생각하는 보기를 클릭하세요!</p>
+                    <div id="quiz-container" class="space-y-6">
+                        <!-- Quiz items will be injected by JavaScript -->
+                    </div>
+                    <div id="quiz-result" class="hidden text-center mt-8">
+                        <h3 class="text-2xl font-bold">퀴즈 결과</h3>
+                        <p class="text-5xl my-4"><span id="score"></span> / <span id="total-questions"></span></p>
+                        <p id="result-message" class="text-lg font-semibold mb-4"></p>
+                        <button id="retry-quiz" class="bg-amber-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-amber-700 transition">다시 풀기</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <footer class="text-center mt-12 text-gray-500">
+            <p>&copy; 2025 Interactive History Learning. All rights reserved.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const data = {
+            timeline: [
+                {
+                    year: '1894년 6월',
+                    title: '1차 갑오개혁 시작',
+                    description: '일본이 경복궁을 점령하고 군국기무처를 설치하여 개혁을 주도했어요. 청일전쟁 중이라 일본의 간섭은 상대적으로 적었죠. 이때 신분제 폐지, 과거제 폐지 등 중요한 개혁이 이루어졌답니다.',
+                    color: 'bg-sky-500'
+                },
+                {
+                    year: '1894년 7월',
+                    title: '청일전쟁 발발',
+                    description: '조선의 지배권을 두고 청나라와 일본이 전쟁을 시작했어요. 이 전쟁의 승패가 앞으로의 개혁 방향에 큰 영향을 미치게 됩니다.',
+                    color: 'bg-red-500'
+                },
+                {
+                    year: '1894년 11월',
+                    title: '2차 갑오개혁 시작',
+                    description: '청일전쟁에서 일본의 승세가 굳어지자, 박영효가 귀국하여 김홍집과 연립 내각을 구성했어요. 이때부터 일본의 적극적인 간섭이 시작되었고, 8도를 23부로 개편하는 등 행정 개혁이 이루어졌습니다.',
+                    color: 'bg-blue-500'
+                },
+                {
+                    year: '1895년 4월',
+                    title: '시모노세키 조약 & 삼국간섭',
+                    description: '청일전쟁에서 승리한 일본은 시모노세키 조약으로 랴오둥 반도를 얻었어요. 하지만 러시아, 프랑스, 독일이 이를 반환하라고 압박했죠. 이것이 바로 "삼국간섭"! 결국 일본은 랴오둥 반도를 포기하게 됩니다.',
+                    color: 'bg-purple-500'
+                },
+                {
+                    year: '1895년 8월',
+                    title: '을미사변 발생',
+                    description: '삼국간섭으로 위신이 떨어진 일본이 조선에 대한 영향력을 회복하기 위해 명성황후를 시해하는 끔찍한 만행을 저질렀어요. 이 사건으로 조선인들의 반일 감정이 극에 달했습니다.',
+                    color: 'bg-gray-700'
+                },
+                {
+                    year: '1895년 10월',
+                    title: '3차 갑오개혁 (을미개혁)',
+                    description: '을미사변 이후 친일 세력이 주도하여 단발령, 태양력 사용 등의 개혁을 추진했어요. 특히 상투를 자르라는 단발령은 백성들의 거센 반발을 불러일으켜 을미의병의 원인이 되었습니다.',
+                    color: 'bg-green-500'
+                },
+                {
+                    year: '1896년 2월',
+                    title: '아관파천',
+                    description: '을미사변과 단발령 등으로 신변에 위협을 느낀 고종이 러시아 공사관으로 피신한 사건이에요. "아관"은 아라사(러시아)의 공관이라는 뜻이랍니다. 이로 인해 을미개혁은 중단되었어요.',
+                    color: 'bg-yellow-500'
+                }
+            ],
+            reforms: {
+                '1': {
+                    title: '1차 갑오개혁',
+                    summary: '군국기무처 중심으로 진행되었으며, 청일전쟁 중이라 일본의 간섭이 비교적 적어 자주적인 성격의 개혁이 많았습니다.',
+                    points: [
+                        { category: '정치', content: '개국기년 사용, 6조→8아문 개편, 국내부 설치(왕실/정부 분리)' },
+                        { category: '경제', content: '재정 일원화(탁지아문), 은 본위 화폐 제도, 조세의 금납화' },
+                        { category: '사회', content: '신분제·과거제 폐지, 고문·연좌제 폐지, 조혼 금지' }
+                    ],
+                    chartData: [4, 3, 4]
+                },
+                '2': {
+                    title: '2차 갑오개혁',
+                    summary: '청일전쟁에서 일본이 승리한 후 박영효가 참여하며 일본의 간섭이 본격화되었습니다. 지방 제도를 개편하고 근대적 교육 제도를 도입했습니다.',
+                    points: [
+                        { category: '정치', content: '내각 7부제, 8도→23부로 개편, 지방관 권한 축소(사법/군사권 박탈)' },
+                        { category: '사법', content: '재판소 설치를 통한 사법권 독립' },
+                        { category: '교육', content: '교육입국조서 반포, 한성사범학교 등 근대 학교 설립' }
+                    ],
+                    chartData: [3, 1, 2]
+                },
+                '3': {
+                    title: '3차 을미개혁',
+                    summary: '을미사변 이후 친일 내각이 주도했으며, 급진적인 개혁(단발령)으로 국민적 반발을 샀습니다.',
+                    points: [
+                        { category: '사회/문화', content: '태양력 사용, 단발령 강행, 종두법 시행' },
+                        { category: '군사', content: '중앙에 친위대, 지방에 진위대 설치' },
+                        { category: '통신', content: '우편사무 재개 (우정총국 재설치)' }
+                    ],
+                    chartData: [0, 2, 3]
+                }
+            },
+            quiz: [
+                {
+                    question: "갑오개혁 시기, 국가 재정을 하나로 통합하여 관리하도록 한 중심 기구는 어디였을까요?",
+                    options: ["군국기무처", "의정부", "탁지아문", "국내부"],
+                    answer: "탁지아문"
+                },
+                {
+                    question: "일본이 청일전쟁 승리 후 얻은 랴오둥 반도를 러시아, 프랑스, 독일의 압력으로 다시 반환한 사건은 무엇일까요?",
+                    options: ["을미사변", "아관파천", "시모노세키 조약", "삼국간섭"],
+                    answer: "삼국간섭"
+                },
+                {
+                    question: "을미개혁 내용 중 백성들의 가장 큰 반발을 사서 의병 운동의 직접적인 원인이 된 것은 무엇일까요?",
+                    options: ["태양력 사용", "단발령", "종두법 시행", "진위대 설치"],
+                    answer: "단발령"
+                },
+                {
+                    question: "1차 갑오개혁의 내용으로 옳지 않은 것은?",
+                    options: ["과거제 폐지", "신분제 폐지", "8도를 23부로 개편", "은 본위 화폐 제도"],
+                    answer: "8도를 23부로 개편"
+                },
+                 {
+                    question: "고종이 일본의 위협을 피해 러시아 공사관으로 피신한 사건을 무엇이라고 할까요?",
+                    options: ["갑신정변", "아관파천", "을미사변", "삼국간섭"],
+                    answer: "아관파천"
+                }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const navButtons = document.querySelectorAll('.nav-btn');
+            const contentSections = document.querySelectorAll('.content-section');
+            const timelineContainer = document.getElementById('timeline-container');
+            const comparisonTabs = document.querySelectorAll('.comparison-tab');
+            const comparisonContent = document.getElementById('comparison-content');
+            const quizContainer = document.getElementById('quiz-container');
+
+            // Initial setup
+            loadTimeline();
+            loadComparison('1');
+            loadQuiz();
+            
+            // Main navigation
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    contentSections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === button.dataset.target) {
+                            section.classList.add('active');
+                        }
+                    });
+                });
+            });
+
+            // Timeline interaction
+            function loadTimeline() {
+                timelineContainer.innerHTML = data.timeline.map(item => `
+                    <div class="timeline-item relative pl-12 pb-8 cursor-pointer group">
+                        <div class="timeline-dot ${item.color}"></div>
+                        <p class="font-bold text-lg">${item.year} - ${item.title} <span class="text-sm text-gray-500">(클릭)</span></p>
+                        <div class="description hidden mt-2 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <p>${item.description}</p>
+                        </div>
+                    </div>
+                `).join('');
+
+                timelineContainer.querySelectorAll('.timeline-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        item.querySelector('.description').classList.toggle('hidden');
+                    });
+                });
+            }
+
+            // Comparison interaction
+            // chart instance is now managed directly within updateChart via Chart.getChart()
+            function loadComparison(reformId) {
+                const reformData = data.reforms[reformId];
+                comparisonContent.innerHTML = `
+                    <div class="fade-in">
+                        <h3 class="text-xl font-bold mb-2">${reformData.title}</h3>
+                        <p class="text-gray-600 mb-4">${reformData.summary}</p>
+                        <ul class="space-y-2">
+                            ${reformData.points.map(point => `
+                                <li><span class="font-semibold inline-block w-20 text-right mr-2 bg-amber-100 text-amber-800 px-2 py-1 rounded">${point.category}</span> ${point.content}</li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+                updateChart('reformChart', reformData); // Pass canvasId and data to updateChart
+            }
+
+            // Refactored updateChart to manage chart instance
+            function updateChart(canvasId, reformData) {
+                const canvas = document.getElementById(canvasId);
+                const ctx = canvas.getContext('2d');
+
+                // Get existing chart instance on this canvas
+                let existingChart = Chart.getChart(canvas); 
+
+                // If a chart instance already exists, destroy it to avoid conflicts
+                if (existingChart) {
+                    existingChart.destroy();
+                }
+
+                // Create a new chart instance
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['정치/사법', '경제', '사회/문화/군사'],
+                        datasets: [{
+                            label: '주요 개혁 정책 수',
+                            data: reformData.chartData,
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.6)',
+                                'rgba(16, 185, 129, 0.6)',
+                                'rgba(249, 115, 22, 0.6)'
+                            ],
+                            borderColor: [
+                                'rgba(59, 130, 246, 1)',
+                                'rgba(16, 185, 129, 1)',
+                                'rgba(249, 115, 22, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 5,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            title: {
+                                display: true,
+                                text: `${reformData.title} 주요 정책 분야`,
+                                font: {
+                                    size: 16
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            comparisonTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    comparisonTabs.forEach(t => {
+                        t.classList.remove('active', 'text-gray-800');
+                        t.classList.add('text-gray-500');
+                    });
+                    tab.classList.add('active', 'text-gray-800');
+                    tab.classList.remove('text-gray-500');
+                    loadComparison(tab.dataset.reform);
+                });
+            });
+
+
+            // Quiz interaction
+            let userAnswers = {};
+            function loadQuiz() {
+                quizContainer.innerHTML = data.quiz.map((q, index) => `
+                    <div class="quiz-item border border-gray-200 p-4 rounded-lg">
+                        <p class="font-bold mb-3">${index + 1}. ${q.question}</p>
+                        <div class="space-y-2" data-question-index="${index}">
+                            ${q.options.map(opt => `
+                                <div class="quiz-option p-3 rounded-lg border-2 border-gray-200 cursor-pointer">${opt}</div>
+                            `).join('')}
+                        </div>
+                        <div class="feedback mt-2"></div>
+                    </div>
+                `).join('');
+                document.getElementById('quiz-result').classList.add('hidden');
+                document.getElementById('retry-quiz').addEventListener('click', () => {
+                    userAnswers = {};
+                    loadQuiz();
+                });
+
+                quizContainer.querySelectorAll('.quiz-option').forEach(option => {
+                    option.addEventListener('click', e => {
+                        const questionIndex = e.target.parentElement.dataset.questionIndex;
+                        const selectedAnswer = e.target.textContent;
+                        
+                        if (userAnswers[questionIndex]) return;
+
+                        userAnswers[questionIndex] = selectedAnswer;
+                        const correctAnswer = data.quiz[questionIndex].answer;
+                        const feedbackEl = e.target.parentElement.nextElementSibling;
+                        const options = e.target.parentElement.children;
+
+                        for(let opt of options) {
+                            opt.style.pointerEvents = 'none'; // Disable further clicks
+                            if(opt.textContent === correctAnswer) {
+                                opt.classList.remove('border-gray-200');
+                                opt.classList.add('border-green-500', 'bg-green-50');
+                            }
+                        }
+
+                        if (selectedAnswer === correctAnswer) {
+                            feedbackEl.innerHTML = `<p class="text-green-600 font-semibold">정답입니다! 👍</p>`;
+                        } else {
+                            e.target.classList.remove('border-gray-200');
+                            e.target.classList.add('border-red-500', 'bg-red-50');
+                            feedbackEl.innerHTML = `<p class="text-red-600 font-semibold">아쉬워요! 정답은 "${correctAnswer}" 입니다.</p>`;
+                        }
+
+                        if(Object.keys(userAnswers).length === data.quiz.length) {
+                            showResults();
+                        }
+                    });
+                });
+            }
+            
+            function showResults() {
+                let score = 0;
+                data.quiz.forEach((q, index) => {
+                    if(userAnswers[index] === q.answer) {
+                        score++;
+                    }
+                });
+
+                const resultEl = document.getElementById('quiz-result');
+                document.getElementById('score').textContent = score;
+                document.getElementById('total-questions').textContent = data.quiz.length;
+                
+                const messageEl = document.getElementById('result-message');
+                if (score === data.quiz.length) {
+                    messageEl.textContent = "완벽해요! 당신은 갑오개혁 마스터!";
+                    messageEl.className = "text-lg font-semibold mb-4 text-blue-600";
+                } else if (score >= data.quiz.length / 2) {
+                    messageEl.textContent = "잘했어요! 조금만 더 복습해봐요.";
+                    messageEl.className = "text-lg font-semibold mb-4 text-green-600";
+                } else {
+                    messageEl.textContent = "아직 헷갈리는 부분이 있네요. 다시 한번 복습해봅시다!";
+                     messageEl.className = "text-lg font-semibold mb-4 text-orange-600";
+                }
+
+                resultEl.classList.remove('hidden');
+                resultEl.scrollIntoView({ behavior: 'smooth' });
+            }
+
+        });
+    </script>
+</body>
+</html>

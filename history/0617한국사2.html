@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한눈에 보는 한국 근대사: 일본의 침략과 우리 민족의 저항</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony Neutrals -->
+    <!-- Application Structure Plan: 세 개의 주요 탭('국권 피탈 과정', '우리 민족의 저항', '실력 확인 퀴즈')으로 구성된 단일 페이지 앱입니다. 첫 번째 탭에서는 인터랙티브 타임라인을 통해 일본의 침략 조약들을 순서대로 보여주고, 각 조약을 클릭하면 상세 내용과 그 의미(주권 상실 정도)가 나타납니다. 이를 통해 학생들은 침략이 어떻게 단계적으로 심화되었는지 시각적으로 이해할 수 있습니다. 두 번째 탭에서는 차트를 이용해 시기별 의병 운동(을미, 을사, 정미)의 특징을 비교하고, 기타 의열 활동을 카드로 제시하여 저항의 다양한 양상을 입체적으로 학습하도록 설계했습니다. 세 번째 탭은 빈칸 채우기, 객관식 등 다양한 형식의 퀴즈를 제공하여 학습한 내용을 점검하고 실력을 확인하며, 즉각적인 피드백과 해설을 통해 학습 효과를 극대화합니다. 이 구조는 '침략', '저항'이라는 두 가지 큰 흐름과 '실력 점검'이라는 학습 단계를 명확히 구분하여 보여줌으로써 복잡한 역사를 체계적으로 정리하고, 원인과 결과를 연결하여 생각하도록 유도하기 때문에 학습 효과를 극대화할 수 있습니다. -->
+    <!-- Visualization & Content Choices: 1. 국권 피탈 과정 -> 목표: 시간의 흐름에 따른 침략 심화 과정 이해 -> 표현: 인터랙티브 타임라인(HTML/CSS/JS) 및 주권 상실 정도 이모지 시각화 -> 상호작용: 타임라인의 각 이벤트 클릭 시, 상세 정보 패널 내용 업데이트 및 해당 시점의 주권 상실 정도를 이모지로 시각화. -> 정당성: 텍스트 나열보다 시간의 흐름과 각 사건의 심각성을 직관적으로 전달. 2. 의병 운동 비교 -> 목표: 각 의병의 특징(배경, 주도 세력, 전투력) 비교 분석 -> 표현: 그룹 막대그래프(Chart.js) -> 상호작용: 차트의 특정 막대 클릭 시 해당 의병의 상세 정보(배경, 주요 활동, 의의)를 카드 형태로 표시. -> 정당성: 여러 요소를 동시에 비교/분석하는 데 효과적이며, 의병 운동의 발전 과정을 명확히 보여줌. 3. 의열/언론 활동 -> 목표: 다양한 비무장 저항 방식 제시 -> 표현: 정보 카드(HTML/CSS/JS) -> 상호작용: 각 카드는 주요 내용 요약. -> 정당성: 의병 운동 외의 중요한 저항 활동들을 간결하고 명확하게 전달. 4. 실력 확인 퀴즈 -> 목표: 학습 내용 점검 및 이해도 확인 -> 표현: 동적 퀴즈 질문(HTML/CSS/JS) 및 입력/선택 필드 -> 상호작용: 사용자 답변 입력/선택, 정답 확인 버튼 클릭 시 즉각적인 피드백(정답/오답, 해설, 팁) 및 점수 업데이트. 이전/다음 문제 이동, 다시 풀기 기능 제공. -> 정당성: 다양한 유형의 퀴즈로 능동적인 학습을 유도하고, 자기 주도 학습을 강화함. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #FDFBF6; }
+        .tab-button.active { border-color: #A35D6A; color: #A35D6A; background-color: #F7F1E3; }
+        .timeline-item::before { content: ''; position: absolute; left: -2.375rem; top: 50%; transform: translateY(-50%); width: 1.25rem; height: 1.25rem; background-color: #D1C7B7; border-radius: 9999px; border: 3px solid #FDFBF6; }
+        .timeline-item.active::before { background-color: #A35D6A; }
+        .timeline-item { transition: all 0.3s ease; }
+        .chart-container { position: relative; width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; height: 350px; max-height: 400px; }
+        @media (max-width: 768px) { .chart-container { height: 300px; } }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#4A4A4A] mb-2">한눈에 보는 한국 근대사</h1>
+            <p class="text-lg text-gray-600">일본의 침략과 우리 민족의 저항</p>
+        </header>
+
+        <div class="bg-white/50 rounded-2xl shadow-lg p-4 md:p-6 backdrop-blur-sm">
+            <div class="mb-6 border-b border-gray-200">
+                <nav class="flex -mb-px space-x-1" aria-label="Tabs">
+                    <button id="tab-btn-1" class="tab-button w-1/3 py-4 px-1 text-center border-b-4 font-bold text-lg text-gray-500 hover:text-[#A35D6A] active">
+                        STEP 1. 일본의 국권 피탈 과정
+                    </button>
+                    <button id="tab-btn-2" class="tab-button w-1/3 py-4 px-1 text-center border-b-4 font-bold text-lg text-gray-500 hover:text-[#A35D6A]">
+                        STEP 2. 우리 민족의 저항
+                    </button>
+                    <button id="tab-btn-3" class="tab-button w-1/3 py-4 px-1 text-center border-b-4 font-bold text-lg text-gray-500 hover:text-[#A35D6A]">
+                        STEP 3. 실력 확인 퀴즈
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Tab 1: 국권 피탈 과정 -->
+            <div id="tab-content-1">
+                <div class="text-center mb-8 p-4 bg-[#F7F1E3]/50 rounded-lg">
+                    <h2 class="text-2xl font-bold text-[#4A4A4A] mb-2">점점 조여오는 일본의 압박</h2>
+                    <p class="text-gray-700">이곳에서는 일본이 러일 전쟁을 시작으로 어떻게 단계적으로 대한제국의 주권을 빼앗아 갔는지 시간 순서대로 살펴봅니다. 타임라인의 각 사건을 클릭하면 상세한 내용과 그 사건이 우리에게 어떤 의미였는지 확인할 수 있어요. 역사의 흐름을 따라가며 비극의 과정을 정확히 이해해 봅시다.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-1">
+                        <div id="timeline" class="relative border-l-4 border-[#EAE3D9] ml-10 py-4">
+                            <!-- Timeline items will be injected by JS -->
+                        </div>
+                    </div>
+                    <div id="details-panel" class="md:col-span-2 bg-[#F7F1E3]/50 p-6 rounded-lg shadow-inner min-h-[300px]">
+                        <!-- Details will be injected by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: 우리 민족의 저항 -->
+            <div id="tab-content-2" class="hidden">
+                 <div class="text-center mb-8 p-4 bg-[#F7F1E3]/50 rounded-lg">
+                    <h2 class="text-2xl font-bold text-[#4A4A4A] mb-2">꺼지지 않는 저항의 불꽃</h2>
+                    <p class="text-gray-700">나라를 빼앗기려는 일본에 맞서 우리 민족은 가만히 있지 않았습니다. 전국 각지에서 일어난 의병 운동의 특징을 차트로 비교해보고, 목숨을 바쳐 저항한 의사들과 언론의 노력을 통해 우리 민족의 굳센 저항 정신을 느껴봅시다.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <h3 class="text-xl font-bold text-center mb-4">의병 운동의 전개와 발전 (그래프를 클릭해보세요!)</h3>
+                    <div class="chart-container">
+                        <canvas id="resistance-chart"></canvas>
+                    </div>
+                    <div id="resistance-details" class="mt-4 p-4 bg-gray-100 rounded-lg text-center min-h-[100px] flex items-center justify-center">
+                        <p class="text-gray-600">그래프의 막대를 클릭하면 각 의병에 대한 자세한 설명을 볼 수 있어요.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold text-center mb-4">의열 활동 및 언론 저항</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow">
+                            <h4 class="font-bold text-lg text-[#5A7D9A]">장지연의 '시일야방성대곡'</h4>
+                            <p class="text-sm mt-2">을사늑약의 부당함을 알리고자 황성신문에 실은 논설. "오늘에 이르러 목 놓아 통곡하노라"라는 문장으로 온 백성의 슬픔과 분노를 대변했습니다.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow">
+                            <h4 class="font-bold text-lg text-[#5A7D9A]">민영환, 조병세 등의 자결</h4>
+                            <p class="text-sm mt-2">을사늑약 체결에 항거하여 고위 관료들이 스스로 목숨을 끊어 일제에 대한 저항 의지를 보이고, 백성들의 각성을 촉구했습니다.</p>
+                        </div>
+                         <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-shadow">
+                            <h4 class="font-bold text-lg text-[#5A7D9A]">스티븐스 암살 의거</h4>
+                            <p class="text-sm mt-2">친일 외교 고문이었던 스티븐스를 샌프란시스코에서 장인환, 전명운 의사가 처단한 사건. 미주 한인 사회의 독립운동에 큰 영향을 주었습니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: 실력 확인 퀴즈 -->
+            <div id="tab-content-3" class="hidden">
+                 <div class="text-center mb-8 p-4 bg-[#F7F1E3]/50 rounded-lg">
+                    <h2 class="text-2xl font-bold text-[#4A4A4A] mb-2">과연 내가 역사 천재?!</h2>
+                    <p class="text-gray-700">그동안 배운 내용을 퀴즈로 풀어보며 실력을 확인해 봅시다! 빈칸 채우기, 객관식 등 다양한 유형의 문제가 기다리고 있어요. 문제를 풀고 바로 정답 확인도 가능하답니다!</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <div id="quiz-container" class="min-h-[250px] flex flex-col justify-between">
+                        <!-- Quiz content will be injected here -->
+                    </div>
+                    <div id="quiz-feedback" class="mt-4 p-3 rounded-lg text-center font-bold hidden"></div>
+                    <div id="quiz-score" class="mt-2 text-right text-lg font-bold hidden">현재 점수: <span id="current-score">0</span>점</div>
+                    <div class="mt-6 flex justify-between">
+                        <button id="prev-quiz" class="px-6 py-3 bg-[#D1C7B7] text-white rounded-lg font-bold hover:bg-[#A35D6A] transition-colors disabled:opacity-50" disabled>이전 문제</button>
+                        <button id="check-answer" class="px-6 py-3 bg-[#A35D6A] text-white rounded-lg font-bold hover:bg-[#8F4F5B] transition-colors">정답 확인</button>
+                        <button id="next-quiz" class="px-6 py-3 bg-[#A35D6A] text-white rounded-lg font-bold hover:bg-[#8F4F5B] transition-colors">다음 문제</button>
+                        <button id="restart-quiz" class="px-6 py-3 bg-gray-500 text-white rounded-lg font-bold hover:bg-gray-700 transition-colors hidden">다시 풀기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer class="text-center mt-8 text-gray-500 text-sm">
+            <p>&copy; 2025 한국사 핵심 정리. All rights reserved.</p>
+        </footer>
+    </div>
+
+<script>
+    const tabBtn1 = document.getElementById('tab-btn-1');
+    const tabBtn2 = document.getElementById('tab-btn-2');
+    const tabBtn3 = document.getElementById('tab-btn-3');
+    const content1 = document.getElementById('tab-content-1');
+    const content2 = document.getElementById('tab-content-2');
+    const content3 = document.getElementById('tab-content-3');
+
+    tabBtn1.addEventListener('click', () => {
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        tabBtn1.classList.add('active');
+        document.querySelectorAll('[id^="tab-content-"]').forEach(content => content.classList.add('hidden'));
+        content1.classList.remove('hidden');
+    });
+
+    tabBtn2.addEventListener('click', () => {
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        tabBtn2.classList.add('active');
+        document.querySelectorAll('[id^="tab-content-"]').forEach(content => content.classList.add('hidden'));
+        content2.classList.remove('hidden');
+        if (!resistanceChart) createResistanceChart();
+    });
+
+    tabBtn3.addEventListener('click', () => {
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        tabBtn3.classList.add('active');
+        document.querySelectorAll('[id^="tab-content-"]').forEach(content => content.classList.add('hidden'));
+        content3.classList.remove('hidden');
+        if (!quizInitialized) {
+            initQuiz();
+            quizInitialized = true;
+        }
+    });
+
+    const timelineData = [
+        { year: '1904.02', title: '한일의정서', subtitle: '군사기지 마음대로 사용', description: '러일전쟁 중 일본이 대한제국의 중립 선언을 무시하고 강제로 체결했습니다. 이를 통해 일본은 군사 전략상 필요한 지역을 마음대로 사용할 수 있게 되어, 사실상 한반도를 군사적으로 점령하는 발판을 마련했습니다.', sovereigntyLoss: 1 },
+        { year: '1904.08', title: '제1차 한일협약', subtitle: '고문 파견, 내정 간섭 시작', description: '일본이 추천하는 재정 고문(메가타)과 외교 고문(스티븐스)을 두도록 강요한 조약입니다. \'자문\'이라는 이름이었지만, 실제로는 우리나라의 재정과 외교에 직접 간섭하여 내정을 장악하려는 시작점이었습니다.', sovereigntyLoss: 2 },
+        { year: '1905.07', title: '가쓰라-태프트 밀약', subtitle: '미국, 일본의 한국 지배 인정', description: '미국과 일본이 필리핀과 대한제국에 대한 서로의 지배를 암묵적으로 인정한 비밀 협약입니다. 일본은 미국의 필리핀 지배를, 미국은 일본의 한국 지배를 인정하며 국제적인 침략의 명분을 쌓아갔습니다.', sovereigntyLoss: 3 },
+        { year: '1905.11', title: '을사늑약(제2차 한일협약)', subtitle: '외교권 박탈, 통감부 설치', description: '대한제국의 외교권을 완전히 박탈하고, 통감부를 설치하여 보호국으로 만든 강제 조약입니다. 이로 인해 대한제국은 국제 사회에서 목소리를 낼 수 없게 되었고, 초대 통감 이토 히로부미가 부임하여 내정 간섭을 본격화했습니다.', sovereigntyLoss: 4 },
+        { year: '1907.07', title: '헤이그 특사 & 고종 강제 퇴위', subtitle: '을사늑약의 부당함 호소 실패', description: '고종 황제가 을사늑약의 부당함을 알리기 위해 네덜란드 헤이그 만국평화회의에 특사를 파견했으나, 일본의 방해로 실패했습니다. 일본은 이를 빌미로 고종 황제를 강제로 퇴위시켰습니다.', sovereigntyLoss: 4 },
+        { year: '1907.07', title: '한일신협약(정미7조약)', subtitle: '행정권 장악, 군대 해산', description: '통감의 권한을 대폭 강화하여 각 부처에 일본인 차관을 임명, 대한제국의 행정권을 장악했습니다. 또한, 부속 각서로 대한제국 군대를 해산시켜 우리의 군사적 저항 능력마저 빼앗아갔습니다.', sovereigntyLoss: 5 },
+    ];
+
+    const timelineContainer = document.getElementById('timeline');
+    const detailsPanel = document.getElementById('details-panel');
+
+    function displayDetails(index) {
+        const item = timelineData[index];
+        detailsPanel.innerHTML = `
+            <div class="flex justify-between items-start mb-2">
+                <div>
+                    <p class="text-sm text-gray-500">${item.year}</p>
+                    <h3 class="text-2xl font-bold text-[#A35D6A]">${item.title}</h3>
+                    <p class="text-lg font-bold text-gray-700">${item.subtitle}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-semibold">주권 상실 정도</p>
+                    <div class="flex justify-end mt-1">${'&#x1f512;'.repeat(item.sovereigntyLoss)}${'&#x1f513;'.repeat(5-item.sovereigntyLoss)}</div>
+                </div>
+            </div>
+            <hr class="my-4">
+            <p class="text-gray-700 leading-relaxed">${item.description}</p>
+            <div class="mt-4 p-3 bg-[#A35D6A]/10 rounded-lg">
+                <p class="text-sm font-bold text-[#A35D6A]">💡 선생님의 시험 꿀팁!</p>
+                <p class="text-sm text-gray-800 mt-1">이 사건은 우리나라의 주권이 어떻게 단계적으로 사라졌는지 보여주는 핵심이에요. ${item.title}의 결과로 ${item.subtitle}이(가) 이루어졌다는 점을 꼭 기억하세요!</p>
+            </div>
+        `;
+        document.querySelectorAll('.timeline-item').forEach((el, i) => {
+            if (i === index) el.classList.add('active', 'scale-105');
+            else el.classList.remove('active', 'scale-105');
+        });
+    }
+    
+    timelineData.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'timeline-item relative pl-8 pb-8 cursor-pointer';
+        div.innerHTML = `<h4 class="font-bold">${item.title}</h4><p class="text-sm text-gray-600">${item.year}</p>`;
+        div.addEventListener('click', () => displayDetails(index));
+        timelineContainer.appendChild(div);
+    });
+
+    displayDetails(0);
+
+    let resistanceChart; // Declare globally once
+    const resistanceData = {
+        labels: ['을미의병 (1895)', '을사의병 (1905)', '정미의병 (1907)'],
+        datasets: [{
+            label: '조직력/전투력',
+            data: [2, 4, 8],
+            backgroundColor: 'rgba(90, 125, 154, 0.6)',
+            borderColor: 'rgba(90, 125, 154, 1)',
+            borderWidth: 1
+        }, {
+            label: '참여 계층 다양성',
+            data: [3, 6, 9],
+            backgroundColor: 'rgba(163, 93, 106, 0.6)',
+            borderColor: 'rgba(163, 93, 106, 1)',
+            borderWidth: 1
+        }]
+    };
+    
+    const resistanceDetailsData = [
+        {
+            title: '을미의병 (1895)',
+            description: '<strong>배경:</strong> 을미사변(명성황후 시해) + 단발령 강제 시행<br><strong>주도 세력:</b> 유생 출신 의병장 (유인석, 이소응 등)<br><strong>특징:</strong> 위정척사 사상을 바탕으로 한 최초의 대규모 항일 의병 운동. 왕의 해산 권고에 따라 자진 해산하는 한계를 보임.'
+        },
+        {
+            title: '을사의병 (1905)',
+            description: '<strong>배경:</strong> 을사늑약 강제 체결(외교권 박탈)<br><strong>주도 세력:</strong> 전직 관료, 유생 + 평민 의병장 등장 (신돌석)<br><strong>특징:</strong> 참여 계층이 확대되고, 국권 회복이라는 명확한 목표를 가짐. 신돌석 같은 평민 의병장의 활약이 돋보임.'
+        },
+        {
+            title: '정미의병 (1907)',
+            description: '<strong>배경:</strong> 고종 강제 퇴위 + 대한제국 군대 해산<br><strong>주도 세력:</strong> 해산된 군인 합류!<br><strong>특징:</strong> 해산 군인의 참여로 조직력과 전투력이 비약적으로 강화됨. 13도 창의군을 결성하여 서울 진공 작전을 시도하는 등 전국적인 의병 전쟁으로 발전했으나, 일제의 남한 대토벌 작전으로 큰 타격을 입음.'
+        }
+    ];
+
+    function createResistanceChart() {
+        const ctx = document.getElementById('resistance-chart').getContext('2d');
+        resistanceChart = new Chart(ctx, {
+            type: 'bar',
+            data: resistanceData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { display: false },
+                        grid: { display: false },
+                        max: 10
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) { label += ': '; }
+                                label += '상대적 수치 ' + context.parsed.y;
+                                return label;
+                            }
+                        }
+                    }
+                },
+                onClick: (event, elements) => {
+                    if (elements.length > 0) {
+                        const index = elements[0].index;
+                        const resistanceDetailsPanel = document.getElementById('resistance-details');
+                        resistanceDetailsPanel.innerHTML = `
+                            <div class="text-left">
+                                <h4 class="font-bold text-lg text-center mb-2">${resistanceDetailsData[index].title}</h4>
+                                <p class="text-sm">${resistanceDetailsData[index].description}</p>
+                            </div>
+                        `;
+                    }
+                }
+            }
+        });
+    }
+
+    let quizInitialized = false;
+    let currentQuizIndex = 0;
+    let score = 0;
+    let userAnswers = [];
+    let answeredQuestions = [];
+
+    const quizData = [
+        {
+            type: 'multiple-choice',
+            question: '다음 중 러일 전쟁 중 일본이 대한제국의 중립 선언을 무시하고 강제로 체결하여, 군사 전략상 필요한 지역을 마음대로 사용할 수 있게 된 조약은 무엇인가요?',
+            options: ['을사늑약', '한일의정서', '제1차 한일협약', '한일신협약'],
+            correctAnswer: 1,
+            explanation: '정답은 <strong>한일의정서</strong>입니다. 이는 일본이 러일 전쟁 중 대한제국을 군사적으로 이용하기 위해 강제로 체결한 조약입니다.',
+            tip: '한일의정서는 러일 전쟁과 함께 가장 먼저 기억해야 할 조약이에요!'
+        },
+        {
+            type: 'fill-in-the-blank',
+            question: '일본이 재정 고문(메가타)과 외교 고문(스티븐스)을 파견하여 우리나라의 내정을 간섭하기 시작한 조약의 이름은 무엇인가요? (정식 명칭으로 입력하세요)',
+            correctAnswer: '제1차 한일협약',
+            explanation: '정답은 <strong>제1차 한일협약</strong>입니다. 이를 통해 일본은 대한제국의 내정에 깊숙이 개입하기 시작했습니다.',
+            tip: '고문 통치 시작! 기억해두면 편해요.'
+        },
+        {
+            type: 'multiple-choice',
+            question: '을사늑약(제2차 한일협약)으로 인해 대한제국이 가장 크게 상실한 주권은 무엇인가요?',
+            options: ['사법권', '외교권', '군사권', '행정권'],
+            correctAnswer: 1,
+            explanation: '정답은 <strong>외교권</strong>입니다. 을사늑약으로 인해 대한제국은 국제 사회에서 독립적인 국가로서의 권리를 잃게 됩니다.',
+            tip: '을사늑약은 외교권 박탈! 통감부 설치! 중요해요!'
+        },
+        {
+            type: 'fill-in-the-blank',
+            question: '을사늑약의 부당함을 국제 사회에 알리기 위해 고종 황제가 네덜란드 헤이그 만국평화회의에 파견했던 세 명의 특사 중 한 명인 인물은 이준, 이상설 그리고 OOO이다. OOO에 들어갈 이름은?',
+            correctAnswer: '이위종',
+            explanation: '정답은 <strong>이위종</strong>입니다. 이준, 이상설, 이위종은 헤이그 특사로 파견되어 을사늑약의 부당함을 알리려 노력했습니다.',
+            tip: '헤이그 특사 삼총사! 꼭 기억해야 할 인물들이죠.'
+        },
+        {
+            type: 'multiple-choice',
+            question: '다음 중 정미의병에 대한 설명으로 옳지 않은 것은?',
+            options: [
+                '고종의 강제 퇴위와 대한제국 군대 해산이 계기가 되었다.',
+                '해산된 군인들이 합류하여 조직력과 전투력이 강화되었다.',
+                '유생 중심의 의병으로, 위정척사 사상을 바탕으로 했다.',
+                '13도 창의군을 결성하여 서울 진공 작전을 시도했다.'
+            ],
+            correctAnswer: 2,
+            explanation: '정답은 <strong>3번</strong>입니다. 유생 중심의 의병은 <strong>을미의병</strong>에 대한 설명입니다. 정미의병은 해산된 군인의 합류로 조직력이 강화된 것이 특징입니다.',
+            tip: '의병은 시기별 특징을 비교하는 문제가 단골이에요!'
+        },
+        {
+            type: 'fill-in-the-blank',
+            question: '을사늑약의 부당함을 비판하며 "시일야방성대곡"이라는 논설을 황성신문에 발표한 언론인은 누구인가요?',
+            correctAnswer: '장지연',
+            explanation: '정답은 <strong>장지연</strong>입니다. 그의 논설은 을사늑약에 대한 민족의 분노와 슬픔을 대변했습니다.',
+            tip: '언론인의 저항도 중요하게 다뤄진답니다!'
+        },
+        {
+            type: 'multiple-choice',
+            question: '일본이 영국의 필리핀 지배를, 미국은 일본의 한국 지배를 상호 인정하게 된 비밀 협약은 무엇인가요?',
+            options: ['포츠머스 조약', '제2차 영일동맹', '가쓰라-태프트 밀약', '한일의정서'],
+            correctAnswer: 2,
+            explanation: '정답은 <strong>가쓰라-태프트 밀약</strong>입니다. 이는 일본이 한국 침략에 대한 국제적 승인을 얻는 데 중요한 역할을 했습니다.',
+            tip: '미국과 일본의 이해관계가 얽힌 부분이에요.'
+        },
+        {
+            type: 'fill-in-the-blank',
+            question: '한일신협약(정미7조약)과 함께 대한제국의 OOO가 해산되어 우리나라의 군사적 저항 능력이 크게 약화되었습니다. OOO에 들어갈 단어는?',
+            correctAnswer: '군대',
+            explanation: '정답은 <strong>군대</strong>입니다. 대한제국 군대 해산은 우리 민족의 무장 저항 능력을 없애려는 일본의 의도였습니다.',
+            tip: '군대 해산은 의병 운동이 강화되는 중요한 계기가 되기도 했어요.'
+        },
+        {
+            type: 'multiple-choice',
+            question: '을사의병에 대한 설명으로 옳은 것은?',
+            options: [
+                '을미사변과 단발령이 배경이 되었다.',
+                '주로 유생 중심의 의병이었다.',
+                '평민 출신 의병장 신돌석이 활약하였다.',
+                '해산된 군인들이 다수 참여하여 전투력이 강화되었다.'
+            ],
+            correctAnswer: 2,
+            explanation: '정답은 <strong>3번</strong>입니다. 을사의병은 을사늑약이 배경이며, 평민 의병장 신돌석의 활약이 두드러졌습니다.',
+            tip: '평민 의병장 신돌석은 시험에 자주 나와요!'
+        },
+        {
+            type: 'fill-in-the-blank',
+            question: '을사늑약 체결에 항거하여 스스로 목숨을 끊어 저항 의지를 보인 고위 관료 중 한 명은 민영환입니다. 또 다른 인물은 OOO입니다. OOO에 들어갈 이름은?',
+            correctAnswer: '조병세',
+            explanation: '정답은 <strong>조병세</strong>입니다. 민영환과 조병세는 자결로써 을사늑약의 부당함에 항거했습니다.',
+            tip: '고위 관료들의 자결 저항도 우리 민족의 강한 의지를 보여줍니다.'
+        }
+    ];
+
+    const quizContainer = document.getElementById('quiz-container');
+    const quizFeedback = document.getElementById('quiz-feedback');
+    const quizScoreDisplay = document.getElementById('quiz-score');
+    const currentScoreSpan = document.getElementById('current-score');
+    const prevQuizBtn = document.getElementById('prev-quiz');
+    const nextQuizBtn = document.getElementById('next-quiz');
+    const checkAnswerBtn = document.getElementById('check-answer');
+    const restartQuizBtn = document.getElementById('restart-quiz');
+
+    function initQuiz() {
+        currentQuizIndex = 0;
+        score = 0;
+        userAnswers = Array(quizData.length).fill(null);
+        answeredQuestions = Array(quizData.length).fill(false);
+        quizScoreDisplay.classList.add('hidden');
+        restartQuizBtn.classList.add('hidden');
+        renderQuiz();
+    }
+
+    function renderQuiz() {
+        quizFeedback.classList.add('hidden');
+        quizFeedback.textContent = '';
+        currentScoreSpan.textContent = score;
+
+        const quizItem = quizData[currentQuizIndex];
+        quizContainer.innerHTML = `
+            <p class="text-xl font-semibold mb-4">${currentQuizIndex + 1}. ${quizItem.question}</p>
+            <div id="quiz-options" class="flex flex-col gap-3"></div>
+        `;
+
+        const quizOptionsDiv = document.getElementById('quiz-options');
+        checkAnswerBtn.disabled = true;
+
+        if (quizItem.type === 'multiple-choice') {
+            quizItem.options.forEach((option, i) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center p-3 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer';
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = 'quiz-option';
+                radio.value = i;
+                radio.id = `option-${i}`;
+                radio.className = 'form-radio h-5 w-5 text-[#A35D6A] cursor-pointer';
+                radio.addEventListener('change', () => {
+                    userAnswers[currentQuizIndex] = i;
+                    checkAnswerBtn.disabled = false;
+                });
+                const label = document.createElement('label');
+                label.htmlFor = `option-${i}`;
+                label.className = 'ml-3 text-lg cursor-pointer flex-grow';
+                label.textContent = option;
+                div.appendChild(radio);
+                div.appendChild(label);
+                quizOptionsDiv.appendChild(div);
+
+                if (userAnswers[currentQuizIndex] !== null && userAnswers[currentQuizIndex] === i) {
+                    radio.checked = true;
+                }
+            });
+        } else if (quizItem.type === 'fill-in-the-blank') {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#A35D6A]';
+            input.placeholder = '여기에 정답을 입력하세요...';
+            input.value = userAnswers[currentQuizIndex] !== null ? userAnswers[currentQuizIndex] : '';
+            input.addEventListener('input', (e) => {
+                userAnswers[currentQuizIndex] = e.target.value.trim();
+                checkAnswerBtn.disabled = false;
+            });
+            quizOptionsDiv.appendChild(input);
+        }
+
+        updateNavigationButtons();
+        if (userAnswers[currentQuizIndex] !== null && !answeredQuestions[currentQuizIndex]) {
+            checkAnswerBtn.disabled = false;
+        } else if (answeredQuestions[currentQuizIndex]) {
+            checkAnswerBtn.disabled = true;
+        }
+    }
+
+    function updateNavigationButtons() {
+        prevQuizBtn.disabled = currentQuizIndex === 0;
+        nextQuizBtn.disabled = currentQuizIndex === quizData.length - 1;
+        
+        if (currentQuizIndex === quizData.length - 1 && answeredQuestions.every(q => q !== null)) {
+            restartQuizBtn.classList.remove('hidden');
+        } else {
+            restartQuizBtn.classList.add('hidden');
+        }
+    }
+
+    function checkAnswer() {
+        const quizItem = quizData[currentQuizIndex];
+        let isCorrect = false;
+
+        if (quizItem.type === 'multiple-choice') {
+            const selectedOption = userAnswers[currentQuizIndex];
+            if (selectedOption !== null && selectedOption === quizItem.correctAnswer) {
+                isCorrect = true;
+            }
+        } else if (quizItem.type === 'fill-in-the-blank') {
+            const userAnswerText = userAnswers[currentQuizIndex];
+            if (userAnswerText && userAnswerText.toLowerCase() === quizItem.correctAnswer.toLowerCase()) {
+                isCorrect = true;
+            }
+        }
+
+        quizFeedback.classList.remove('hidden');
+        checkAnswerBtn.disabled = true;
+
+        if (isCorrect) {
+            quizFeedback.className = 'mt-4 p-3 rounded-lg text-center font-bold bg-green-100 text-green-700';
+            quizFeedback.innerHTML = `정답입니다! 🎉 ${quizItem.explanation} 💡 ${quizItem.tip || ''}`;
+            if (!answeredQuestions[currentQuizIndex]) {
+                score += 1;
+                answeredQuestions[currentQuizIndex] = true;
+                currentScoreSpan.textContent = score;
+            }
+        } else {
+            quizFeedback.className = 'mt-4 p-3 rounded-lg text-center font-bold bg-red-100 text-red-700';
+            quizFeedback.innerHTML = `아쉽네요. 다시 한번 생각해 보세요. ${quizItem.explanation} 💡 ${quizItem.tip || ''}`;
+            answeredQuestions[currentQuizIndex] = false;
+        }
+        quizScoreDisplay.classList.remove('hidden');
+        checkAnswerBtn.disabled = true; 
+        if (answeredQuestions[currentQuizIndex]) { 
+                 checkAnswerBtn.disabled = true;
+            }
+    }
+
+    prevQuizBtn.addEventListener('click', () => {
+        if (currentQuizIndex > 0) {
+            currentQuizIndex--;
+            renderQuiz();
+        }
+    });
+
+    nextQuizBtn.addEventListener('click', () => {
+        if (currentQuizIndex < quizData.length - 1) {
+            currentQuizIndex++;
+            renderQuiz();
+        }
+    });
+
+    checkAnswerBtn.addEventListener('click', checkAnswer);
+
+    restartQuizBtn.addEventListener('click', initQuiz);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동학농민운동: 인터랙티브 역사 탐험</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Neutrals (Antique White, Dark Slate Gray, Muted Green) -->
+    <!-- Application Structure Plan: The application uses a thematic, single-page scrolling structure with a fixed top navigation for easy access to key sections: '배경' (Background), '전개' (Development), '결과와 의의' (Result & Significance), and '퀴즈' (Quiz). This structure was chosen over a linear report format to allow users to explore the movement's context, chronological flow, and impact in a non-linear, intuitive way, and then test their knowledge. Key interactions include clickable cards for background details, an interactive timeline for the movement's progression, a chart visualizing the shift in demands, and a dynamic quiz, enhancing engagement and understanding. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: 19th Century social crisis -> Goal: Inform -> Viz/Method: Interactive cards (HTML/CSS/JS) -> Interaction: Click to reveal details -> Justification: Breaks down complex socio-economic factors into digestible, focused pieces.
+        - Report Info: Movement chronology (Gobu Uprising to Ugeumchi Battle) -> Goal: Show Change -> Viz/Method: Interactive vertical timeline (HTML/CSS/JS) -> Interaction: Click timeline event to display details -> Justification: Provides an intuitive and engaging way to follow the historical sequence.
+        - Report Info: Gyojo Shinwon Movement's changing goals -> Goal: Compare -> Viz/Method: Bar Chart (Chart.js/Canvas) -> Interaction: Hover for tooltips -> Justification: Visually demonstrates the crucial shift from a religious to a political movement, making the change impactful.
+        - Report Info: Pejeong Gaehyeokan (12-Point Reform) -> Goal: Organize/Inform -> Viz/Method: Interactive grid (HTML/CSS/JS) -> Interaction: Hover to see details -> Justification: Presents the reform points in a more visually appealing and organized manner than a simple list.
+        - Report Info: Quiz for knowledge check -> Goal: Test understanding -> Viz/Method: Multiple-choice questions (HTML radio buttons), feedback (HTML/JS) -> Interaction: Select answers, submit, view results -> Justification: Provides an engaging way for users to assess their learning and reinforce key facts.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #fdfaf6; color: #2F4F4F; }
+        .nav-link { transition: color 0.3s, border-bottom-color 0.3s; }
+        .nav-link:hover, .nav-link.active { color: #8A9A5B; border-bottom-color: #8A9A5B; }
+        .content-card { transition: transform 0.3s, box-shadow 0.3s; }
+        .content-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .timeline::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background-color: #e5e7eb; transform: translateX(-50%); }
+        .timeline-item { position: relative; width: 50%; }
+        .timeline-item:nth-child(odd) { left: 0; padding-right: 2rem; }
+        .timeline-item:nth-child(even) { left: 50%; padding-left: 2rem; }
+        .timeline-dot { content: ''; position: absolute; top: 1.25rem; left: 50%; width: 1.2rem; height: 1.2rem; background-color: #fdfaf6; border: 3px solid #8A9A5B; border-radius: 50%; transform: translateX(-50%); z-index: 10; }
+        .timeline-item:nth-child(even) .timeline-dot { left: -0.6rem; }
+        .timeline-item:nth-child(odd) .timeline-dot { right: -0.6rem; left: auto; }
+        .section-title::after { content: ''; display: block; width: 50px; height: 3px; background-color: #8A9A5B; margin-top: 0.5rem; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 350px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 400px; } }
+        .quiz-option:hover { background-color: #e0e9cf; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <a href="#" class="text-xl font-bold text-gray-800">동학농민운동</a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#intro" class="nav-link px-3 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent">소개</a>
+                        <a href="#background" class="nav-link px-3 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent">시대적 배경</a>
+                        <a href="#development" class="nav-link px-3 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent">전개 과정</a>
+                        <a href="#significance" class="nav-link px-3 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent">결과와 의의</a>
+                        <a href="#quiz" class="nav-link px-3 py-2 text-sm font-medium text-gray-600 border-b-2 border-transparent">퀴즈</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="intro" class="min-h-[60vh] flex items-center justify-center text-center bg-cover bg-center bg-fdfaf6">
+            <div class="container mx-auto px-4">
+                <h1 class="text-4xl md:text-6xl font-extrabold text-gray-800 mb-4">동학농민운동</h1>
+                <p class="text-xl md:text-2xl text-gray-700 font-light">백성의 목소리, 역사의 흐름을 바꾸다</p>
+                <p class="mt-8 max-w-3xl mx-auto text-gray-600">
+                    19세기 말, 조선은 안팎으로 큰 혼란을 겪고 있었습니다. 이 웹 애플리케이션은 부패한 사회를 바로잡고 외세에 맞서 싸웠던 백성들의 위대한 저항, 동학농민운동의 전 과정을 인터랙티브하게 탐험합니다.
+                </p>
+            </div>
+        </section>
+
+        <section id="background" class="py-20 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="section-title text-3xl font-bold text-center mb-4">시대적 배경</h2>
+                <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">동학농민운동은 왜 일어났을까요? 당시 백성들의 고통과 새로운 사상의 등장을 통해 그 원인을 알아봅니다. 아래 카드를 **클릭**하여 자세한 내용을 확인해보세요.</p>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-bold mb-4 text-center">1. 흔들리는 조선 사회</h3>
+                        <div class="space-y-4" id="crisis-cards">
+                            <div class="bg-white p-4 rounded-lg shadow-sm cursor-pointer content-card" data-content="gov-exploit">
+                                <h4 class="font-bold">정부의 수탈과 세금 폭등 📈</h4>
+                                <p class="text-sm text-gray-500">개화정책과 배상금으로 재정이 부족해지자...</p>
+                            </div>
+                             <div class="bg-white p-4 rounded-lg shadow-sm cursor-pointer content-card" data-content="eco-crisis">
+                                <h4 class="font-bold">농업과 상공업의 위기 📉</h4>
+                                <p class="text-sm text-gray-500">일본 상인 유입으로 국내 경제가 몰락하고...</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-bold mb-4 text-center">2. 희망의 씨앗, 동학</h3>
+                        <div class="space-y-4" id="donghak-cards">
+                             <div class="bg-white p-4 rounded-lg shadow-sm cursor-pointer content-card" data-content="choe-jeu">
+                                <h4 class="font-bold">창시자, 최제우 🕊️</h4>
+                                <p class="text-sm text-gray-500">서학에 대항하여 새로운 사상을 펼치다.</p>
+                            </div>
+                             <div class="bg-white p-4 rounded-lg shadow-sm cursor-pointer content-card" data-content="sicheonju">
+                                <h4 class="font-bold">핵심 사상: 시천주(侍天主) 💖</h4>
+                                <p class="text-sm text-gray-500">'사람이 곧 하늘'이라는 평등 사상.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="background-detail" class="mt-8 p-6 bg-green-50 rounded-lg text-gray-700 hidden"></div>
+            </div>
+        </section>
+
+        <section id="development" class="py-20">
+            <div class="container mx-auto px-4">
+                <h2 class="section-title text-3xl font-bold text-center mb-4">전개 과정</h2>
+                <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">작은 불씨가 거대한 함성이 되기까지, 동학농민운동의 역동적인 전개 과정을 타임라인으로 따라가 봅니다. 각 사건을 **클릭**하면 상세한 설명을 볼 수 있습니다.</p>
+                
+                <div class="md:flex">
+                    <div class="md:w-1/2">
+                        <div class="relative timeline py-4">
+                            <div class="timeline-item cursor-pointer" data-event="event1">
+                                <div class="timeline-dot"></div>
+                                <div class="p-4 bg-white rounded-lg shadow-md content-card">
+                                    <p class="text-sm text-gray-500">~1893</p>
+                                    <h4 class="font-bold">교조 신원 운동</h4>
+                                    <p class="text-sm">종교적 요구에서 정치적 운동으로</p>
+                                </div>
+                            </div>
+                             <div class="timeline-item cursor-pointer" data-event="event2">
+                                <div class="timeline-dot"></div>
+                                <div class="p-4 bg-white rounded-lg shadow-md content-card">
+                                    <p class="text-sm text-gray-500">1894.01</p>
+                                    <h4 class="font-bold">고부 농민 봉기</h4>
+                                    <p class="text-sm">탐관오리 조병갑에 맞선 저항</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item cursor-pointer" data-event="event3">
+                                <div class="timeline-dot"></div>
+                                <div class="p-4 bg-white rounded-lg shadow-md content-card">
+                                    <p class="text-sm text-gray-500">1894.03 - 05</p>
+                                    <h4 class="font-bold">1차 봉기</h4>
+                                    <p class="text-sm">황토현 승리, 전주성 점령</p>
+                                </div>
+                            </div>
+                             <div class="timeline-item cursor-pointer" data-event="event4">
+                                <div class="timeline-dot"></div>
+                                <div class="p-4 bg-white rounded-lg shadow-md content-card">
+                                    <p class="text-sm text-gray-500">1894.05</p>
+                                    <h4 class="font-bold">전주 화약과 집강소</h4>
+                                    <p class="text-sm">농민 자치 개혁 기구 설치</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item cursor-pointer" data-event="event5">
+                                <div class="timeline-dot"></div>
+                                <div class="p-4 bg-white rounded-lg shadow-md content-card">
+                                    <p class="text-sm text-gray-500">1894.06 - 11</p>
+                                    <h4 class="font-bold">2차 봉기와 우금치 전투</h4>
+                                    <p class="text-sm">외세에 맞선 최후의 항전</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="event-detail-container" class="md:w-1/2 md:pl-8 mt-8 md:mt-0 sticky top-24 h-fit">
+                        <div id="event-detail" class="p-6 bg-white rounded-lg shadow-lg text-gray-700">
+                           <h3 class="font-bold text-lg mb-2">타임라인의 사건을 클릭하세요</h3>
+                           <p>선택한 사건에 대한 자세한 정보가 여기에 표시됩니다.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-20">
+                    <h3 class="text-xl font-bold text-center mb-4">교조 신원 운동의 성격 변화</h3>
+                    <p class="text-center text-gray-600 mb-8 max-w-2xl mx-auto">교조 신원 운동은 초기의 종교적 요구에서 점차 정치적, 사회적 요구로 발전했습니다. 3차 보은 집회에서는 반봉건, 반외세 구호가 등장하며 그 성격이 크게 변화했음을 알 수 있습니다.</p>
+                    <div class="chart-container">
+                        <canvas id="demandChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="significance" class="py-20 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="section-title text-3xl font-bold text-center mb-4">결과와 의의</h2>
+                <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">비록 군사적으로는 실패했지만, 동학농민운동은 한국 근대사에 거대한 족적을 남겼습니다. 농민들이 꿈꿨던 세상과 그 역사적 가치를 살펴봅니다.</p>
+
+                <div class="bg-gray-50 p-8 rounded-lg">
+                    <h3 class="text-2xl font-bold mb-4">농민들이 꿈꾼 세상: 폐정개혁안 12조</h3>
+                    <p class="text-gray-600 mb-6">전주 화약 당시 농민군이 제시한 개혁안입니다. 불합리한 제도를 개혁하고 평등한 사회를 만들고자 했던 열망이 담겨있습니다. 주요 항목에 마우스를 **올리면** 상세한 내용이 나타납니다.</p>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4" id="reform-grid">
+                    </div>
+                </div>
+
+                <div class="mt-12 text-center">
+                    <h3 class="text-2xl font-bold mb-4">역사적 의의</h3>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <div class="p-6 bg-green-100 rounded-lg max-w-sm">
+                            <h4 class="font-bold text-lg">최초의 반봉건 민주 운동</h4>
+                            <p class="text-gray-700">신분제를 비판하고 낡은 봉건 체제를 바꾸려 한 아래로부터의 개혁 운동이었습니다.</p>
+                        </div>
+                         <div class="p-6 bg-green-100 rounded-lg max-w-sm">
+                            <h4 class="font-bold text-lg">자주적 근대 민족 운동</h4>
+                            <p class="text-gray-700">외세의 침략에 맞서 나라를 지키려 했던 자주적인 항쟁이었습니다.</p>
+                        </div>
+                         <div class="p-6 bg-green-100 rounded-lg max-w-sm">
+                            <h4 class="font-bold text-lg">이후 운동에 영향</h4>
+                            <p class="text-gray-700">갑오개혁에 일부 내용이 반영되었고, 이후 항일 의병 운동으로 그 정신이 이어졌습니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="quiz" class="py-20">
+            <div class="container mx-auto px-4">
+                <h2 class="section-title text-3xl font-bold text-center mb-4">지식 점검 퀴즈</h2>
+                <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">동학농민운동에 대한 지식을 확인해볼 시간입니다! 아래 퀴즈를 풀어보세요. '제출하기' 버튼을 **클릭**하면 결과를 확인할 수 있습니다.</p>
+                
+                <div id="quiz-container" class="bg-white p-8 rounded-lg shadow-lg max-w-3xl mx-auto">
+                    <!-- Quiz questions will be rendered here by JavaScript -->
+                </div>
+
+                <div class="text-center mt-8">
+                    <button id="submit-quiz" class="bg-gray-800 text-white px-8 py-3 rounded-lg hover:bg-gray-700 transition-colors font-semibold">제출하기</button>
+                </div>
+
+                <div id="quiz-results" class="mt-8 p-6 bg-green-50 rounded-lg text-gray-700 hidden">
+                    <h3 class="font-bold text-xl mb-4 text-center">퀴즈 결과</h3>
+                    <p id="score-display" class="text-center text-lg mb-4"></p>
+                    <div id="feedback-display" class="space-y-4"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-4 text-center text-sm">
+            <p>&copy; 2025 Interactive History. All rights reserved.</p>
+            <p class="mt-1">동학농민운동 보고서 기반 인터랙티브 웹 애플리케이션</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const backgroundData = {
+                'gov-exploit': {
+                    title: '정부의 수탈과 세금 폭등',
+                    content: '개화정책 추진과 제물포 조약 등 불평등 조약으로 인한 배상금 지급으로 정부 재정이 부족해졌습니다. 정부는 부족한 재정을 채우기 위해 세금을 크게 올렸고, 지방 수령들은 온갖 명목으로 백성들의 쌀과 재물을 빼앗아 백성들의 삶은 극도로 피폐해졌습니다. 이는 농민 봉기의 가장 직접적인 배경이 되었습니다.'
+                },
+                'eco-crisis': {
+                    title: '농업과 상공업의 위기',
+                    content: '일본과의 불평등한 교역이 시작되면서 우수한 자본력을 앞세운 일본 상인들이 국내 시장을 장악했습니다. 이로 인해 조선의 상인들과 수공업자들은 몰락했으며, 많은 농민들이 땅을 잃고 소작농으로 전락했습니다. 과도한 소작료와 지주의 간섭은 농민들의 삶을 더욱 힘들게 만들었습니다.'
+                },
+                'choe-jeu': {
+                    title: '창시자, 최제우',
+                    content: '최제우는 19세기 중반, 서양 세력과 그들의 종교인 서학(천주교)이 확산되는 것에 위기감을 느끼고 이에 대항하는 우리 고유의 종교, 동학을 창시했습니다. 그는 유교, 불교, 도교 사상을 융합하여 새로운 가르침을 펼쳤습니다.'
+                },
+                'sicheonju': {
+                    title: '핵심 사상: 시천주(侍天主)',
+                    content: '동학의 핵심 사상은 "사람이 곧 하늘이니, 사람 섬기기를 하늘과 같이 하라(人乃天 事人如天)"는 시천주 사상입니다. 이는 모든 인간은 존엄하고 평등하다는 혁신적인 사상으로, 신분제 사회였던 조선에 큰 파장을 일으켰고 억압받던 백성들에게 큰 희망을 주었습니다.'
+                }
+            };
+            
+            const eventData = {
+                event1: {
+                    title: '교조 신원 운동 ( ~ 1893)',
+                    content: "처형당한 교조 최제우의 억울함을 풀고 동학 포교의 자유를 얻기 위해 시작된 운동입니다. 초기에는 종교적 성격이 강했지만, 공주, 한양, 보은 등에서 대규모 집회를 열면서 점차 사회 개혁을 요구하는 정치적 운동으로 발전했습니다. 특히 3차 보은 집회에서는 '척왜양창의(斥倭洋倡義, 왜와 서양을 물리치자)'라는 구호가 등장하며 반외세 성격이 뚜렷해졌습니다."
+                },
+                event2: {
+                    title: '고부 농민 봉기 (1894.01)',
+                    content: "고부 군수 조병갑의 탐욕과 폭정이 직접적인 원인이었습니다. 그는 만석보라는 저수지를 새로 쌓고 농민들에게 과도한 물세를 징수했습니다. 이에 분노한 농민들은 전봉준을 중심으로 봉기하여 고부 관아를 점령했습니다. 이때 주동자를 숨기기 위해 참가자 명단을 원형으로 적은 '사발통문'이 사용되었습니다."
+                },
+                event3: {
+                    title: '1차 봉기 (1894.03 - 05)',
+                    content: "고부 봉기 후, 정부가 사태를 수습하기는커녕 농민들을 탄압하자, 전봉준은 무장에서 다시 봉기하여 1차 동학농민운동이 시작되었습니다. '보국안민(輔国安民, 나라를 돕고 백성을 편안케 한다)'을 내세운 농민군은 황토현과 황룡촌 전투에서 관군에게 대승을 거두고, 기세를 몰아 전라도의 중심지인 전주성을 점령했습니다."
+                },
+                event4: {
+                    title: '전주 화약과 집강소 (1894.05)',
+                    content: "전주성 점령에 놀란 정부는 청나라에 군대를 요청했고, 톈진 조약을 빌미로 일본군까지 조선에 들어왔습니다. 외세 개입을 우려한 농민군과 정부는 협상을 맺어(전주 화약), 폐정개혁을 약속하고 해산했습니다. 이후 농민군은 전라도 각지에 자치적 개혁 기구인 '집강소'를 설치하고 스스로 개혁을 실천해나갔습니다."
+                },
+                event5: {
+                    title: '2차 봉기와 우금치 전투 (1894.06 - 11)',
+                    content: "일본군이 개혁을 빌미로 경복궁을 점령하고 청일전쟁을 일으키자, 농민군은 일본군을 몰아내기 위해 2차로 봉기했습니다. 남북접이 연합한 농민군은 공주를 향해 진격했으나, 우세한 화력을 갖춘 일본군과 관군 연합군에 맞서 싸운 우금치 전투에서 크게 패배했습니다. 이 전투의 패배로 동학농민운동은 사실상 막을 내리게 됩니다."
+                }
+            };
+
+            const reformData = [
+                { title: '탐관오리 징벌', detail: '백성을 괴롭히는 부패한 관리를 엄하게 처벌한다.' },
+                { title: '노비 문서 소각', detail: '신분 차별의 상징인 노비 문서를 불태워 없앤다.' },
+                { title: '과부의 재가 허용', detail: '여성에 대한 불합리한 차별을 없애고 재혼을 자유롭게 한다.' },
+                { title: '무명잡세 폐지', detail: '이름도 없는 과도한 세금을 모두 없앤다.' },
+                { title: '토지 균등 분배', detail: '토지는 농민에게 공평하게 나누어 경작하게 한다.' },
+                { title: '일본과 통하는 자 엄벌', detail: '외세와 결탁하여 나라의 이익을 해치는 자를 처벌한다.' }
+            ];
+
+            // Quiz data
+            const quizQuestions = [
+                {
+                    question: '동학을 창시한 인물은 누구인가요?',
+                    options: ['최시형', '최제우', '전봉준', '김구'],
+                    answer: 1
+                },
+                {
+                    question: '동학의 핵심 사상으로 \'사람이 곧 하늘이다\'라는 의미를 가진 것은 무엇인가요?',
+                    options: ['입헌군주제', '삼정의 문란', '시천주 사상', '척사위정'],
+                    answer: 2
+                },
+                {
+                    question: '교조 신원 운동이 종교적 요구를 넘어 정치적 요구(반봉건, 반외세)를 포함하기 시작한 집회는 어느 것인가요?',
+                    options: ['1차 공주 집회', '2차 한양 집회', '3차 보은 집회', '고부 농민 봉기'],
+                    answer: 2
+                },
+                {
+                    question: '고부 농민 봉기의 직접적인 원인을 제공하고 만석보 건설 후 과도한 물세를 징수한 인물은 누구인가요?',
+                    options: ['조병갑', '홍경래', '김옥균', '흥선대원군'],
+                    answer: 0
+                },
+                {
+                    question: '1차 동학농민운동 당시 농민군이 승리한 주요 전투는 무엇인가요?',
+                    options: ['행주대첩', '살수대첩', '황토현 및 황룡촌 전투', '우금치 전투'],
+                    answer: 2
+                },
+                {
+                    question: '농민군과 정부가 협상을 맺고 폐정개혁을 약속한 화약은 무엇인가요?',
+                    options: ['강화도 조약', '제물포 조약', '전주 화약', '한일 의정서'],
+                    answer: 2
+                },
+                {
+                    question: '2차 동학농민운동의 결정적인 패배를 가져온 전투는 무엇인가요?',
+                    options: ['황토현 전투', '전주성 전투', '우금치 전투', '봉오동 전투'],
+                    answer: 2
+                },
+                {
+                    question: '동학농민운동의 역사적 의의 중, 신분제를 비판하고 낡은 봉건 체제를 바꾸려 한 성격은 무엇인가요?',
+                    options: ['민족 분열 운동', '사대주의 운동', '최초의 반봉건 민주 운동', '독립 협회 운동'],
+                    answer: 2
+                }
+            ];
+
+            const backgroundDetailEl = document.getElementById('background-detail');
+            document.querySelectorAll('#crisis-cards .content-card, #donghak-cards .content-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const dataKey = card.dataset.content;
+                    const data = backgroundData[dataKey];
+                    backgroundDetailEl.innerHTML = `<h4 class="font-bold text-lg mb-2">${data.title}</h4><p>${data.content}</p>`;
+                    backgroundDetailEl.classList.remove('hidden');
+                });
+            });
+
+            const eventDetailEl = document.getElementById('event-detail');
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const eventKey = item.dataset.event;
+                    const data = eventData[eventKey];
+                    eventDetailEl.innerHTML = `<h3 class="font-bold text-lg mb-2">${data.title}</h3><p>${data.content}</p>`;
+                });
+            });
+
+            const reformGridEl = document.getElementById('reform-grid');
+            reformData.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'p-4 bg-white rounded-lg shadow-sm cursor-pointer content-card relative';
+                div.innerHTML = `
+                    <h5 class="font-bold">${item.title}</h5>
+                    <div class="absolute inset-0 bg-black bg-opacity-75 text-white flex items-center justify-center p-4 opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-lg">
+                        <p class="text-center text-sm">${item.detail}</p>
+                    </div>
+                `;
+                reformGridEl.appendChild(div);
+            });
+            
+            const demandCtx = document.getElementById('demandChart').getContext('2d');
+            new Chart(demandCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['1차 (공주/삼례)', '2차 (한양)', '3차 (보은)'],
+                    datasets: [{
+                        label: '종교적 요구',
+                        data: [100, 70, 40],
+                        backgroundColor: 'rgba(138, 154, 91, 0.6)',
+                        borderColor: 'rgba(138, 154, 91, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: '정치/사회적 요구 (반봉건, 반외세)',
+                        data: [0, 30, 60],
+                        backgroundColor: 'rgba(47, 79, 79, 0.6)',
+                        borderColor: 'rgba(47, 79, 79, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '교조 신원 운동 집회별 요구사항 비중 변화'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y + "%";
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                        },
+                        y: {
+                            stacked: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + "%"
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Quiz rendering and logic
+            const quizContainer = document.getElementById('quiz-container');
+            const submitQuizBtn = document.getElementById('submit-quiz');
+            const quizResultsDiv = document.getElementById('quiz-results');
+            const scoreDisplay = document.getElementById('score-display');
+            const feedbackDisplay = document.getElementById('feedback-display');
+
+            function renderQuiz() {
+                quizContainer.innerHTML = '';
+                quizQuestions.forEach((q, index) => {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.className = 'mb-6';
+                    questionDiv.innerHTML = `
+                        <p class="font-semibold text-lg mb-3">${index + 1}. ${q.question}</p>
+                        <div class="space-y-2">
+                            ${q.options.map((option, optIndex) => `
+                                <label class="flex items-center p-3 bg-gray-50 rounded-md cursor-pointer quiz-option">
+                                    <input type="radio" name="question${index}" value="${optIndex}" class="mr-3 text-green-600 focus:ring-green-500">
+                                    <span>${option}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    `;
+                    quizContainer.appendChild(questionDiv);
+                });
+            }
+
+            function submitQuiz() {
+                let score = 0;
+                feedbackDisplay.innerHTML = ''; // Clear previous feedback
+
+                quizQuestions.forEach((q, index) => {
+                    const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+                    const feedbackDiv = document.createElement('div');
+                    feedbackDiv.className = 'p-3 rounded-lg';
+                    feedbackDiv.innerHTML = `<p class="font-semibold">${index + 1}. ${q.question}</p>`;
+
+                    if (selectedOption) {
+                        const userAnswer = parseInt(selectedOption.value);
+                        if (userAnswer === q.answer) {
+                            score++;
+                            feedbackDiv.classList.add('bg-green-100', 'text-green-800');
+                            feedbackDiv.innerHTML += `<p>✅ 정답입니다! (${q.options[q.answer]})</p>`;
+                        } else {
+                            feedbackDiv.classList.add('bg-red-100', 'text-red-800');
+                            feedbackDiv.innerHTML += `<p>❌ 오답입니다. 정답: ${q.options[q.answer]}</p>`;
+                        }
+                    } else {
+                        feedbackDiv.classList.add('bg-yellow-100', 'text-yellow-800');
+                        feedbackDiv.innerHTML += `<p>❓ 선택하지 않았습니다. 정답: ${q.options[q.answer]}</p>`;
+                    }
+                    feedbackDisplay.appendChild(feedbackDiv);
+                });
+
+                scoreDisplay.textContent = `총점: ${score} / ${quizQuestions.length} (${(score / quizQuestions.length * 100).toFixed(0)}점)`;
+                quizResultsDiv.classList.remove('hidden');
+                quizResultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            submitQuizBtn.addEventListener('click', submitQuiz);
+            renderQuiz(); // Initial rendering of the quiz
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 70) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

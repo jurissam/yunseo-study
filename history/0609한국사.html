@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>임오군란과 갑신정변: 핵심 정리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Warm Neutrals with Teal Accent) -->
+    <!-- Application Structure Plan: A two-part, timeline-based SPA focusing on the Imo Incident and Gapsin Coup. A top navigation bar allows users to jump between the two main historical events. The content flows chronologically, breaking down each event into 'Cause', 'Event', and 'Result' for clarity. This narrative structure is ideal for learning history, as it presents information as a coherent story rather than isolated facts. Interactive elements like hover-to-reveal details and clickable checklists encourage active engagement. A new quiz section has been added with both multiple-choice and fill-in-the-blank questions for interactive self-assessment and memorization aid. -->
+    <!-- Visualization & Content Choices:
+    - Imo/Gapsin Flow: Goal=Organize, Method=HTML/Tailwind vertical flow diagrams, Interaction=Hover/click on result cards to see details, Justification=Visually represents the cause-and-effect sequence.
+    - Modernization Comparison: Goal=Compare, Method=Chart.js Bar Chart, Interaction=Static visual comparison, Justification=Provides a quick, intuitive understanding of the different scopes of reform between Qing and Japan. The chart is conceptual to aid memory.
+    - 14-Point Reform: Goal=Inform/Organize, Method=HTML/CSS interactive list, Interaction=Click to reveal simplified explanation, Justification=Makes dense text more digestible and reinforces key concepts.
+    - Treaties/Results: Goal=Inform, Method=Styled HTML cards, Interaction=Click/hover for details, Justification=Groups related information cleanly.
+    - Quiz: Goal=Assess/Engage/Memorize, Method=HTML forms with JavaScript logic for both multiple-choice and fill-in-the-blank. Interaction=Select answers, type answers, check individual answers, submit, receive overall feedback, retry. Justification=Provides a versatile interactive self-assessment tool that also aids direct memorization.
+    - Library/Method: Chart.js for the bar chart. All diagrams and layouts use standard HTML and Tailwind CSS.
+     -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+        .teacher-speech {
+            border-left: 5px solid #0d9488; /* teal-600 */
+            background-color: #f0fdfa; /* teal-50 */
+        }
+        .flow-arrow {
+            font-size: 2rem;
+            color: #52525b; /* zinc-600 */
+            line-height: 1;
+        }
+        .section-title {
+            font-weight: 900;
+            color: #1e293b; /* slate-800 */
+            letter-spacing: -0.05em;
+        }
+        .card {
+            transition: all 0.3s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .nav-button.active {
+            background-color: #0d9488;
+            color: white;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+        .quiz-option.correct {
+            background-color: #d1fae5; /* green-100 */
+            border-color: #10b981; /* green-500 */
+        }
+        .quiz-option.incorrect {
+            background-color: #fee2e2; /* red-100 */
+            border-color: #ef4444; /* red-500 */
+        }
+        .quiz-input-feedback {
+            margin-top: 8px;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .quiz-input-feedback.correct {
+            background-color: #d1fae5; /* green-100 */
+            color: #10b981; /* green-500 */
+        }
+        .quiz-input-feedback.incorrect {
+            background-color: #fee2e2; /* red-100 */
+            color: #ef4444; /* red-500 */
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl md:text-3xl font-black text-center text-teal-700">윤서의 한국 근대사 완전 정복</h1>
+            <p class="text-center text-stone-500 mt-1">임오군란부터 갑신정변까지, 선생님과 함께하는 핵심 총정리!</p>
+            <nav class="flex justify-center items-center space-x-2 sm:space-x-4 mt-4">
+                <button onclick="scrollToSection('imo')" class="nav-button px-3 py-2 sm:px-4 text-sm sm:text-base font-bold rounded-full transition-all duration-300 bg-white border-2 border-teal-600 text-teal-600 hover:bg-teal-600 hover:text-white">1. 임오군란</button>
+                <button onclick="scrollToSection('gapsin')" class="nav-button px-3 py-2 sm:px-4 text-sm sm:text-base font-bold rounded-full transition-all duration-300 bg-white border-2 border-teal-600 text-teal-600 hover:bg-teal-600 hover:text-white">2. 갑신정변</button>
+                <button onclick="scrollToSection('quiz')" class="nav-button px-3 py-2 sm:px-4 text-sm sm:text-base font-bold rounded-full transition-all duration-300 bg-white border-2 border-teal-600 text-teal-600 hover:bg-teal-600 hover:text-white">3. 퀴즈 풀기!</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- 임오군란 섹션 -->
+        <section id="imo" class="mb-16 scroll-mt-24">
+            <h2 class="section-title text-3xl md:text-4xl mb-4 text-center">💥 임오군란 (1882)</h2>
+            <p class="text-center text-lg text-stone-600 mb-8">"얘들아~ 나라가 개화 정책 한다고 갑자기 신식 군대를 만들었어. 근데 기존에 있던 구식 군대는? 차별만 받지!" 신식 군대와의 차별에 분노한 구식 군인과 도시 빈민들이 함께 일으킨 봉기, 임오군란의 흐름을 따라가 보자!</p>
+
+            <div class="space-y-8 flex flex-col items-center">
+                <!-- 원인 -->
+                <div class="card w-full max-w-lg p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-xl text-red-600">😡 원인: 쌓여가는 불만</h3>
+                    <p class="mt-2 text-stone-700">신식 군대 '별기군'만 우대하고 구식 군대는 13개월이나 월급이 밀렸어. 겨우 준 월급은 쌀에 모래와 겨가 섞인 불량미! 이게 바로 도화선이 된 거야.</p>
+                </div>
+
+                <div class="flow-arrow">⬇️</div>
+
+                <!-- 전개 -->
+                <div class="card w-full max-w-lg p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-xl text-orange-600">🔥 전개: 분노의 폭발</h3>
+                    <p class="mt-2 text-stone-700">분노한 군인들과 도시 빈민들이 합세해서 고관대작의 집을 습격하고, 일본 공사관까지 공격했어. 상황이 심각해지자, 명성황후는 청나라에 도움을 요청했지.</p>
+                </div>
+
+                <div class="flow-arrow">⬇️</div>
+
+                <!-- 결과 -->
+                <div class="card w-full max-w-lg p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-xl text-blue-600">📜 결과: 더 커진 외세의 그림자</h3>
+                    <p class="mt-2 text-stone-700">청나라 군대가 들어와 봉기를 진압하면서, 조선에 대한 내정 간섭이 본격화됐어. 일본도 공사관 피습을 빌미로 새로운 조약을 요구했지. <span class="font-bold text-teal-700">이거 시험에 꼭 나온다!</span> 아래 두 조약을 꼭 비교해야 돼!</p>
+                    <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                            <h4 class="font-bold text-lg">🇯🇵 vs 🇰🇷 제물포 조약</h4>
+                            <ul class="list-disc list-inside mt-2 text-sm text-stone-600">
+                                <li>일본에 배상금 지불</li>
+                                <li>일본 공사관 경비 병력 주둔 허용</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+                            <h4 class="font-bold text-lg">🇨🇳 vs 🇰🇷 조청상민수륙무역장정</h4>
+                            <ul class="list-disc list-inside mt-2 text-sm text-stone-600">
+                                <li>청나라 상인의 내륙 통상 허용</li>
+                                <li>청의 조선 속방(屬邦) 명시</li>
+                                <li class="font-bold text-red-500">→ 내정 간섭 심화!</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 개화파 비교 섹션 -->
+        <section id="comparison" class="mb-16 scroll-mt-24">
+             <h2 class="section-title text-3xl md:text-4xl mb-4 text-center">🤔 청나라 vs 일본, 개화의 길</h2>
+             <p class="text-center text-lg text-stone-600 mb-8">"얘들아 이건 외워야 돼요~ 이거 틀리면 그냥 그대로 앉아서 울어야 돼~" 조선의 개화파가 어떤 모델을 따를지 고민했던 청나라와 일본의 개혁! 그 차이점을 확실히 비교하고 넘어가자.</p>
+
+            <div class="chart-container">
+                <canvas id="modernizationChart"></canvas>
+            </div>
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="card p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-2xl text-center">🇨🇳 청: 양무운동 (점진적)</h3>
+                    <p class="text-center mt-2 font-bold text-lg text-amber-600">"중체서용(中體西用)"</p>
+                    <p class="mt-2 text-stone-700">몸(정치, 사상)은 중국 전통을 그대로 두고, 서양의 기술(무기, 공장)만 받아들이자는 거야. 변화의 속도가 느렸지.</p>
+                </div>
+                 <div class="card p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-2xl text-center">🇯🇵 일본: 메이지 유신 (급진적)</h3>
+                    <p class="text-center mt-2 font-bold text-lg text-rose-600">"문명개화(文明開化)"</p>
+                    <p class="mt-2 text-stone-700">기술뿐만 아니라 정치, 사회, 사상까지 서양의 모든 것을 적극적으로 받아들여 나라를 완전히 뜯어고쳤어. 속도가 빨랐지.</p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 갑신정변 섹션 -->
+        <section id="gapsin" class="mb-16 scroll-mt-24">
+            <h2 class="section-title text-3xl md:text-4xl mb-4 text-center">⚡️ 갑신정변 (1884)</h2>
+            <p class="text-center text-lg text-stone-600 mb-8">"아 이거 안 되겠다. 직접 우리가 하자!" 청나라의 간섭을 비판하고 일본의 메이지 유신을 모델로 삼았던 급진 개화파! 그들이 일으킨 3일 천하, 갑신정변을 파헤쳐 보자!</p>
+
+            <div class="space-y-8 flex flex-col items-center">
+                <!-- 원인 -->
+                <div class="card w-full max-w-lg p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-xl text-red-600">😡 원인: 급진 개화파의 위기감</h3>
+                    <p class="mt-2 text-stone-700">임오군란 이후 청의 간섭은 더 심해지고, 개화 정책은 후퇴했어. 위기를 느낀 김옥균, 박영효 등 급진 개화파는 일본의 힘을 빌려 정변을 계획하게 돼.</p>
+                </div>
+
+                <div class="flow-arrow">⬇️</div>
+
+                <!-- 전개 -->
+                <div class="card w-full max-w-lg p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-xl text-orange-600">🔥 전개: 3일 천하</h3>
+                    <p class="mt-2 text-stone-700">우정총국 개국 축하연을 기회로 정변을 일으켜 새 정부를 수립하고 '개혁 정강 14개조'를 발표했어. 하지만 청나라 군대가 바로 개입하면서, 단 3일 만에 실패로 끝나고 말지.</p>
+                </div>
+
+                <div class="flow-arrow">⬇️</div>
+
+                <!-- 결과 -->
+                <div class="card w-full max-w-lg p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-xl text-blue-600">📜 결과: 조선을 둘러싼 청-일 대립</h3>
+                    <p class="mt-2 text-stone-700">정변은 실패하고 청의 간섭은 더욱 강화됐어. 하지만 이 사건을 계기로 조선에서 청과 일본의 갈등이 커졌고, 결국 두 나라는 서로를 견제하기 위한 조약을 맺게 돼. <span class="font-bold text-teal-700">▲시험 포인트! 이 조약의 배경은 갑신정변이야!</span></p>
+                    <div class="mt-4 p-4 bg-cyan-50 rounded-lg border border-cyan-200">
+                        <h4 class="font-bold text-lg">🇨🇳 vs 🇯🇵 텐진 조약</h4>
+                        <p class="text-sm text-stone-500 mb-2">목적: 조선을 두고 일단 싸우지 말자!</p>
+                        <ul class="list-disc list-inside mt-2 text-sm text-stone-600">
+                            <li>조선에서 양국 군대 모두 철수</li>
+                            <li>나중에 파병할 땐 서로에게 사전 통보</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 개혁 정강 14개조 -->
+        <section id="reforms" class="mb-16 scroll-mt-24">
+            <h2 class="section-title text-3xl md:text-4xl mb-4 text-center">📜 개혁 정강 14개조</h2>
+            <p class="text-center text-lg text-stone-600 mb-8">"이건 최소 두 문제 나옵니다~" 갑신정변 때 발표한 개혁안이야. 비록 실패했지만, 우리나라 최초의 근대적 개혁 방향을 제시했다는 점에서 아주 중요해! 아래 항목을 클릭해서 핵심 의미를 확인해봐!</p>
+            <div class="w-full max-w-2xl mx-auto space-y-2">
+                <div class="reform-item p-4 bg-white rounded-lg shadow cursor-pointer hover:bg-amber-50" onclick="toggleDetail(this)">
+                    <h4 class="font-bold">☆ 1조: 문벌을 폐지하여 인민 평등의 권리를 세운다.</h4>
+                    <p class="detail hidden mt-2 text-sm text-teal-800 bg-teal-100 p-2 rounded">▶︎ 핵심: 신분제 폐지! 양반, 상민 구분 없이 모두가 평등한 사회를 만들자는 거야.</p>
+                </div>
+                <div class="reform-item p-4 bg-white rounded-lg shadow cursor-pointer hover:bg-amber-50" onclick="toggleDetail(this)">
+                    <h4 class="font-bold">☆ 2조: 지조법을 개혁하여 관리의 부정을 막고 백성을 보호한다.</h4>
+                    <p class="detail hidden mt-2 text-sm text-teal-800 bg-teal-100 p-2 rounded">▶︎ 핵심: 조세 제도 개혁! 토지세를 공평하게 걷어 나라 재정을 튼튼히 하자는 것.</p>
+                </div>
+                 <div class="reform-item p-4 bg-white rounded-lg shadow cursor-pointer hover:bg-amber-50" onclick="toggleDetail(this)">
+                    <h4 class="font-bold">☆ 3조: 내각 제도를 만들어 왕의 권한을 제한한다.</h4>
+                    <p class="detail hidden mt-2 text-sm text-teal-800 bg-teal-100 p-2 rounded">▶︎ 핵심: 왕권 견제! 왕 혼자 모든 걸 결정하는 게 아니라, 여러 신하가 함께 논의하는 시스템이야.</p>
+                </div>
+                 <div class="reform-item p-4 bg-white rounded-lg shadow cursor-pointer hover:bg-amber-50" onclick="toggleDetail(this)">
+                    <h4 class="font-bold">☆ 4조: 혜상공국(보부상 관청)을 폐지한다.</h4>
+                    <p class="detail hidden mt-2 text-sm text-teal-800 bg-teal-100 p-2 rounded">▶︎ 핵심: 상공업 자유화! 특정 상인에게만 주던 특권을 없애고 자유로운 경쟁을 유도하자는 것.</p>
+                </div>
+                <div class="reform-item p-4 bg-white rounded-lg shadow cursor-pointer hover:bg-amber-50" onclick="toggleDetail(this)">
+                    <h4 class="font-bold">☆ 5조: 모든 재정은 호조에서 통합 관리한다.</h4>
+                    <p class="detail hidden mt-2 text-sm text-teal-800 bg-teal-100 p-2 rounded">▶︎ 핵심: 재정 일원화! 여기저기 흩어져 있던 돈줄을 '호조'라는 한 부서에서 관리해 투명하게 만들자는 거야.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 역사적 평가 -->
+        <section id="evaluation" class="mb-16 scroll-mt-24">
+            <h2 class="section-title text-3xl md:text-4xl mb-4 text-center">⚖️ 갑신정변, 어떻게 볼까?</h2>
+            <p class="text-center text-lg text-stone-600 mb-8">"얘들아~ 실패했지만 방향은 맞았어. 좌표는 찍은 거야." 갑신정변은 역사적으로 어떻게 평가받고 있을까? 긍정적인 면과 아쉬운 점을 모두 살펴보자.</p>
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="card p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-2xl text-center">� 긍정적 평가</h3>
+                    <p class="mt-4 text-stone-700">자주독립과 근대 국가 건설을 목표로 한 우리나라 최초의 정치 개혁 운동이었어. 신분제 폐지, 입헌 군주제 지향 등 개혁 내용은 시대를 앞서나간 혁신적인 것이었지.</p>
+                </div>
+                 <div class="card p-6 bg-white rounded-xl shadow-lg border border-stone-200">
+                    <h3 class="font-bold text-2xl text-center">👎 부정적 평가</h3>
+                    <p class="mt-4 text-stone-700">일본의 군사력에 의존했고, 토지 개혁 같은 백성들이 가장 원하던 내용이 빠져있어서 대중의 지지를 받지 못했어. 소수의 엘리트가 주도한 위로부터의 개혁이라는 한계가 있었지.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 퀴즈 섹션 -->
+        <section id="quiz" class="mb-16 scroll-mt-24">
+            <h2 class="section-title text-3xl md:text-4xl mb-4 text-center">📝 실력 점검 퀴즈!</h2>
+            <p class="text-center text-lg text-stone-600 mb-8">"윤서야, 이제 네 실력을 보여줄 시간이야! 오늘 배운 내용들을 얼마나 잘 이해했는지 퀴즈로 확인해 보자!"</p>
+
+            <div id="quiz-container" class="bg-white rounded-xl shadow-lg border border-stone-200 p-6 space-y-6">
+                <!-- Quiz questions will be rendered here by JavaScript -->
+            </div>
+
+            <div id="quiz-results" class="hidden mt-8 p-6 bg-blue-50 rounded-xl shadow-lg border border-blue-200 text-center">
+                <h3 class="text-2xl font-bold text-blue-800 mb-4">⭐ 퀴즈 결과 ⭐</h3>
+                <p id="score-display" class="text-xl font-bold text-blue-700 mb-4"></p>
+                <button onclick="resetQuiz()" class="mt-4 px-6 py-3 bg-teal-600 text-white font-bold rounded-full hover:bg-teal-700 transition-all duration-300">다시 풀기</button>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center p-8 text-stone-500 text-sm">
+        <p>윤서 학생의 역사 시험 만점을 응원합니다! 💯</p>
+    </footer>
+
+    <script>
+        const quizData = [
+            {
+                question: "Q1. 임오군란이 발생한 가장 직접적인 원인은 구식 군인에 대한 차별과 ____ 지급입니다.",
+                type: "fill_in_the_blank",
+                blankAnswer: "불량미",
+                placeholder: "예) 불량미"
+            },
+            {
+                question: "Q2. 갑신정변 이후 청과 일본이 조선 문제에 대해 체결한 조약의 이름은 무엇인가요?",
+                type: "multiple_choice",
+                options: [
+                    "제물포 조약",
+                    "조청상민수륙무역장정",
+                    "텐진 조약",
+                    "강화도 조약"
+                ],
+                answer: 2
+            },
+            {
+                question: "Q3. 다음 중 갑신정변의 개혁 정강 14개조에 포함된 내용으로 가장 거리가 먼 것은 무엇인가요?",
+                type: "multiple_choice",
+                options: [
+                    "문벌 폐지 및 인민 평등",
+                    "조세 제도 개혁",
+                    "토지 개혁을 통한 농민들의 요구 수용",
+                    "재정의 호조 일원화"
+                ],
+                answer: 2
+            },
+            {
+                question: "Q4. 청나라의 양무운동은 기술만 수용하고 일본의 메이지 유신은 ____ 서구화를 지향했다.",
+                type: "fill_in_the_blank",
+                blankAnswer: "전면적인",
+                placeholder: "예) 전면적인"
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createModernizationChart();
+            renderQuiz();
+            setupScrollSpy();
+        });
+
+        function createModernizationChart() {
+            const ctx = document.getElementById('modernizationChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['청 (양무운동)', '일본 (메이지 유신)'],
+                    datasets: [{
+                        label: '개혁의 범위',
+                        data: [50, 100],
+                        backgroundColor: [
+                            'rgba(217, 119, 6, 0.6)',  // amber-600
+                            'rgba(225, 29, 72, 0.6)'  // rose-600
+                        ],
+                        borderColor: [
+                            'rgba(217, 119, 6, 1)',
+                            'rgba(225, 29, 72, 1)'
+                        ],
+                        borderWidth: 2,
+                        barThickness: 60,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.raw === 50) return '기술만 부분 수용';
+                                    return '기술 + 정치 + 사상 전면 수용';
+                                }
+                            }
+                        },
+                         title: {
+                            display: true,
+                            text: '청나라와 일본의 개혁 범위 비교',
+                            font: {
+                                size: 16
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 110,
+                             ticks: {
+                                display: false
+                            }
+                        },
+                        y: {
+                           ticks: {
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function toggleDetail(element) {
+            const detail = element.querySelector('.detail');
+            detail.classList.toggle('hidden');
+        }
+
+        function renderQuiz() {
+            const quizContainer = document.getElementById('quiz-container');
+            quizContainer.innerHTML = ''; // Clear previous quiz
+
+            quizData.forEach((q, qIndex) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'mb-4 p-4 border border-stone-200 rounded-lg bg-stone-50';
+                questionDiv.dataset.questionIndex = qIndex; // Add data attribute for easier lookup
+
+                const questionText = document.createElement('p');
+                questionText.className = "font-bold text-lg mb-3 text-stone-800";
+                questionText.textContent = q.question;
+                questionDiv.appendChild(questionText);
+
+                if (q.type === "multiple_choice") {
+                    q.options.forEach((option, oIndex) => {
+                        const optionLabel = document.createElement('label');
+                        optionLabel.className = 'block flex items-center mb-2 cursor-pointer p-2 rounded-md hover:bg-stone-100 transition-colors duration-200';
+                        optionLabel.innerHTML = `
+                            <input type="radio" name="question${qIndex}" value="${oIndex}" class="mr-2 text-teal-600 focus:ring-teal-500">
+                            <span class="text-stone-700">${option}</span>
+                        `;
+                        questionDiv.appendChild(optionLabel);
+                    });
+                } else if (q.type === "fill_in_the_blank") {
+                    const inputWrapper = document.createElement('div');
+                    inputWrapper.className = 'flex items-center gap-2 mt-2';
+                    inputWrapper.innerHTML = `
+                        <input type="text" id="blank-q${qIndex}" placeholder="${q.placeholder || '정답 입력'}" class="flex-grow p-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500">
+                        <button type="button" onclick="checkBlankAnswer(${qIndex})" class="px-4 py-2 bg-teal-500 text-white font-bold rounded-md hover:bg-teal-600 transition-colors duration-200 text-sm whitespace-nowrap">정답 확인</button>
+                    `;
+                    questionDiv.appendChild(inputWrapper);
+                    const feedbackDiv = document.createElement('div');
+                    feedbackDiv.id = `feedback-q${qIndex}`;
+                    feedbackDiv.className = 'quiz-input-feedback hidden';
+                    questionDiv.appendChild(feedbackDiv);
+                }
+                quizContainer.appendChild(questionDiv);
+            });
+
+            const submitButton = document.createElement('button');
+            submitButton.textContent = "최종 결과 확인!";
+            submitButton.className = "w-full py-3 bg-teal-600 text-white font-bold rounded-full hover:bg-teal-700 transition-all duration-300 mt-6";
+            submitButton.onclick = submitQuiz;
+            quizContainer.appendChild(submitButton);
+
+            document.getElementById('quiz-results').classList.add('hidden');
+        }
+
+        function checkBlankAnswer(qIndex) {
+            const questionData = quizData[qIndex];
+            const inputElement = document.getElementById(`blank-q${qIndex}`);
+            const feedbackDiv = document.getElementById(`feedback-q${qIndex}`);
+            const typedAnswer = inputElement.value.trim();
+
+            feedbackDiv.classList.remove('hidden', 'correct', 'incorrect');
+            inputElement.disabled = true; // Disable input after checking
+
+            if (typedAnswer === questionData.blankAnswer) {
+                feedbackDiv.textContent = `정답입니다! '${questionData.blankAnswer}'`;
+                feedbackDiv.classList.add('correct');
+            } else {
+                feedbackDiv.textContent = `오답입니다. 정답은 '${questionData.blankAnswer}' 입니다.`;
+                feedbackDiv.classList.add('incorrect');
+            }
+            // Hide the individual check button
+            inputElement.nextElementSibling.classList.add('hidden');
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            const quizContainer = document.getElementById('quiz-container');
+            const quizResults = document.getElementById('quiz-results');
+            const scoreDisplay = document.getElementById('score-display');
+
+            quizData.forEach((q, qIndex) => {
+                const questionDiv = document.querySelector(`div[data-question-index="${qIndex}"]`);
+
+                if (q.type === "multiple_choice") {
+                    const selectedOption = document.querySelector(`input[name="question${qIndex}"]:checked`);
+
+                    if (selectedOption) {
+                        const selectedValue = parseInt(selectedOption.value);
+                        if (selectedValue === q.answer) {
+                            score++;
+                            selectedOption.closest('label').classList.add('quiz-option', 'correct');
+                        } else {
+                            selectedOption.closest('label').classList.add('quiz-option', 'incorrect');
+                            const correctAnswerLabel = document.querySelector(`input[name="question${qIndex}"][value="${q.answer}"]`).closest('label');
+                            if (correctAnswerLabel) {
+                                correctAnswerLabel.classList.add('quiz-option', 'correct');
+                                correctAnswerLabel.classList.remove('hover:bg-stone-100');
+                                correctAnswerLabel.style.fontWeight = 'bold';
+                            }
+                        }
+                        const options = document.querySelectorAll(`input[name="question${qIndex}"]`);
+                        options.forEach(opt => opt.disabled = true);
+                    } else {
+                        // If no option is selected, mark as incorrect and show correct answer
+                        const correctAnswerLabel = document.querySelector(`input[name="question${qIndex}"][value="${q.answer}"]`).closest('label');
+                        if (correctAnswerLabel) {
+                             correctAnswerLabel.classList.add('quiz-option', 'correct');
+                             correctAnswerLabel.classList.remove('hover:bg-stone-100');
+                             correctAnswerLabel.style.fontWeight = 'bold';
+                        }
+                        const options = document.querySelectorAll(`input[name="question${qIndex}"]`);
+                        options.forEach(opt => opt.disabled = true);
+                    }
+                } else if (q.type === "fill_in_the_blank") {
+                    // Fill-in-the-blank questions are checked individually.
+                    // Just ensure they are disabled and feedback is shown if not already.
+                    const inputElement = document.getElementById(`blank-q${qIndex}`);
+                    const feedbackDiv = document.getElementById(`feedback-q${qIndex}`);
+                    const checkButton = inputElement.nextElementSibling; // Get the check button
+
+                    if (!inputElement.disabled) { // If not already checked
+                         checkBlankAnswer(qIndex);
+                    }
+
+                    if (inputElement.value.trim() === q.blankAnswer) {
+                        score++;
+                    }
+                }
+            });
+
+            scoreDisplay.textContent = `총 ${quizData.length}문제 중 ${score}문제 맞혔어요!`;
+            quizResults.classList.remove('hidden');
+            document.querySelector('#quiz-container button').classList.add('hidden'); // Hide submit button
+            scrollToSection('quiz-results'); // Scroll to results
+        }
+
+        function resetQuiz() {
+            renderQuiz(); // Re-render quiz to reset state
+            document.getElementById('quiz-results').classList.add('hidden');
+        }
+
+        function setupScrollSpy() {
+            const sections = document.querySelectorAll('section[id]');
+            const navButtons = document.querySelectorAll('.nav-button');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navButtons.forEach(button => {
+                            button.classList.remove('active');
+                            if (button.getAttribute('onclick').includes(entry.target.id)) {
+                                button.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px" });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        }
+    </script>
+</body>
+</html>
+�

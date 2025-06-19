@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사회 문화 핵심 정리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Neutral Harmony -->
+    <!-- Application Structure Plan: The application is structured into four main thematic sections accessible via a top navigation bar: '문화의 기초' (Basics), '전통의 재해석' (Reinterpretation), '문화 이해의 태도' (Attitudes), and '핵심 요약' (Summary). This thematic structure was chosen over a linear one to allow students to focus on specific conceptual areas as needed for their study. Key interactions include tab-based navigation to switch between these focused sections, interactive cards for exploring case studies, a Chart.js visualization to compare cultural attitudes, and clickable flashcards for final revision. This design enhances learning by breaking down complex information into manageable, interactive chunks, facilitating a more effective and engaging study experience than a static document. -->
+    <!-- Visualization & Content Choices: 
+    1. Cultural Attitudes -> Goal: Compare -> Viz: Polar Area Chart -> Interaction: Click a chart segment to display detailed text -> Justification: Visually differentiates the inward/outward/balanced focus of each attitude in an engaging way, superior to a simple list for conceptual comparison. -> Library: Chart.js.
+    2. Key Concepts (e.g., Creative Inheritance) -> Goal: Memorize/Inform -> Viz: Interactive Flashcards & Fill-in-the-blank -> Interaction: Click to flip card, type and check answer -> Justification: Active recall methods highly effective for exam preparation. The fill-in-the-blank specifically targets sentence-level memorization. -> Library/Method: Vanilla JS + HTML/CSS.
+    3. Case Studies (Hallyu, LEENALCHI) -> Goal: Organize/Inform -> Viz: Clickable Cards/Tabs -> Interaction: Click to reveal detailed descriptions -> Justification: Neatly organizes distinct examples, allowing users to explore them one by one without being overwhelmed. -> Library/Method: Vanilla JS + HTML/CSS.
+    4. Structural Diagram (Tradition + Modern) -> Goal: Inform -> Viz: HTML/CSS typographic diagram -> Interaction: Static -> Justification: A simple, clear visual representation of a core concept that is easily built and understood without external libraries. -> Library/Method: HTML/Tailwind CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+        .nav-btn { transition: all 0.3s ease; }
+        .nav-btn.active { color: #0d9488; border-bottom-color: #0d9488; font-weight: 700; }
+        .nav-btn:not(.active) { border-bottom-color: transparent; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .flashcard-container { perspective: 1000px; }
+        .flashcard { position: relative; transform-style: preserve-3d; transition: transform 0.6s; cursor: pointer; }
+        .flashcard.flipped { transform: rotateY(180deg); }
+        .flashcard-face, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            text-align: center; /* Center text on flashcard faces */
+        }
+        .flashcard-face {
+            background-color: #0d9488;
+            color: white;
+        }
+        .flashcard-back {
+            background-color: white;
+            color: #3b3b3b;
+            border: 2px solid #0d9488;
+            transform: rotateY(180deg);
+        }
+        .chart-container { position: relative; width: 100%; max-width: 400px; margin: auto; height: 350px; max-height: 40vh; }
+        .quiz-input {
+            border: 1px solid #ccc;
+            border-radius: 0.375rem;
+            padding: 0.5rem 0.75rem;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        .quiz-feedback {
+            margin-top: 0.5rem;
+            font-weight: bold;
+        }
+        .correct { color: #0d9488; }
+        .incorrect { color: #dc2626; }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-teal-700">사회 문화 핵심 정리</h1>
+            <p class="text-stone-600 mt-2">시험 대비를 위한 대화형 학습 가이드</p>
+        </header>
+
+        <nav class="flex justify-center border-b-2 border-stone-200 mb-8">
+            <button data-target="basics" class="nav-btn active text-lg px-6 py-3 border-b-2">문화의 기초</button>
+            <button data-target="reinterpret" class="nav-btn text-lg px-6 py-3 border-b-2">전통의 재해석</button>
+            <button data-target="attitudes" class="nav-btn text-lg px-6 py-3 border-b-2">문화 이해의 태도</button>
+            <button data-target="summary" class="nav-btn text-lg px-6 py-3 border-b-2">핵심 요약 퀴즈</button>
+        </nav>
+
+        <main>
+            <!-- Section 1: 문화의 기초 -->
+            <section id="basics" class="content-section active">
+                <div class="p-6 bg-white rounded-xl shadow-md mb-8">
+                    <h2 class="text-2xl font-bold text-teal-700 mb-4">문화의 기초 다지기</h2>
+                    <p class="text-stone-600">문화의 기본적인 의미부터 우리 삶에 어떻게 스며들어 있는지 알아봅니다. 전통 문화의 정의, 한복에 담긴 미의식, 그리고 문화가 어떻게 우리의 정체성을 형성하는지 핵심 개념들을 클릭하며 확인해 보세요.</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="card bg-white rounded-xl shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-3">✓ 전통 문화란?</h3>
+                        <p>과거부터 이어져 내려오며, 공동체 구성원들에게 <span class="font-bold text-teal-600">긍정적 가치</span>를 지니고 <span class="font-bold text-teal-600">현재까지 계승</span>되는 문화를 의미합니다. 단순히 오래된 것이 아니라, 오늘날에도 의미를 갖는 것이 중요해요!</p>
+                        <div class="mt-4 p-3 bg-stone-100 rounded-lg">
+                           <p class="font-bold">예시) 한복</p>
+                           <p class="text-sm text-stone-600">단순한 의복을 넘어, 한국인의 정서와 미의식이 담겨있는 살아있는 전통 문화입니다.</p>
+                        </div>
+                    </div>
+                     <div class="card bg-white rounded-xl shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-3">✓ 한복과 한국인의 미의식</h3>
+                        <p>우리 조상들은 옷을 통해 정신적 가치를 표현했습니다.</p>
+                        <ul class="list-disc list-inside mt-2 space-y-2 text-stone-700">
+                            <li><span class="font-bold text-teal-600">백의(白衣)</span>: 청결, 순수, 평화를 상징하며 비폭력 저항의 의미로도 사용되었습니다 (3.1 운동).</li>
+                            <li><span class="font-bold text-teal-600">여성의 치마</span>: 외출 시 머리에 둘러쓰며 절제, 겸손, 예의의 미덕을 나타냈습니다.</li>
+                        </ul>
+                    </div>
+                    <div class="card bg-white rounded-xl shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-3">✓ 문화 정체성과 사회 통합</h3>
+                        <p>문화는 "우리는 누구인가?"라는 정체성을 형성하고, 사회 구성원을 하나로 묶는 힘을 가집니다.</p>
+                        <div class="mt-4 p-4 bg-teal-50 border-l-4 border-teal-500 rounded-r-lg">
+                            <p class="font-bold text-teal-800">"나는 무력 말고, 찬란한 문화로 세계를 이기기를 바란다"</p>
+                            <p class="text-right text-sm text-teal-700 mt-2">- 김구 선생님</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: 전통의 재해석 -->
+            <section id="reinterpret" class="content-section">
+                <div class="p-6 bg-white rounded-xl shadow-md mb-8">
+                    <h2 class="text-2xl font-bold text-teal-700 mb-4">전통의 창조적 계승과 확산</h2>
+                    <p class="text-stone-600">전통은 박물관에 갇혀 있는 것이 아니라, 현 시대에 맞게 재해석될 때 생명력을 얻습니다. 한류 열풍부터 새로운 국악의 시도까지, 전통이 어떻게 세계로 뻗어나가는지 다양한 사례를 통해 살펴보세요.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="font-bold text-xl mb-4 text-center">전통의 힘, 세계를 만나다</h3>
+                        <div class="space-y-4">
+                            <div class="card bg-white rounded-xl shadow-md p-6">
+                                <p class="font-bold">사례 1: 드라마 '대장금'</p>
+                                <p class="text-sm text-stone-600">단순한 재미를 넘어 <span class="text-teal-600 font-semibold">유교적 미덕, 권선징악, 가족애</span> 등 보편적 가치가 중동 등 여러 문화권에서 공감을 얻으며 한류의 초석이 되었습니다.</p>
+                            </div>
+                            <div class="card bg-white rounded-xl shadow-md p-6">
+                                <p class="font-bold">사례 2: 밴드 '이날치'</p>
+                                <p class="text-sm text-stone-600">판소리라는 전통 국악을 현대적인 팝, 댄스 음악과 결합하여 전 세계적인 인기를 끌었습니다. 이는 <span class="text-teal-600 font-semibold">'전통 + 현대의 조화'</span>를 통한 창조적 계승의 대표적인 예시입니다.</p>
+                            </div>
+                             <div class="card bg-white rounded-xl shadow-md p-6">
+                                <p class="font-bold">사례 3: BTS</p>
+                                <p class="text-sm text-stone-600">한국적인 정체성을 음악과 퍼포먼스에 녹여내면서도 세계인들이 공감할 수 있는 메시지를 전달하여, 문화적 특수성과 보편성을 모두 성취했습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl mb-4 text-center">세계 속의 한복</h3>
+                         <div class="space-y-4">
+                            <div class="card bg-white rounded-xl shadow-md p-6">
+                                <p class="font-bold">호주 대사의 한복 사랑</p>
+                                <p class="text-sm text-stone-600">외교관이 공식 석상에서 한복을 즐겨 입으며, 한복의 아름다움과 가치를 세계에 알리는 데 기여했습니다.</p>
+                            </div>
+                            <div class="card bg-white rounded-xl shadow-md p-6">
+                                <p class="font-bold">엘리자베스 키스의 그림</p>
+                                <p class="text-sm text-stone-600">영국 화가 엘리자베스 키스는 한복 입은 여인의 뒷모습 등을 통해 한복의 <span class="text-teal-600 font-semibold">단아함과 절제미</span>를 예술적으로 표현하여 서양에 소개했습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: 문화 이해의 태도 -->
+            <section id="attitudes" class="content-section">
+                <div class="p-6 bg-white rounded-xl shadow-md mb-8">
+                    <h2 class="text-2xl font-bold text-teal-700 mb-4">다양한 문화, 어떻게 이해할까?</h2>
+                    <p class="text-stone-600">세계화 시대, 우리는 수많은 다른 문화를 마주하며 살아갑니다. 다른 문화를 이해하는 세 가지 주요 태도를 비교해보고, 어떤 태도가 바람직한지, 그리고 그 한계는 무엇인지 알아보세요. 차트의 각 항목을 클릭하면 자세한 설명을 볼 수 있습니다.</p>
+                </div>
+                <div class="flex flex-col lg:flex-row gap-8 items-center">
+                    <div class="w-full lg:w-1/2">
+                        <div class="chart-container">
+                            <canvas id="attitudesChart"></canvas>
+                        </div>
+                    </div>
+                    <div id="attitude-details" class="w-full lg:w-1/2 space-y-4">
+                         <div id="default-detail" class="p-4 bg-stone-100 rounded-lg">
+                            <h3 class="font-bold text-lg text-stone-700">차트 항목을 클릭하세요</h3>
+                            <p class="text-stone-600">문화 이해의 각 태도에 대한 설명을 확인할 수 있습니다.</p>
+                        </div>
+                        <div id="relativism-detail" class="hidden p-4 bg-teal-50 border-l-4 border-teal-500 rounded-r-lg">
+                            <h3 class="font-bold text-lg text-teal-800">문화 상대주의 (바람직한 태도 👍)</h3>
+                            <p>한 사회의 문화를 그 사회의 <span class="font-semibold">특수한 환경과 역사적 맥락</span> 속에서 이해하려는 태도입니다. 문화의 다양성을 존중하고 문화 간 우열을 가리지 않습니다.</p>
+                        </div>
+                        <div id="absolutism-detail" class="hidden p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
+                            <h3 class="font-bold text-lg text-red-800">문화 절대주의 (자문화 중심주의)</h3>
+                            <p>자신의 문화만을 우월한 것으로 여기고, 다른 문화를 무시하거나 부정적으로 평가하는 태도입니다. 문화 간 <span class="font-semibold">갈등을 유발</span>할 수 있습니다.</p>
+                        </div>
+                        <div id="flunkeyism-detail" class="hidden p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded-r-lg">
+                            <h3 class="font-bold text-lg text-yellow-800">문화 사대주의</h3>
+                            <p>다른 사회의 문화를 무조건적으로 동경하고, 자신의 문화는 낮게 평가하는 태도입니다. <span class="font-semibold">문화적 주체성과 자존감을 상실</span>할 위험이 있습니다.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 grid md:grid-cols-2 gap-6">
+                    <div class="card bg-white rounded-xl shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-3">⚠️ 문화 상대주의의 한계</h3>
+                        <p>모든 문화를 무조건 인정해야 할까요? 그렇지 않습니다. 인류의 <span class="font-bold text-red-600">보편적 가치(인권, 정의, 생명 존중 등)</span>를 훼손하는 문화까지 존중의 대상이 될 수는 없습니다.</p>
+                        <div class="mt-4 p-3 bg-red-100 rounded-lg">
+                           <p class="font-bold">예시) 명예살인, 여성 차별, 식인 풍습 등</p>
+                           <p class="text-sm text-stone-600">이러한 극단적 문화 현상은 '문화'라는 이름으로 정당화될 수 없으며, 비판적인 성찰이 필요합니다.</p>
+                        </div>
+                    </div>
+                    <div class="card bg-white rounded-xl shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-3">✓ 언어와 방언의 가치</h3>
+                        <p>언어, 특히 지역 방언은 단순한 의사소통 수단을 넘어, 그 지역의 <span class="font-bold text-teal-600">정서와 삶이 담긴 소중한 문화유산</span>입니다.</p>
+                         <div class="mt-4 p-3 bg-stone-100 rounded-lg">
+                           <p class="font-bold">표준어만 강조할 경우</p>
+                           <p class="text-sm text-stone-600">지역 문화의 고유성이 사라지고 문화의 다양성이 훼손될 수 있으므로 방언 보존 노력이 중요합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: 핵심 요약 퀴즈 -->
+            <section id="summary" class="content-section">
+                <div class="p-6 bg-white rounded-xl shadow-md mb-8">
+                    <h2 class="text-2xl font-bold text-teal-700 mb-4">핵심 요약 & 최종 점검 퀴즈</h2>
+                    <p class="text-stone-600">지금까지 공부한 내용 중 시험에 꼭 나오는 핵심 키워드들을 모았습니다. 카드를 클릭해서 뒷면에 있는 설명을 확인하며 자신의 암기 상태를 점검해 보세요. 완벽하게 숙지했다면 시험에 대한 자신감도 올라갈 거예요!</p>
+                </div>
+
+                <nav class="flex justify-center border-b-2 border-stone-200 mb-8">
+                    <button data-quiz-target="flashcards" class="quiz-nav-btn active text-lg px-6 py-3 border-b-2">플래시카드 퀴즈</button>
+                    <button data-quiz-target="fill-in-the-blank" class="quiz-nav-btn text-lg px-6 py-3 border-b-2">빈칸 채우기 퀴즈</button>
+                </nav>
+
+                <div id="flashcards-quiz" class="quiz-content active">
+                    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="flashcard-container h-48">
+                            <div class="flashcard w-full h-full">
+                                <div class="flashcard-face">
+                                    <h3 class="text-2xl font-bold text-center">전통 문화의 정의</h3>
+                                </div>
+                                <div class="flashcard-back">
+                                    <p class="text-center text-sm">과거로부터 계승되고, 현재에도 긍정적 가치를 지녀 공동체 구성원들에게 의미를 주는 문화.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flashcard-container h-48">
+                            <div class="flashcard w-full h-full">
+                                <div class="flashcard-face">
+                                    <h3 class="text-2xl font-bold text-center">창조적 계승</h3>
+                                </div>
+                                <div class="flashcard-back">
+                                    <p class="text-center text-sm">전통을 그대로 보존하는 것을 넘어, 현대적 가치와 감각에 맞게 재창조하여 새로운 문화적 가치를 만들어내는 것. (예: 이날치, BTS)</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flashcard-container h-48">
+                            <div class="flashcard w-full h-full">
+                                <div class="flashcard-face">
+                                    <h3 class="text-2xl font-bold text-center">문화 상대주의</h3>
+                                </div>
+                                <div class="flashcard-back">
+                                    <p class="text-center text-sm">문화를 평가의 대상이 아닌 이해의 대상으로 보고, 그 사회의 특수한 맥락에서 존중하려는 바람직한 태도.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flashcard-container h-48">
+                            <div class="flashcard w-full h-full">
+                                <div class="flashcard-face">
+                                    <h3 class="text-2xl font-bold text-center">문화 절대주의</h3>
+                                </div>
+                                <div class="flashcard-back">
+                                    <p class="text-center text-sm">자기 문화만 우월하다고 믿고 다른 문화를 업신여기는 태도. (자문화 중심주의)</p>
+                                </div>
+                            </div>
+                        </div>
+                         <div class="flashcard-container h-48">
+                            <div class="flashcard w-full h-full">
+                                <div class="flashcard-face">
+                                    <h3 class="text-2xl font-bold text-center">문화 사대주의</h3>
+                                </div>
+                                <div class="flashcard-back">
+                                    <p class="text-center text-sm">외래 문화를 맹목적으로 동경하며 자기 문화는 낮게 평가하는 태도.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flashcard-container h-48">
+                            <div class="flashcard w-full h-full">
+                                <div class="flashcard-face">
+                                    <h3 class="text-xl font-bold text-center">보편적 가치</h3>
+                                </div>
+                                <div class="flashcard-back">
+                                    <p class="text-center text-sm">문화 상대주의의 한계. 인권, 정의, 생명 존중 등 인류가 보편적으로 지켜야 할 가치. 이를 해치는 문화는 비판의 대상이 될 수 있음.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="fill-in-the-blank-quiz" class="quiz-content hidden">
+                    <div class="space-y-6" id="fill-in-the-blank-questions-container">
+                        <!-- Questions will be dynamically loaded here -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navButtons = document.querySelectorAll('.nav-btn');
+            const contentSections = document.querySelectorAll('.content-section');
+            const quizNavButtons = document.querySelectorAll('.quiz-nav-btn');
+            const quizContents = document.querySelectorAll('.quiz-content');
+            const flashcards = document.querySelectorAll('.flashcard');
+            const fillInTheBlankContainer = document.getElementById('fill-in-the-blank-questions-container');
+
+            const fillInTheBlankQuestions = [
+                {
+                    question: "전통 문화는 무조건 옛날 거라고 다 되는 게 아니야. ______까지 이어져 오고, 우리가 좋다고 여기는 가치가 있어야 전통 문화라고 해.",
+                    answer: "현재"
+                },
+                {
+                    question: "우리 조상들은 흰 옷을 좋아했어. 왜? 청결하고 순수하며 평화롭다는 의미가 있거든. 3.1 운동 때도 일부러 흰 옷 맞춰 입고 나왔던 거 기억나? 그게 ______ 저항의 상징이야.",
+                    answer: "비폭력"
+                },
+                {
+                    question: "조선시대 여성들, 밖에 나갈 때 치마 둘러쓰고 외출했잖아. 이게 뭐야? ______, 겸손, 예의 이런 미덕들이 우리 옷 속에 다 들어가 있다는 거야.",
+                    answer: "절제"
+                },
+                {
+                    question: "김구 선생님 말씀 기억나지? '나는 무력 말고, 찬란한 ______ 힘으로 세계를 이기기를 바란다'",
+                    answer: "문화"
+                },
+                {
+                    question: "'대장금'이 중동에서 인기 많았던 거 알지? 왜일까? 단순히 재미있어서가 아니라 유교적 미덕, ______, 가족 중심 문화가 외국인들 마음에 울리는 거야.",
+                    answer: "권선징악"
+                },
+                {
+                    question: "이날치 = 전통 + ______의 조화. 시험에 꼭 나온다!",
+                    answer: "현대"
+                },
+                {
+                    question: "방언은 감정과 정서가 담긴 ______이야. 단순히 말이 달라서가 아니라 그 지역의 정서를 반영하거든.",
+                    answer: "문화유산"
+                },
+                {
+                    question: "문화 상대주의: 그 문화의 ______에서 이해→ ★ 이게 제일 중요!",
+                    answer: "맥락"
+                },
+                {
+                    question: "어떤 문화라도 ______ 인권, 정의를 해치면 안 돼.",
+                    answer: "보편적"
+                }
+            ];
+
+            function renderFillInTheBlankQuestions() {
+                fillInTheBlankContainer.innerHTML = ''; // Clear previous questions
+                fillInTheBlankQuestions.forEach((q, index) => {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.className = 'bg-white rounded-xl shadow-md p-6';
+                    questionDiv.innerHTML = `
+                        <p class="text-lg mb-2">${index + 1}. ${q.question.replace('______', '<input type="text" class="quiz-input inline-block w-32 md:w-48" data-index="${index}">')}</p>
+                        <button class="check-answer-btn mt-2 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition" data-index="${index}">정답 확인</button>
+                        <button class="reveal-answer-btn mt-2 ml-2 px-4 py-2 bg-stone-500 text-white rounded-lg hover:bg-stone-600 transition" data-index="${index}">정답 보기</button>
+                        <p class="quiz-feedback mt-2" data-index="${index}"></p>
+                    `;
+                    fillInTheBlankContainer.appendChild(questionDiv);
+                });
+
+                document.querySelectorAll('.check-answer-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const index = event.target.dataset.index;
+                        const input = document.querySelector(`.quiz-input[data-index="${index}"]`);
+                        const feedback = document.querySelector(`.quiz-feedback[data-index="${index}"]`);
+                        const userAnswer = input.value.trim();
+                        const correctAnswer = fillInTheBlankQuestions[index].answer;
+
+                        if (userAnswer === correctAnswer) {
+                            feedback.textContent = '✅ 정답입니다!';
+                            feedback.className = 'quiz-feedback correct';
+                        } else {
+                            feedback.textContent = `❌ 오답입니다. 다시 시도해 보세요.`;
+                            feedback.className = 'quiz-feedback incorrect';
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.reveal-answer-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const index = event.target.dataset.index;
+                        const feedback = document.querySelector(`.quiz-feedback[data-index="${index}"]`);
+                        const correctAnswer = fillInTheBlankQuestions[index].answer;
+                        feedback.textContent = `💡 정답: ${correctAnswer}`;
+                        feedback.className = 'quiz-feedback correct';
+                    });
+                });
+            }
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    contentSections.forEach(section => {
+                        if (section.id === targetId) {
+                            section.classList.add('active');
+                            // If it's the summary section, ensure the active quiz tab is shown
+                            if (targetId === 'summary') {
+                                const activeQuizTab = document.querySelector('.quiz-nav-btn.active');
+                                if (activeQuizTab) {
+                                    const activeQuizContentId = activeQuizTab.dataset.quizTarget;
+                                    quizContents.forEach(qc => {
+                                        if (qc.id === `${activeQuizContentId}-quiz`) {
+                                            qc.classList.remove('hidden');
+                                        } else {
+                                            qc.classList.add('hidden');
+                                        }
+                                    });
+                                }
+                                // Render fill-in-the-blank questions when its tab is activated
+                                if (document.querySelector('.quiz-nav-btn[data-quiz-target="fill-in-the-blank"]').classList.contains('active')) {
+                                    renderFillInTheBlankQuestions();
+                                }
+                            }
+                        } else {
+                            section.classList.remove('active');
+                        }
+                    });
+                });
+            });
+
+            quizNavButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.quizTarget;
+
+                    quizNavButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    quizContents.forEach(content => {
+                        if (content.id === `${targetId}-quiz`) {
+                            content.classList.remove('hidden');
+                        } else {
+                            content.classList.add('hidden');
+                        }
+                    });
+
+                    if (targetId === 'fill-in-the-blank') {
+                        renderFillInTheBlankQuestions();
+                    }
+                });
+            });
+
+            flashcards.forEach(card => {
+                card.addEventListener('click', () => {
+                    card.classList.toggle('flipped');
+                });
+            });
+
+            const attitudesCtx = document.getElementById('attitudesChart');
+            if (attitudesCtx) {
+                const attitudesChart = new Chart(attitudesCtx, {
+                    type: 'polarArea',
+                    data: {
+                        labels: ['문화 상대주의', '문화 절대주의', '문화 사대주의'],
+                        datasets: [{
+                            label: '문화 이해 태도',
+                            data: [10, 10, 10],
+                            backgroundColor: [
+                                'rgba(13, 148, 136, 0.7)',  // Teal
+                                'rgba(220, 38, 38, 0.7)',  // Red
+                                'rgba(234, 179, 8, 0.7)'  // Yellow
+                            ],
+                            borderColor: [
+                                'rgba(13, 148, 136, 1)',
+                                'rgba(220, 38, 38, 1)',
+                                'rgba(234, 179, 8, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                display: false
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                enabled: true
+                            }
+                        },
+                        onClick: (event, elements) => {
+                            if (elements.length > 0) {
+                                const elementIndex = elements[0].index;
+                                const details = document.getElementById('attitude-details');
+                                
+                                details.childNodes.forEach(node => {
+                                    if(node.nodeType === 1) node.classList.add('hidden');
+                                });
+
+                                if (elementIndex === 0) {
+                                    document.getElementById('relativism-detail').classList.remove('hidden');
+                                } else if (elementIndex === 1) {
+                                    document.getElementById('absolutism-detail').classList.remove('hidden');
+                                } else if (elementIndex === 2) {
+                                    document.getElementById('flunkeyism-detail').classList.remove('hidden');
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>

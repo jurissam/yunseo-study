@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>지리 핵심 정리: 온대기후 완벽 정복</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Earth Tones with Blue and Green Accents -->
+    <!-- Application Structure Plan: A new SPA for the Geography lesson. The structure is designed to build knowledge progressively: 1. Basic Concepts (the "why" and "where"), 2. The core interactive "Climate Graph Lab" where users can actively compare the four main temperate climates, 3. A practical application section connecting climate to "Lifestyles", and 4. A comprehensive final quiz for self-assessment. This structure prioritizes interactive exploration of the graphs, as highlighted in the source material as the most critical skill for the exam. -->
+    <!-- Visualization & Content Choices: 
+        1. Basic Concepts: Report Info -> Temp/Latitude definitions, Westerlies vs Monsoons. Goal -> Establish foundation. Viz -> Simple two-column comparison diagram (HTML/CSS). Interaction -> None needed, for clarity. Justification -> Directly addresses the "basic of basics" point.
+        2. Climate Graph Lab: Report Info -> Cfb, Csa, Cw, Cfa graphs and rules. Goal -> Allow comparison and pattern recognition. Viz -> A single, dynamically updated Chart.js canvas. Interaction -> User clicks buttons (Cfb, Csa, etc.) to load the corresponding dataset and annotations (key temp/precip lines) into the chart. Justification -> This is the most effective way to learn graph interpretation, far better than static images.
+        3. Lifestyles: Report Info -> Cfb vs Csa lifestyles. Goal -> Connect abstract data to human geography. Viz -> Side-by-side info cards (HTML/CSS). Interaction -> Simple reveal or static comparison. Justification -> Easy-to-digest format for comparing two distinct lifestyles.
+        4. Final Quiz: Report Info -> All key concepts. Goal -> Assess and reinforce all learning points. Viz -> Interactive multiple-choice quiz (HTML/JS). Interaction -> Click answers for immediate feedback. Justification -> Crucial for exam prep and knowledge retention.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .exam-highlight {
+            background-color: #fdf6b2;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0.25rem;
+        }
+        .exam-marker {
+            color: #d97706;
+            font-weight: 700;
+        }
+        .nav-button {
+            transition: all 0.3s;
+        }
+        .nav-button.active {
+            background-color: #047857;
+            color: white;
+        }
+        .climate-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .climate-btn.active {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            background-color: #10b981;
+            color: white;
+            border-color: #059669;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 py-3">
+            <ul class="flex flex-wrap justify-center items-center gap-2">
+                <li><button data-target="section-1" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-gray-200 hover:bg-emerald-700 hover:text-white">1. 온대기후 기본</button></li>
+                <li><button data-target="section-2" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-gray-200 hover:bg-emerald-700 hover:text-white">2. 기후 그래프 분석</button></li>
+                <li><button data-target="section-3" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-gray-200 hover:bg-emerald-700 hover:text-white">3. 기후와 생활</button></li>
+                <li><button data-target="section-4" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-amber-200 hover:bg-amber-500 hover:text-white">★ 최종 암기 퀴즈 ★</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-12">
+        
+        <section id="section-1" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-gray-900">1. 온대기후 기본 개념</h1>
+            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">온대기후는 사람이 살기 좋은 기후로, 우리가 사는 중위도 지역에 주로 나타납니다. 기본 정의와 바람의 영향을 먼저 알아봅시다.</p>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <div class="text-center mb-6">
+                    <h3 class="font-bold text-xl text-emerald-700">온대기후의 정의</h3>
+                    <p class="text-lg">가장 추운 달(최한월) 평균 기온이 <span class="font-bold text-blue-600">-3℃</span> 이상, <span class="font-bold text-red-600">18℃</span> 미만인 기후</p>
+                    <p class="text-gray-500">주로 남북위 30˚ ~ 60˚ 사이의 중위도 지역에 분포</p>
+                </div>
+                 <div class="exam-highlight">
+                    <p><span class="exam-marker">★ 대륙 위치에 따른 바람의 영향</span>: 온대기후를 나누는 가장 큰 기준은 '바람'입니다. 대륙 서쪽과 동쪽의 바람이 어떻게 다른지 꼭 기억하세요!</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                        <h4 class="font-bold text-lg text-blue-800">💨 대륙 서안 (서쪽)</h4>
+                        <p>1년 내내 바다에서 <span class="font-bold">편서풍</span>이 불어옴</p>
+                        <p>→ 연교차가 작고, 강수량이 연중 고름</p>
+                        <p class="font-semibold mt-2">대표 기후: 서안해양성(Cfb), 지중해성(Csa)</p>
+                    </div>
+                     <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                        <h4 class="font-bold text-lg text-red-800">🌞 대륙 동안 (동쪽)</h4>
+                        <p>여름과 겨울의 바람 방향이 다른 <span class="font-bold">계절풍</span>의 영향</p>
+                        <p>→ 연교차가 크고, 강수가 특정 계절에 집중</p>
+                         <p class="font-semibold mt-2">대표 기후: 온대겨울건조(Cw), 온난습윤(Cfa)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-2" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-gray-900">2. 기후 그래프 완전 정복</h1>
+            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">온대기후 시험의 핵심! 아래 버튼을 눌러 각 기후별 그래프 특징을 비교 분석해 보세요.</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <div class="flex flex-wrap justify-center gap-3 mb-6">
+                    <button class="climate-btn active font-bold py-2 px-4 border-2 rounded-lg bg-gray-100 border-gray-300" data-climate="Cfb">Cfb (서안해양성)</button>
+                    <button class="climate-btn font-bold py-2 px-4 border-2 rounded-lg bg-gray-100 border-gray-300" data-climate="Csa">Csa (지중해성)</button>
+                    <button class="climate-btn font-bold py-2 px-4 border-2 rounded-lg bg-gray-100 border-gray-300" data-climate="Cw">Cw (온대겨울건조)</button>
+                    <button class="climate-btn font-bold py-2 px-4 border-2 rounded-lg bg-gray-100 border-gray-300" data-climate="Cfa">Cfa (온난습윤)</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="climateChart"></canvas>
+                </div>
+                <div id="climate-info" class="mt-4 p-4 rounded-lg bg-gray-100"></div>
+            </div>
+        </section>
+        
+        <section id="section-3" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-gray-900">3. 기후와 생활 모습</h1>
+            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">기후는 농업, 교통, 주거 등 우리 생활에 직접적인 영향을 줍니다. 대표적인 두 기후의 생활 모습을 비교해 봅시다.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-emerald-700">Cfb: 서안해양성 기후</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-3"><span class="text-2xl">💧</span><div><span class="font-bold">수운 교통 발달:</span> 연중 강수량이 일정해 하천 수위가 안정적이므로 배를 이용한 교통이 발달.</div></li>
+                        <li class="flex items-start gap-3"><span class="text-2xl">💨</span><div><span class="font-bold">풍력 발전 유리:</span> 1년 내내 꾸준히 부는 편서풍을 이용. (예: 영국, 덴마크)</div></li>
+                        <li class="flex items-start gap-3"><span class="text-2xl">🐄</span><div><span class="font-bold">혼합 농업 & 목축업:</span> 선선한 여름 기후를 이용해 밀, 감자 등 식량 작물과 사료 작물을 함께 재배하며 가축을 기름. (유제품 유명)</div></li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-amber-600">Csa: 지중해성 기후</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-3"><span class="text-2xl">🍇</span><div><span class="font-bold">여름 - 수목 농업:</span> 덥고 건조한 여름에 잘 자라는 올리브, 포도, 오렌지, 코르크 등 나무 과일 재배.</div></li>
+                        <li class="flex items-start gap-3"><span class="text-2xl">🌾</span><div><span class="font-bold">겨울 - 곡물 농업:</span> 온난하고 비가 오는 겨울에 밀, 보리 등 곡물 재배.</div></li>
+                        <li class="flex items-start gap-3"><span class="text-2xl">🏠</span><div><span class="font-bold">전통 가옥:</span> 뜨거운 햇빛을 피하기 위해 벽을 두껍게 만들고 창문을 작게 냄.</div></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <section id="section-4" class="scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-gray-900">★ 최종 암기 퀴즈 ★</h1>
+            <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">온대기후의 모든 것을 퀴즈로 최종 점검! 기호와 그래프, 생활 모습까지 완벽하게 마스터해 봅시다.</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg max-w-3xl mx-auto">
+                <div id="quiz-container"></div>
+                <div id="quiz-result" class="text-center font-bold text-2xl mt-6 hidden"></div>
+                <button id="quiz-retry-button" class="w-full mt-4 bg-amber-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-amber-600 transition-colors hidden">다시 풀기</button>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="text-center py-6 bg-gray-100 mt-12">
+        <p class="text-gray-500 text-sm">지리 핵심 개념 학습용 인터랙티브 요약 자료</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const sections = document.querySelectorAll('main section');
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+                    const targetSection = document.getElementById(targetId);
+                    if(targetSection) {
+                        window.scrollTo({ top: targetSection.offsetTop - 80, behavior: 'smooth' });
+                    }
+                });
+            });
+            
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) { current = section.getAttribute('id'); }
+                });
+                navButtons.forEach(button => {
+                    button.classList.remove('active');
+                    if (button.dataset.target === current) { button.classList.add('active'); }
+                });
+            });
+
+            const climateData = {
+                Cfb: {
+                    label: 'Cfb (런던)',
+                    temps: [3, 4, 6, 9, 12, 16, 18, 17, 14, 10, 6, 4],
+                    precips: [55, 41, 42, 44, 49, 45, 50, 50, 49, 68, 60, 55],
+                    info: `<h4 class="font-bold text-lg">Cfb: 서안해양성 기후</h4><p>연교차가 작고, 1년 내내 비가 고르게 와요. 여름은 22℃를 넘지 않아 선선합니다.</p><div class="exam-highlight"><span class="exam-marker">★ 그래프 해석 팁</span>: 기온 곡선이 완만하고, 강수량 막대가 1년 내내 비슷한 높이를 유지하는 것을 확인하세요.</div>`
+                },
+                Csa: {
+                    label: 'Csa (로마)',
+                    temps: [8, 9, 11, 14, 19, 23, 26, 26, 22, 17, 12, 9],
+                    precips: [80, 75, 70, 55, 30, 15, 10, 20, 50, 100, 110, 90],
+                    info: `<h4 class="font-bold text-lg">Csa: 지중해성 기후</h4><p>여름은 덥고 건조하며(<span class="font-bold">고온건조</span>), 겨울은 온화하고 습윤합니다(<span class="font-bold">온난습윤</span>).</p><div class="exam-highlight"><span class="exam-marker">★ 그래프 해석 팁</span>: 여름(6-8월)에 강수량이 거의 0에 가깝고, 기온과 강수량 패턴이 서로 반대인 것을 확인하세요.</div>`
+                },
+                Cw: {
+                    label: 'Cw (서울)',
+                    temps: [-2, 0, 6, 13, 18, 23, 25, 26, 21, 14, 6, -1],
+                    precips: [20, 25, 45, 60, 105, 135, 395, 265, 140, 50, 50, 20],
+                    info: `<h4 class="font-bold text-lg">Cw: 온대 겨울 건조 기후</h4><p>여름은 덥고 비가 집중되며(<span class="font-bold">고온다습</span>), 겨울은 춥고 건조합니다(<span class="font-bold">한랭건조</span>). 연교차가 매우 큽니다.</p><div class="exam-highlight"><span class="exam-marker">★ 그래프 해석 팁</span>: 여름(6-8월)에 강수량 막대가 폭발적으로 솟아있고, 겨울 강수량은 30mm 이하로 매우 낮은 것을 확인하세요.</div>`
+                },
+                Cfa: {
+                    label: 'Cfa (도쿄)',
+                    temps: [6, 6, 9, 14, 18, 22, 26, 27, 23, 18, 13, 8],
+                    precips: [50, 60, 115, 125, 140, 170, 155, 150, 210, 190, 95, 55],
+                    info: `<h4 class="font-bold text-lg">Cfa: 온난 습윤 기후</h4><p>연중 비가 많이 오지만 여름에 더 집중됩니다. 여름 기온이 22℃를 훌쩍 넘어 매우 덥고 습합니다.</p><div class="exam-highlight"><span class="exam-marker">★ 그래프 해석 팁</span>: 모든 달 강수량이 30mm를 넘고(f), 여름 기온이 가장 높으며(a), 여름 강수량이 더 많은 패턴을 확인하세요.</div>`
+                },
+            };
+            
+            const climateButtons = document.querySelectorAll('.climate-btn');
+            const climateInfoPanel = document.getElementById('climate-info');
+            const ctx = document.getElementById('climateChart').getContext('2d');
+            let climateChart;
+
+            function createChart(climateId) {
+                if (climateChart) {
+                    climateChart.destroy();
+                }
+                const data = climateData[climateId];
+                climateChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+                        datasets: [
+                            {
+                                type: 'line',
+                                label: '평균 기온 (°C)',
+                                data: data.temps,
+                                borderColor: 'rgb(239, 68, 68)',
+                                backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                                yAxisID: 'y1',
+                                tension: 0.1
+                            },
+                            {
+                                label: '월 강수량 (mm)',
+                                data: data.precips,
+                                backgroundColor: 'rgb(59, 130, 246)',
+                                yAxisID: 'y'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: { text: '강수량 (mm)', display: true }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: { text: '기온 (°C)', display: true },
+                                grid: { drawOnChartArea: false }
+                            }
+                        },
+                        plugins: {
+                            title: { display: true, text: data.label, font: {size: 16} },
+                            legend: { display: false },
+                             annotation: {
+                                annotations: {
+                                    line18: { type: 'line', yMin: 18, yMax: 18, borderColor: 'rgba(252, 165, 165, 0.7)', borderWidth: 2, yAxisID: 'y1', label: { content: '18°C', enabled: true, position: 'start', backgroundColor: 'rgba(252, 165, 165, 0.7)'}},
+                                    lineNeg3: { type: 'line', yMin: -3, yMax: -3, borderColor: 'rgba(147, 197, 253, 0.7)', borderWidth: 2, yAxisID: 'y1', label: { content: '-3°C', enabled: true, position: 'start', backgroundColor: 'rgba(147, 197, 253, 0.7)'}},
+                                    line30mm: { type: 'line', yMin: 30, yMax: 30, borderColor: 'rgba(167, 243, 208, 0.9)', borderWidth: 2, yAxisID: 'y', label: { content: '30mm', enabled: true, position: 'end', backgroundColor: 'rgba(167, 243, 208, 0.9)'}}
+                                }
+                            }
+                        }
+                    }
+                });
+                climateInfoPanel.innerHTML = data.info;
+            }
+
+            climateButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const climateId = e.target.dataset.climate;
+                    climateButtons.forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    createChart(climateId);
+                });
+            });
+
+            createChart('Cfb');
+
+            const quizContainer = document.getElementById('quiz-container');
+            const quizResult = document.getElementById('quiz-result');
+            const quizRetryButton = document.getElementById('quiz-retry-button');
+            
+            const quizData = [
+                { question: '1. 최한월 평균 기온이 -3℃~18℃ 사이에 해당하는 기후는?', options: ['냉대기후', '온대기후', '열대기후', '건조기후'], answer: '온대기후' },
+                { question: '2. 여름에 덥고 건조하며, 겨울에 온화하고 비가 오는 기후는?', options: ['Cfb', 'Csa', 'Cw', 'Cfa'], answer: 'Csa' },
+                { question: '3. 우리나라(서울)처럼 여름에 강수가 집중되고 겨울이 건조한 기후는?', options: ['Cfb', 'Csa', 'Cw', 'Cfa'], answer: 'Cw' },
+                { question: '4. 연중 강수가 고르며, 혼합 농업과 목축업이 발달한 기후는?', options: ['서안해양성 기후(Cfb)', '지중해성 기후(Csa)', '온대겨울건조 기후(Cw)', '온난습윤 기후(Cfa)'], answer: '서안해양성 기후(Cfb)' },
+                { question: '5. 올리브, 포도, 오렌지 등 수목 농업이 주로 발달한 기후는?', options: ['서안해양성 기후(Cfb)', '지중해성 기후(Csa)', '온대겨울건조 기후(Cw)', '온난습윤 기후(Cfa)'], answer: '지중해성 기후(Csa)' },
+                { question: '6. 대륙 서안 지역의 기후에 주로 영향을 미치는 바람은?', options: ['무역풍', '편서풍', '계절풍', '극동풍'], answer: '편서풍' },
+                { question: '7. 기후 그래프에서 여름철 기온이 22℃ 이상으로 매우 덥고, 연중 강수량이 풍부한 기후는?', options: ['Cfb', 'Csa', 'Cw', 'Cfa'], answer: 'Cfa' },
+                { question: "8. 기후 기호에서 'f'가 의미하는 것은?", options: ['여름 건조', '겨울 건조', '연중 습윤', '연중 한랭'], answer: '연중 습윤' },
+                { question: '9. 다음 중 지중해성 기후(Csa) 지역의 생활 모습으로 적절하지 않은 것은?', options: ['여름에 산불 위험이 높다.', '전통 가옥의 벽이 두껍다.', '겨울에 밀, 보리를 재배한다.', '수운 교통이 발달했다.'], answer: '수운 교통이 발달했다.' },
+                { question: '10. 기후 그래프를 해석할 때, 건기와 우기를 구분하는 월 강수량 기준은?', options: ['10mm', '30mm', '50mm', '100mm'], answer: '30mm' }
+            ];
+
+            let currentQuestionIndex = 0;
+            let score = 0;
+
+            function loadQuiz() {
+                currentQuestionIndex = 0;
+                score = 0;
+                quizContainer.innerHTML = '';
+                quizResult.classList.add('hidden');
+                quizRetryButton.classList.add('hidden');
+                showQuestion();
+            }
+
+            function showQuestion() {
+                 if (currentQuestionIndex >= quizData.length) {
+                    showResult();
+                    return;
+                }
+                const questionData = quizData[currentQuestionIndex];
+                const progress = `${currentQuestionIndex + 1} / ${quizData.length}`;
+                const questionElement = document.createElement('div');
+                questionElement.className = 'mb-6';
+                questionElement.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="font-bold text-lg text-gray-800">${questionData.question}</p>
+                        <span class="text-sm font-semibold text-gray-500 bg-gray-200 px-3 py-1 rounded-full">${progress}</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        ${questionData.options.map(option => `<button class="quiz-option w-full text-left p-3 border-2 border-gray-300 rounded-lg hover:bg-gray-100">${option}</button>`).join('')}
+                    </div>`;
+                quizContainer.appendChild(questionElement);
+                const optionButtons = questionElement.querySelectorAll('.quiz-option');
+                optionButtons.forEach(button => button.addEventListener('click', handleOptionClick));
+            }
+
+            function handleOptionClick(event) {
+                const selectedOption = event.target;
+                const questionData = quizData[currentQuestionIndex];
+                const isCorrect = selectedOption.textContent === questionData.answer;
+                const correctButtonClass = 'correct';
+                const incorrectButtonClass = 'incorrect';
+                if (isCorrect) {
+                    selectedOption.classList.add(correctButtonClass);
+                    score++;
+                } else {
+                    selectedOption.classList.add(incorrectButtonClass);
+                }
+                const optionButtons = selectedOption.parentElement.querySelectorAll('.quiz-option');
+                optionButtons.forEach(button => {
+                    button.disabled = true;
+                    if (button.textContent === questionData.answer) button.classList.add(correctButtonClass);
+                });
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    quizContainer.innerHTML = '';
+                    showQuestion();
+                }, 1200);
+            }
+
+            function showResult() {
+                quizContainer.innerHTML = '';
+                quizResult.innerHTML = `🎉 퀴즈 완료! 총 ${quizData.length}문제 중 <span class="text-amber-500 text-3xl">${score}</span>문제를 맞혔습니다!`;
+                quizResult.classList.remove('hidden');
+                quizRetryButton.classList.remove('hidden');
+            }
+            quizRetryButton.addEventListener('click', loadQuiz);
+            loadQuiz();
+        });
+    </script>
+</body>
+</html>

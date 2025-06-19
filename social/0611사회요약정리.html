@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사회 핵심 정리: 문화 변동의 이해</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Dynamic Purples and Pinks -->
+    <!-- Application Structure Plan: A new SPA for the June 11th lesson on cultural change. The structure follows a logical progression: 1. Internal Factors of Change (Discovery & Invention). 2. External Factors (The 3 types of Diffusion). 3. The core interactive section on the "Aspects of Cultural Contact," allowing users to compare Coexistence, Fusion, and Assimilation. 4. A comprehensive final quiz heavily focused on differentiating these key concepts. -->
+    <!-- Visualization & Content Choices: 
+        1. Internal Factors: Report Info -> Discovery vs. Invention. Goal -> Clarify definitions. Viz -> Simple definition cards. Interaction -> Static. Justification -> Clear, direct explanation for foundational terms.
+        2. External Factors (Diffusion): Report Info -> Direct, Indirect, Stimulus Diffusion. Goal -> Explain the mechanisms of cultural spread. Viz -> Clickable cards for each type. Interaction -> Clicking a card reveals examples like Buddhism (Direct), Hallyu (Indirect), and Bulgogi Pizza (Stimulus). Justification -> Organizes related concepts for easy comparison.
+        3. Aspects of Contact: Report Info -> Coexistence (A+B), Fusion (A+B->C), Assimilation (A->B). Goal -> Visualize the outcomes of cultural contact. Viz -> An interactive diagram with buttons. Interaction -> Clicking a button (e.g., "문화 융합") updates a central display with a visual formula and iconic examples like Bulgogi Pizza. Justification -> This is the most effective way to teach the core, and often confusing, part of the lesson.
+        4. Final Quiz: Report Info -> All key concepts. Goal -> Assess and reinforce learning. Viz -> Interactive multiple-choice quiz. Interaction -> Immediate feedback. Justification -> Essential for exam prep.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .exam-highlight {
+            background-color: #fefce8;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0.25rem;
+        }
+        .exam-marker {
+            color: #d97706;
+            font-weight: 700;
+        }
+        .nav-button {
+            transition: all 0.3s;
+        }
+        .nav-button.active {
+            background-color: #7c3aed;
+            color: white;
+        }
+        .aspect-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .aspect-btn.active {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            background-color: #a855f7;
+            color: white;
+            border-color: #9333ea;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+    <header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 py-3">
+            <ul class="flex flex-wrap justify-center items-center gap-2">
+                <li><button data-target="section-1" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-purple-700 hover:text-white">1. 문화 변동의 요인</button></li>
+                <li><button data-target="section-2" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-purple-700 hover:text-white">2. 문화 변동의 양상</button></li>
+                <li><button data-target="section-3" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-amber-200 hover:bg-amber-500 hover:text-white">★ 최종 암기 퀴즈 ★</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-12">
+        
+        <section id="section-1" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">1. 문화는 어떻게 변할까? (변동 요인)</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">문화는 사회 내부의 힘으로 스스로 변하기도 하고(내재적 요인), 외부 문화와의 만남을 통해 변하기도 합니다(외재적 요인).</p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-2xl font-bold mb-4 text-purple-700">내재적 요인 (스스로 변화)</h3>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-purple-50 rounded-lg">
+                            <p class="font-bold">🔍 발견 (Discovery)</p>
+                            <p class="text-sm text-slate-600">이미 존재했지만 알려지지 않았던 것을 찾아내는 것. (예: 불의 원리, 대륙의 발견)</p>
+                        </div>
+                        <div class="p-4 bg-purple-50 rounded-lg">
+                            <p class="font-bold">💡 발명 (Invention)</p>
+                            <p class="text-sm text-slate-600">기존에 없던 새로운 문화 요소를 만들어내는 것. (예: 온돌, 한글, 스마트폰)</p>
+                        </div>
+                    </div>
+                </div>
+                 <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-2xl font-bold mb-4 text-purple-700">외재적 요인 (문화 전파)</h3>
+                     <div class="space-y-4">
+                        <div class="p-4 bg-purple-50 rounded-lg">
+                             <p class="font-bold">🏃 직접 전파</p>
+                             <p class="text-sm text-slate-600">사람들의 직접적인 접촉이나 이동을 통해 문화가 전해지는 것. (예: 스님이 전해준 불교, 문익점이 가져온 목화씨)</p>
+                        </div>
+                        <div class="p-4 bg-purple-50 rounded-lg">
+                             <p class="font-bold">💻 간접 전파</p>
+                             <p class="text-sm text-slate-600">책, TV, 인터넷 등 대중 매체를 통해 문화가 전해지는 것. (예: 영화나 유튜브를 통한 한류 열풍)</p>
+                        </div>
+                        <div class="p-4 bg-purple-50 rounded-lg">
+                             <p class="font-bold">💥 자극 전파</p>
+                             <p class="text-sm text-slate-600">외부 문화에서 아이디어를 얻어 새로운 것을 발명하는 것. (예: 서양 피자 → 불고기피자 발명)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-2" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">2. 문화 변동의 세 가지 모습 (양상)</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">다른 문화가 들어왔을 때 우리 문화는 어떻게 변할까요? 세 가지 양상을 버튼을 눌러 비교해 보세요.</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <div class="flex flex-wrap justify-center gap-3 mb-6">
+                    <button class="aspect-btn active font-bold py-2 px-4 border-2 rounded-lg bg-slate-100 border-slate-300" data-aspect="coexistence">문화 병존</button>
+                    <button class="aspect-btn font-bold py-2 px-4 border-2 rounded-lg bg-slate-100 border-slate-300" data-aspect="fusion">문화 융합</button>
+                    <button class="aspect-btn font-bold py-2 px-4 border-2 rounded-lg bg-slate-100 border-slate-300" data-aspect="assimilation">문화 동화</button>
+                </div>
+                
+                <div id="aspect-display" class="p-6 bg-slate-100 rounded-lg text-center transition-all">
+                    <!-- JS will populate this area -->
+                </div>
+            </div>
+        </section>
+        
+        <section id="section-3" class="scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">★ 최종 암기 퀴즈 ★</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">문화 변동, 이제 확실히 구분할 수 있죠? 퀴즈로 배운 내용을 최종 점검하고 시험 만점에 도전하세요!</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg max-w-3xl mx-auto">
+                <div id="quiz-container"></div>
+                <div id="quiz-result" class="text-center font-bold text-2xl mt-6 hidden"></div>
+                <button id="quiz-retry-button" class="w-full mt-4 bg-amber-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-amber-600 transition-colors hidden">다시 풀기</button>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="text-center py-6 bg-slate-100 mt-12">
+        <p class="text-slate-500 text-sm">사회 핵심 개념 학습용 인터랙티브 요약 자료</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const sections = document.querySelectorAll('main section');
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    document.getElementById(button.dataset.target).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            });
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    if (pageYOffset >= section.offsetTop - 90) { current = section.id; }
+                });
+                navButtons.forEach(button => {
+                    button.classList.remove('active');
+                    if (button.dataset.target === current) { button.classList.add('active'); }
+                });
+            });
+            
+            const aspectData = {
+                coexistence: {
+                    title: '🤝 문화 병존 (A + B)',
+                    formula: '<div class="flex justify-center items-center gap-4 text-3xl"><div class="w-20 h-20 bg-blue-400 rounded-full flex items-center justify-center font-bold text-white">A</div><p class="font-bold">+</p><div class="w-20 h-20 bg-red-400 rounded-full flex items-center justify-center font-bold text-white">B</div></div>',
+                    desc: '기존 문화(A)와 새로운 외부 문화(B)가 각각의 정체성을 유지한 채 나란히 존재하는 모습입니다. 문화의 다양성이 증가하는 긍정적 효과가 있습니다.',
+                    example: '예: 한국에서 전통 혼례와 서양식 결혼식이 모두 행해지는 것, 한의원과 양방 병원이 함께 있는 것'
+                },
+                fusion: {
+                    title: '💡 문화 융합 (A + B → C)',
+                    formula: '<div class="flex justify-center items-center gap-4 text-3xl"><div class="w-20 h-20 bg-blue-400 rounded-full flex items-center justify-center font-bold text-white">A</div><p class="font-bold">+</p><div class="w-20 h-20 bg-red-400 rounded-full flex items-center justify-center font-bold text-white">B</div><p class="font-bold">→</p><div class="w-20 h-20 bg-purple-500 rounded-full flex items-center justify-center font-bold text-white">C</div></div>',
+                    desc: '기존 문화(A)와 새로운 외부 문화(B)가 결합하여 두 문화의 특징을 모두 가지는 완전히 새로운 문화(C)가 나타나는 모습입니다.',
+                    example: '예: 불고기 피자, 한국식 천주교 성당(기와지붕+십자가)'
+                },
+                assimilation: {
+                    title: '➡️ 문화 동화 (A → B)',
+                    formula: '<div class="flex justify-center items-center gap-4 text-3xl"><div class="w-20 h-20 bg-blue-400 rounded-full flex items-center justify-center font-bold text-white line-through opacity-50">A</div><p class="font-bold">→</p><div class="w-20 h-20 bg-red-400 rounded-full flex items-center justify-center font-bold text-white">B</div></div>',
+                    desc: '기존 문화(A)가 새로운 외부 문화(B)에 흡수되어 정체성을 잃고 사라지는 모습입니다. 전통문화가 소멸될 수 있다는 문제점이 있습니다.',
+                    example: '예: 아메리카 원주민들이 영어를 사용하며 고유 언어를 잃어버리는 것'
+                }
+            };
+            const aspectButtons = document.querySelectorAll('.aspect-btn');
+            const aspectDisplay = document.getElementById('aspect-display');
+            function updateAspect(aspectId) {
+                const data = aspectData[aspectId];
+                aspectDisplay.innerHTML = `
+                    <h3 class="text-2xl font-bold mb-4 text-purple-800">${data.title}</h3>
+                    <div class="mb-4">${data.formula}</div>
+                    <p class="text-slate-700 mb-3">${data.desc}</p>
+                    <div class="exam-highlight"><span class="exam-marker">★</span> ${data.example}</div>
+                `;
+            }
+            aspectButtons.forEach(btn => {
+                btn.addEventListener('click', e => {
+                    const aspectId = e.target.dataset.aspect;
+                    aspectButtons.forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    updateAspect(aspectId);
+                });
+            });
+            updateAspect('coexistence');
+
+            const quizContainer = document.getElementById('quiz-container');
+            const quizResult = document.getElementById('quiz-result');
+            const quizRetryButton = document.getElementById('quiz-retry-button');
+            const quizData = [
+                { question: '1. 기존에 없던 온돌 난방 기술을 만들어 낸 것은 문화 변동의 어떤 요인에 해당하는가?', options: ['발견', '발명', '직접 전파', '간접 전파'], answer: '발명' },
+                { question: '2. 스님이 중국에서 불교 경전을 가져와 전파한 것은 어떤 유형의 문화 전파인가?', options: ['자극 전파', '간접 전파', '직접 전파', '내재적 전파'], answer: '직접 전파' },
+                { question: '3. 유튜브를 통해 K-POP이 전 세계로 퍼져나가는 현상은?', options: ['직접 전파', '자극 전파', '문화 융합', '간접 전파'], answer: '간접 전파' },
+                { question: "4. 서양의 피자가 우리나라에 들어와 '불고기 피자'라는 새로운 메뉴가 탄생한 것은?", options: ['문화 병존', '문화 동화', '문화 융합', '문화 지체'], answer: '문화 융합' },
+                { question: '5. 한 사회에서 전통 혼례와 서양식 결혼식이 모두 행해지는 현상은?', options: ['문화 동화', '문화 병존', '문화 융합', '문화 지체'], answer: '문화 병존' },
+                { question: '6. 외부 문화의 영향으로 기존 문화가 정체성을 잃고 완전히 사라지는 현상은?', options: ['문화 동화', '문화 병존', '문화 융합', '문화 반동'], answer: '문화 동화' },
+                { question: "7. 외국 문화에서 아이디어를 얻어 새로운 것을 '발명'하게 되는 문화 전파 유형은?", options: ['직접 전파', '간접 전파', '자극 전파', '강제 전파'], answer: '자극 전파' },
+                { question: '8. 문화 변동의 내재적 요인으로만 짝지어진 것은?', options: ['발견, 전파', '발명, 융합', '발견, 발명', '전파, 동화'], answer: '발견, 발명' }
+            ];
+            let currentQuestionIndex = 0;
+            let score = 0;
+            function loadQuiz() {
+                currentQuestionIndex = 0; score = 0;
+                quizContainer.innerHTML = '';
+                quizResult.classList.add('hidden');
+                quizRetryButton.classList.add('hidden');
+                showQuestion();
+            }
+            function showQuestion() {
+                 if (currentQuestionIndex >= quizData.length) {
+                    showResult(); return;
+                }
+                const q = quizData[currentQuestionIndex];
+                const progress = `${currentQuestionIndex + 1} / ${quizData.length}`;
+                const el = document.createElement('div');
+                el.className = 'mb-6';
+                el.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="font-bold text-lg text-slate-800">${q.question}</p>
+                        <span class="text-sm font-semibold text-slate-500 bg-slate-200 px-3 py-1 rounded-full">${progress}</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        ${q.options.map(o => `<button class="quiz-option w-full text-left p-3 border-2 border-slate-300 rounded-lg hover:bg-slate-100">${o}</button>`).join('')}
+                    </div>`;
+                quizContainer.appendChild(el);
+                el.querySelectorAll('.quiz-option').forEach(b => b.addEventListener('click', handleOptionClick));
+            }
+            function handleOptionClick(e) {
+                const selected = e.target;
+                const q = quizData[currentQuestionIndex];
+                const isCorrect = selected.textContent === q.answer;
+                if (isCorrect) {
+                    selected.classList.add('correct', 'bg-green-500', 'text-white', 'border-green-600');
+                    score++;
+                } else {
+                    selected.classList.add('incorrect', 'bg-red-500', 'text-white', 'border-red-600');
+                }
+                selected.parentElement.querySelectorAll('.quiz-option').forEach(b => {
+                    b.disabled = true;
+                    if (b.textContent === q.answer) b.classList.add('correct', 'bg-green-500', 'text-white', 'border-green-600');
+                });
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    quizContainer.innerHTML = '';
+                    showQuestion();
+                }, 1200);
+            }
+            function showResult() {
+                quizContainer.innerHTML = '';
+                quizResult.innerHTML = `🎉 퀴즈 완료! 총 ${quizData.length}문제 중 <span class="text-amber-500 text-3xl">${score}</span>문제를 맞혔습니다!`;
+                quizResult.classList.remove('hidden');
+                quizRetryButton.classList.remove('hidden');
+            }
+            quizRetryButton.addEventListener('click', loadQuiz);
+            loadQuiz();
+        });
+    </script>
+</body>
+</html>

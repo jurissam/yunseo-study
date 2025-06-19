@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사회 핵심 정리: 냉대·한대 기후 완벽 정복</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Cool Blues and Grays with Warm Amber Accent -->
+    <!-- Application Structure Plan: A new SPA for the May 22nd Social Studies lesson. The structure follows the lesson's flow: 1. Review of East Asian temperate climates (Cw/Cfa) to bridge with the previous topic. 2. A deep dive into Cold Climates (D), featuring an interactive graph comparison of Df vs. Dw. 3. Exploration of Polar Climates (E) with a visual diagram for permafrost houses. 4. A final comprehensive quiz. This structure is designed to build from familiar to new concepts and emphasizes the graph interpretation skills the teacher highlighted as critical for the exam. -->
+    <!-- Visualization & Content Choices: 
+        1. Temperate Review: Report Info -> Cw/Cfa lifestyle (rice, dams). Goal -> Bridge topics. Viz -> Simple info cards. Interaction -> Static. Justification -> Quick and clear recap.
+        2. Cold Climate (D) Graph Lab: Report Info -> Df vs. Dw criteria and graphs. Goal -> Teach graph distinction. Viz -> Dynamic Chart.js canvas. Interaction -> Buttons to switch between Df (Moscow) and Dw (Khabarovsk) data, with key annotation lines (-3, +10, 30mm) appearing. Justification -> Directly simulates the teacher's board work for hands-on learning.
+        3. Polar Climate (E) Lifestyle: Report Info -> Permafrost, stilt houses. Goal -> Explain a difficult concept visually. Viz -> A custom diagram made with HTML/CSS. Interaction -> Static diagram. Justification -> A visual diagram is more effective than text for explaining the structure of a stilt house over permafrost.
+        4. Final Quiz: Report Info -> All key concepts from the lesson. Goal -> Assess and reinforce learning. Viz -> Interactive multiple-choice quiz (HTML/JS). Interaction -> Click answers for immediate feedback. Justification -> Essential tool for exam memorization.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .exam-highlight {
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0.25rem;
+        }
+        .exam-marker {
+            color: #d97706;
+            font-weight: 700;
+        }
+        .nav-button {
+            transition: all 0.3s;
+        }
+        .nav-button.active {
+            background-color: #0e7490;
+            color: white;
+        }
+        .climate-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .climate-btn.active {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            background-color: #06b6d4;
+            color: white;
+            border-color: #0891b2;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .permafrost-diagram {
+            position: relative;
+            height: 250px;
+            background: linear-gradient(to bottom, #f0f9ff 30%, #a5f3fc 30%, #a5f3fc 40%, #0891b2 40%);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 py-3">
+            <ul class="flex flex-wrap justify-center items-center gap-2">
+                <li><button data-target="section-1" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-cyan-700 hover:text-white">1. 온대기후 복습</button></li>
+                <li><button data-target="section-2" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-cyan-700 hover:text-white">2. 냉대기후(D)</button></li>
+                <li><button data-target="section-3" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-cyan-700 hover:text-white">3. 한대기후(E)</button></li>
+                <li><button data-target="section-4" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-amber-200 hover:bg-amber-500 hover:text-white">★ 최종 암기 퀴즈 ★</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-12">
+        
+        <section id="section-1" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">1. 온대기후 생활 모습 복습 (Cw, Cfa)</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">지난 시간에 배운 대륙 동안의 온대기후 생활 모습을 간단히 복습하고 넘어갑시다. '계절풍'이 핵심이었죠!</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-cyan-700">벼농사</h3>
+                    <div class="text-center text-6xl mb-4">🍚</div>
+                    <p class="text-center">여름철 <span class="font-bold">계절풍</span>의 영향으로 <span class="font-bold">덥고 습해서</span> 벼농사에 매우 유리합니다. 특히 동남아시아, 동아시아 지역에서 활발하며, 더 더운 곳은 1년에 2~3번 농사(이기작, 삼기작)도 가능합니다.</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-cyan-700">댐과 저수지</h3>
+                    <div class="text-center text-6xl mb-4">🌊</div>
+                    <p class="text-center">여름에 비가 집중되고 겨울은 건조하여 강수량의 계절차가 큽니다. 그래서 물을 저장해 둘 <span class="font-bold">댐이나 저수지가 필수적</span>입니다. 1년 내내 수위가 일정한 서유럽과는 달라요.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-2" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">2. 냉대기후 (D) 완전 정복</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">겨울이 길고 추운 냉대기후! 그래프를 보며 두 종류의 냉대기후(Df, Dw)를 확실히 구분해 봅시다.</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <div class="text-center mb-6 p-4 bg-blue-50 rounded-lg">
+                    <h3 class="font-bold text-xl text-blue-800">냉대기후(D)의 조건 (둘 다 만족!)</h3>
+                    <p class="text-lg mt-2">1. 가장 추운 달(최한월) 평균 기온 <span class="font-bold text-blue-600">-3℃ 미만</span></p>
+                    <p class="text-lg">2. 가장 따뜻한 달(최난월) 평균 기온 <span class="font-bold text-red-600">10℃ 이상</span></p>
+                </div>
+                <div class="flex flex-wrap justify-center gap-3 mb-6">
+                    <button class="climate-btn active font-bold py-2 px-4 border-2 rounded-lg bg-slate-100 border-slate-300" data-climate="Df">Df (냉대습윤 - 모스크바)</button>
+                    <button class="climate-btn font-bold py-2 px-4 border-2 rounded-lg bg-slate-100 border-slate-300" data-climate="Dw">Dw (냉대겨울건조 - 하바롭스크)</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="climateChartD"></canvas>
+                </div>
+                 <div class="exam-highlight">
+                    <p><span class="exam-marker">★ 냉대기후 생활 모습</span>: 냉대기후 지역에는 <span class="font-bold">'타이가'</span>라는 거대한 침엽수림이 펼쳐져 있어요. 그래서 <span class="font-bold">통나무집</span>을 짓고, <span class="font-bold">목재·펄프 산업</span>이 발달했죠. 농사는 짧은 여름 동안 감자, 밀 등을 재배합니다.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="section-3" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">3. 한대기후 (E) 완전 정복</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">1년 내내 추위가 계속되는 한대기후! 농사가 불가능한 이곳 사람들은 어떻게 살아갈까요?</p>
+            
+             <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <div class="text-center mb-6 p-4 bg-cyan-50 rounded-lg">
+                    <h3 class="font-bold text-xl text-cyan-800">한대기후(E)의 조건</h3>
+                    <p class="text-lg mt-2">가장 따뜻한 달(최난월) 평균 기온 <span class="font-bold text-red-600">10℃ 미만</span></p>
+                    <p class="text-gray-500 mt-1">ET(툰드라): 0℃ 이상인 달이 있음 / EF(빙설): 모든 달 0℃ 미만</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-2xl font-bold text-center mb-4 text-cyan-700">툰드라(ET)의 생활</h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start gap-3"><span class="text-2xl">🦌</span><div><span class="font-bold">순록 유목:</span> 짧은 여름에 자라는 이끼를 찾아 순록을 키우며 이동합니다.</div></li>
+                            <li class="flex items-start gap-3"><span class="text-2xl">🥩</span><div><span class="font-bold">독특한 식문화:</span> 농사가 불가능해 주로 고기를 먹으며, 비타민 보충을 위해 날고기를 먹기도 합니다.</div></li>
+                            <li class="flex items-start gap-3"><span class="text-2xl">🧊</span><div><span class="font-bold">영구 동토층:</span> 땅속이 1년 내내 얼어있어, 여름에 표면만 살짝 녹습니다.</div></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-center mb-4 text-cyan-700">영구 동토층과 고상 가옥</h3>
+                        <div class="permafrost-diagram border-2 border-slate-300 rounded-lg overflow-hidden">
+                            <div class="absolute top-[30%] w-full h-[10%] bg-cyan-200"></div>
+                             <div class="absolute top-[calc(30%-40px)] left-1/2 -translate-x-1/2 w-24 h-16 bg-yellow-900 flex items-center justify-center text-white font-bold text-sm">고상가옥</div>
+                             <div class="absolute top-[calc(30%-40px+64px)] left-1/2 -translate-x-1/2 h-[calc(10%+40px-64px)] w-1 bg-yellow-950"></div>
+                             <div class="absolute top-[calc(40%)] left-1/2 -translate-x-1/2 h-16 w-1 bg-yellow-950"></div>
+                             <div class="text-xs font-bold absolute top-[25%] left-2 text-cyan-800 -translate-y-1/2">활동층 (여름에 녹음)</div>
+                             <div class="text-xs font-bold absolute top-[70%] left-2 text-white -translate-y-1/2">영구 동토층 (안 녹음)</div>
+                        </div>
+                        <p class="text-sm text-center mt-2">집의 열로 땅이 녹아 무너지는 것을 막기 위해, 기둥을 영구 동토층까지 깊게 박고 바닥을 땅에서 띄워 집을 짓습니다.</p>
+                    </div>
+                </div>
+             </div>
+        </section>
+        
+        <section id="section-4" class="scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">★ 최종 암기 퀴즈 ★</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">냉대와 한대 기후, 이제 눈 감고도 구분할 수 있겠죠? 퀴즈로 마지막 실력을 점검해 보세요!</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg max-w-3xl mx-auto">
+                <div id="quiz-container"></div>
+                <div id="quiz-result" class="text-center font-bold text-2xl mt-6 hidden"></div>
+                <button id="quiz-retry-button" class="w-full mt-4 bg-amber-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-amber-600 transition-colors hidden">다시 풀기</button>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="text-center py-6 bg-slate-100 mt-12">
+        <p class="text-slate-500 text-sm">사회 핵심 개념 학습용 인터랙티브 요약 자료</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const sections = document.querySelectorAll('main section');
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+                    const targetSection = document.getElementById(targetId);
+                    if(targetSection) {
+                        window.scrollTo({ top: targetSection.offsetTop - 80, behavior: 'smooth' });
+                    }
+                });
+            });
+            
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) { current = section.getAttribute('id'); }
+                });
+                navButtons.forEach(button => {
+                    button.classList.remove('active');
+                    if (button.dataset.target === current) { button.classList.add('active'); }
+                });
+            });
+
+            const climateDataD = {
+                Df: {
+                    label: 'Df (모스크바)',
+                    temps: [-9, -8, -2, 6, 13, 17, 19, 17, 11, 5, -2, -7],
+                    precips: [42, 36, 34, 44, 51, 75, 85, 76, 65, 59, 58, 56],
+                },
+                Dw: {
+                    label: 'Dw (하바롭스크)',
+                    temps: [-22, -17, -7, 4, 12, 18, 21, 20, 13, 4, -8, -19],
+                    precips: [13, 11, 22, 44, 62, 72, 133, 154, 88, 51, 29, 17],
+                },
+            };
+            
+            const climateButtonsD = document.querySelectorAll('#section-2 .climate-btn');
+            const ctxD = document.getElementById('climateChartD').getContext('2d');
+            let climateChartD;
+
+            function createChartD(climateId) {
+                if (climateChartD) {
+                    climateChartD.destroy();
+                }
+                const data = climateDataD[climateId];
+                climateChartD = new Chart(ctxD, {
+                    type: 'bar',
+                    data: {
+                        labels: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+                        datasets: [{
+                            type: 'line',
+                            label: '평균 기온 (°C)',
+                            data: data.temps,
+                            borderColor: 'rgb(239, 68, 68)',
+                            yAxisID: 'y1',
+                        }, {
+                            label: '월 강수량 (mm)',
+                            data: data.precips,
+                            backgroundColor: 'rgb(59, 130, 246)',
+                            yAxisID: 'y'
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        scales: {
+                            y: { type: 'linear', display: true, position: 'left', title: { text: '강수량 (mm)', display: true } },
+                            y1: { type: 'linear', display: true, position: 'right', title: { text: '기온 (°C)', display: true }, grid: { drawOnChartArea: false } }
+                        },
+                        plugins: {
+                            title: { display: true, text: data.label, font: {size: 16} },
+                            legend: { display: false },
+                            annotation: {
+                                annotations: {
+                                    line10: { type: 'line', yMin: 10, yMax: 10, borderColor: 'rgba(239, 68, 68, 0.7)', borderWidth: 2, yAxisID: 'y1', label: { content: '10°C', enabled: true, position: 'start', backgroundColor: 'rgba(239, 68, 68, 0.7)'}},
+                                    lineNeg3: { type: 'line', yMin: -3, yMax: -3, borderColor: 'rgba(59, 130, 246, 0.7)', borderWidth: 2, yAxisID: 'y1', label: { content: '-3°C', enabled: true, position: 'start', backgroundColor: 'rgba(59, 130, 246, 0.7)'}},
+                                    line30mm: { type: 'line', yMin: 30, yMax: 30, borderColor: 'rgba(167, 243, 208, 0.9)', borderWidth: 2, yAxisID: 'y', label: { content: '30mm', enabled: true, position: 'end', backgroundColor: 'rgba(167, 243, 208, 0.9)'}}
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            climateButtonsD.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const climateId = e.target.dataset.climate;
+                    climateButtonsD.forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    createChartD(climateId);
+                });
+            });
+            createChartD('Df');
+
+            const quizContainer = document.getElementById('quiz-container');
+            const quizResult = document.getElementById('quiz-result');
+            const quizRetryButton = document.getElementById('quiz-retry-button');
+            const quizData = [
+                { question: '1. 냉대기후(D)를 정의하는 조건으로 옳은 것은?', options: ['최한월 -3℃ 이상, 최난월 10℃ 이상', '최한월 -3℃ 미만, 최난월 10℃ 이상', '최한월 -3℃ 미만, 최난월 10℃ 미만', '최한월 -3℃ 이상, 최난월 10℃ 미만'], answer: '최한월 -3℃ 미만, 최난월 10℃ 이상' },
+                { question: '2. 냉대기후 지역에 넓게 나타나는 침엽수림을 무엇이라고 하는가?', options: ['사바나', '스텝', '툰드라', '타이가'], answer: '타이가' },
+                { question: '3. 한대기후(E) 중, 가장 따뜻한 달의 기온이 0℃를 넘는 달이 있는 기후는?', options: ['툰드라 기후(ET)', '빙설 기후(EF)', '고산 기후(H)', '냉대 기후(D)'], answer: '툰드라 기후(ET)' },
+                { question: '4. 영구 동토층의 열기로 집이 무너지는 것을 막기 위해 짓는 독특한 가옥 형태는?', options: ['통나무집', '이글루', '고상 가옥', '수상 가옥'], answer: '고상 가옥' },
+                { question: '5. 동아시아 지역에서 여름철 벼농사가 발달한 주된 이유는?', options: ['건조한 여름 날씨', '선선한 여름 날씨', '고온다습한 계절풍의 영향', '연중 고른 강수량'], answer: '고온다습한 계절풍의 영향' },
+                { question: '6. 냉대 겨울 건조 기후(Dw)가 냉대 습윤 기후(Df)와 구분되는 가장 큰 특징은?', options: ['여름이 더 덥다', '겨울 강수량이 30mm 미만으로 매우 적다', '연교차가 더 작다', '농사가 불가능하다'], answer: '겨울 강수량이 30mm 미만으로 매우 적다' },
+                { question: '7. 툰드라 기후 지역에서 짧은 여름 동안 이끼류를 먹고 자라는 대표적인 가축은?', options: ['소', '양', '순록', '알파카'], answer: '순록' },
+                { question: '8. 강수량의 계절차가 큰 지역에서 물을 안정적으로 이용하기 위해 꼭 필요한 시설은?', options: ['풍력발전소', '송유관', '댐·저수지', '운하'], answer: '댐·저수지' },
+            ];
+
+            let currentQuestionIndex = 0;
+            let score = 0;
+
+            function loadQuiz() {
+                currentQuestionIndex = 0;
+                score = 0;
+                quizContainer.innerHTML = '';
+                quizResult.classList.add('hidden');
+                quizRetryButton.classList.add('hidden');
+                showQuestion();
+            }
+
+            function showQuestion() {
+                 if (currentQuestionIndex >= quizData.length) {
+                    showResult(); return;
+                }
+                const q = quizData[currentQuestionIndex];
+                const progress = `${currentQuestionIndex + 1} / ${quizData.length}`;
+                const el = document.createElement('div');
+                el.className = 'mb-6';
+                el.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="font-bold text-lg text-slate-800">${q.question}</p>
+                        <span class="text-sm font-semibold text-slate-500 bg-slate-200 px-3 py-1 rounded-full">${progress}</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        ${q.options.map(o => `<button class="quiz-option w-full text-left p-3 border-2 border-slate-300 rounded-lg hover:bg-slate-100">${o}</button>`).join('')}
+                    </div>`;
+                quizContainer.appendChild(el);
+                el.querySelectorAll('.quiz-option').forEach(b => b.addEventListener('click', handleOptionClick));
+            }
+
+            function handleOptionClick(e) {
+                const selected = e.target;
+                const q = quizData[currentQuestionIndex];
+                const isCorrect = selected.textContent === q.answer;
+                
+                if (isCorrect) {
+                    selected.classList.add('correct', 'bg-green-500', 'text-white', 'border-green-600');
+                    score++;
+                } else {
+                    selected.classList.add('incorrect', 'bg-red-500', 'text-white', 'border-red-600');
+                }
+                
+                selected.parentElement.querySelectorAll('.quiz-option').forEach(b => {
+                    b.disabled = true;
+                    if (b.textContent === q.answer) {
+                        b.classList.add('correct', 'bg-green-500', 'text-white', 'border-green-600');
+                    }
+                });
+                
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    quizContainer.innerHTML = '';
+                    showQuestion();
+                }, 1200);
+            }
+
+            function showResult() {
+                quizContainer.innerHTML = '';
+                quizResult.innerHTML = `🎉 퀴즈 완료! 총 ${quizData.length}문제 중 <span class="text-amber-500 text-3xl">${score}</span>문제를 맞혔습니다!`;
+                quizResult.classList.remove('hidden');
+                quizRetryButton.classList.remove('hidden');
+            }
+            quizRetryButton.addEventListener('click', loadQuiz);
+            loadQuiz();
+        });
+    </script>
+</body>
+</html>

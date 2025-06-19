@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사회 핵심 정리: 산업화와 도시화</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Urban Grays with Vibrant Accent Colors -->
+    <!-- Application Structure Plan: A new SPA for the June 10th Social Studies lesson. The structure follows a logical path for understanding urbanization: 1. Defining Industrialization and Urbanization (the core relationship). 2. A deep dive into the "Stages of Urbanization," featuring an interactive S-curve chart. 3. A "Global Urbanization Dashboard" to explore real-world data with an interactive map and regional chart. 4. A focus on Korea's specific urbanization journey. 5. A final comprehensive quiz to solidify all concepts for the exam. -->
+    <!-- Visualization & Content Choices: 
+        1. Core Concepts: Report Info -> Definitions of industrialization, urbanization, industry types. Goal -> Establish foundational knowledge. Viz -> Simple info cards. Interaction -> Static. Justification -> Clear and direct explanation of key terms.
+        2. Urbanization Curve: Report Info -> 3 stages (Initial, Acceleration, Terminal) and their characteristics. Goal -> Visualize a process. Viz -> An interactive Chart.js line chart (S-curve). Interaction -> User can click on points/segments to highlight details for each stage. Justification -> Best way to understand the dynamic process of urbanization over time.
+        3. Global Dashboard: Report Info -> Urbanization rates by continent and country. Goal -> Compare real-world data. Viz -> A simplified world map schematic and a dynamic bar chart. Interaction -> Buttons to show data for different years or regions. Justification -> Makes abstract global trends concrete and explorable.
+        4. Korean Case Study: Report Info -> Korea's rapid urbanization and current status. Goal -> Provide a specific, relatable example. Viz -> A combination of a line chart and key statistics. Interaction -> Static. Justification -> Focuses the user on a key example mentioned in class.
+        5. Final Quiz: Report Info -> All key concepts. Goal -> Assess and reinforce learning. Viz -> Interactive multiple-choice quiz. Interaction -> Immediate feedback. Justification -> Crucial for exam prep.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .exam-highlight {
+            background-color: #fefce8;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0.25rem;
+        }
+        .exam-marker {
+            color: #d97706;
+            font-weight: 700;
+        }
+        .nav-button {
+            transition: all 0.3s;
+        }
+        .nav-button.active {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+    <header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 py-3">
+            <ul class="flex flex-wrap justify-center items-center gap-2">
+                <li><button data-target="section-1" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-indigo-700 hover:text-white">1. 산업화와 도시화</button></li>
+                <li><button data-target="section-2" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-indigo-700 hover:text-white">2. 도시화 과정</button></li>
+                <li><button data-target="section-3" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-indigo-700 hover:text-white">3. 세계의 도시화</button></li>
+                <li><button data-target="section-4" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-amber-200 hover:bg-amber-500 hover:text-white">★ 최종 암기 퀴즈 ★</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-12">
+        
+        <section id="section-1" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">1. 산업화와 도시화: 뗄 수 없는 짝꿍</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">산업화가 진행되면 일자리를 찾아 사람들이 도시로 모여들며 도시화가 나타납니다. 두 개념의 관계를 확실히 이해해 보세요.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-indigo-700">산업화(Industrialization)</h3>
+                    <div class="text-center text-6xl mb-4">🏭</div>
+                    <p class="text-center">농업(1차) 중심의 사회가 <span class="font-bold">광공업(2차)과 서비스업(3차) 중심</span>으로 변화하는 과정입니다. 18세기 영국의 산업 혁명에서 시작되었죠.</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-indigo-700">도시화(Urbanization)</h3>
+                    <div class="text-center text-6xl mb-4">🏙️</div>
+                    <p class="text-center">전체 인구 중 <span class="font-bold">도시에 거주하는 인구의 비율(도시화율)</span>이 높아지고, 도시적 생활 양식이 확산되는 현상입니다. 산업화로 인해 도시의 일자리가 늘면서 촉진됩니다.</p>
+                </div>
+            </div>
+             <div class="exam-highlight mt-8">
+                <p><span class="exam-marker">★ 시험 포인트</span>: 산업화로 도시의 일자리가 늘어나면, 촌락을 떠나 도시로 향하는 <span class="font-bold">'이촌향도(離村向都)'</span> 현상이 나타나고, 이는 <span class="font-bold">도시화를 가속화</span>시키는 직접적인 원인이 됩니다. 이 인과 관계는 반드시 기억해야 합니다!</p>
+            </div>
+        </section>
+
+        <section id="section-2" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">2. 도시화 과정 3단계 (도시화 곡선)</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">도시화는 S자 모양의 곡선을 그리며 3단계를 거쳐 진행됩니다. 각 단계의 특징을 그래프와 함께 익혀보세요.</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <div class="chart-container">
+                    <canvas id="urbanizationChart"></canvas>
+                </div>
+                <div id="urbanization-info" class="mt-6 p-4 bg-indigo-50 rounded-lg text-center">
+                    <p class="text-indigo-800 font-semibold">차트의 각 단계를 클릭하여 설명을 확인해보세요.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="section-3" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">3. 세계의 도시화</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">선진국은 대부분 종착 단계에 도달했지만, 개발도상국은 여전히 빠른 도시화가 진행 중입니다.</p>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="font-bold text-xl mb-3">대륙별 도시화율 (2020년 기준)</h3>
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="continentChart"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xl mb-3">주요 지역별 도시화 수준</h3>
+                        <ul class="space-y-3">
+                            <li class="p-3 bg-slate-100 rounded-md"><strong class="text-indigo-700">높음 (종착 단계):</strong> 앵글로아메리카, 라틴아메리카, 유럽, 오세아니아, 한국, 일본 등 (주로 선진국)</li>
+                            <li class="p-3 bg-slate-100 rounded-md"><strong class="text-indigo-700">낮음 (가속화 단계):</strong> 아시아, 아프리카의 다수 개발도상국</li>
+                        </ul>
+                         <div class="exam-highlight mt-4">
+                            <p><span class="exam-marker">★ 라틴아메리카 심화</span>: 유럽보다 경제 수준이 낮음에도 도시화율이 더 높은 이유는, 일부 대도시로만 인구가 집중되는 <span class="font-bold">종주 도시화</span> 현상과 높은 <span class="font-bold">인구 자연 증가율</span> 때문입니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="section-4" class="scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">★ 최종 암기 퀴즈 ★</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">산업화와 도시화, 이제 자신 있죠? 퀴즈로 배운 내용을 최종 점검하고 시험 만점에 도전하세요!</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg max-w-3xl mx-auto">
+                <div id="quiz-container"></div>
+                <div id="quiz-result" class="text-center font-bold text-2xl mt-6 hidden"></div>
+                <button id="quiz-retry-button" class="w-full mt-4 bg-amber-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-amber-600 transition-colors hidden">다시 풀기</button>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="text-center py-6 bg-slate-100 mt-12">
+        <p class="text-slate-500 text-sm">사회 핵심 개념 학습용 인터랙티브 요약 자료</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const sections = document.querySelectorAll('main section');
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    document.getElementById(button.dataset.target).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            });
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    if (pageYOffset >= section.offsetTop - 90) { current = section.id; }
+                });
+                navButtons.forEach(button => {
+                    button.classList.remove('active');
+                    if (button.dataset.target === current) { button.classList.add('active'); }
+                });
+            });
+            
+            const urbanizationData = {
+                labels: ['시간', '초기 단계', '가속화 단계', '종착 단계', ''],
+                datasets: [{
+                    label: '도시화율(%)', data: [5, 25, 75, 90, 91],
+                    borderColor: '#4f46e5', backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                    fill: true, tension: 0.4, pointRadius: 6, pointBackgroundColor: '#4f46e5', pointHoverRadius: 8
+                }]
+            };
+            const urbanizationInfoData = {
+                1: { title: '1️⃣ 초기 단계 (~25%)', desc: '대부분 인구가 촌락에 거주하며 1차 산업 중심. 도시화가 매우 느리게 진행됩니다.' },
+                2: { title: '2️⃣ 가속화 단계 (25~75%)', desc: '산업화로 이촌향도 현상이 활발해지며 도시 인구가 급격히 증가합니다. <br><span class="exam-highlight inline-block mt-2"><span class="exam-marker">★</span> 주택 부족, 교통 체증 등 각종 도시 문제가 발생합니다.</span>' },
+                3: { title: '3️⃣ 종착 단계 (75%~)', desc: '도시화율 증가가 둔화됩니다. <br><span class="exam-highlight inline-block mt-2"><span class="exam-marker">★</span> 인구와 기능이 도시 외곽으로 빠져나가는 <strong>교외화</strong> 현상이 나타나며 <strong>대도시권</strong>이 형성됩니다.</span>' }
+            };
+            const infoPanel = document.getElementById('urbanization-info');
+            const ctxUrb = document.getElementById('urbanizationChart').getContext('2d');
+            new Chart(ctxUrb, {
+                type: 'line', data: urbanizationData,
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, max: 100, title: { display: true, text: '도시화율 (%)' } }, x: { grid: { display: false } } },
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            if(urbanizationInfoData[index]){
+                                infoPanel.innerHTML = `<h4 class="font-bold text-lg text-indigo-900">${urbanizationInfoData[index].title}</h4><p class="mt-1 text-indigo-800">${urbanizationInfoData[index].desc}</p>`;
+                            }
+                        }
+                    }
+                }
+            });
+            infoPanel.innerHTML = `<h4 class="font-bold text-lg text-indigo-900">우리나라는 현재 어디?</h4><p class="mt-1 text-indigo-800">우리나라는 도시화율 90% 이상으로, 성장이 둔화되고 교외화 현상이 나타나는 <strong>종착 단계</strong>에 해당합니다!</p>`;
+            
+            const ctxCont = document.getElementById('continentChart').getContext('2d');
+            new Chart(ctxCont, {
+                type: 'bar',
+                data: {
+                    labels: ['앵글로 아메리카', '라틴 아메리카', '유럽', '오세아니아', '아시아', '아프리카'],
+                    datasets: [{
+                        label: '대륙별 도시화율 (%)',
+                        data: [82.6, 81.3, 75.1, 68.7, 51.1, 43.5],
+                        backgroundColor: ['#4f46e5', '#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe', '#e0e7ff']
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            const quizContainer = document.getElementById('quiz-container');
+            const quizResult = document.getElementById('quiz-result');
+            const quizRetryButton = document.getElementById('quiz-retry-button');
+            const quizData = [
+                { question: '1. 농업 중심 사회가 광공업, 서비스업 중심으로 바뀌는 현상은?', options: ['도시화', '산업화', '정보화', '세계화'], answer: '산업화' },
+                { question: '2. 촌락 인구가 도시로 이동하는 현상을 무엇이라고 하는가?', options: ['이촌향도', '귀농', '교외화', '역도시화'], answer: '이촌향도' },
+                { question: '3. 주택 부족, 교통 체증 등 각종 도시 문제가 집중적으로 발생하는 도시화 단계는?', options: ['초기 단계', '가속화 단계', '종착 단계', '안정 단계'], answer: '가속화 단계' },
+                { question: '4. 도시의 인구와 기능이 주변 외곽 지역으로 빠져나가는 현상은?', options: ['이촌향도', '집중화', '슬럼화', '교외화'], answer: '교외화' },
+                { question: '5. 현재 우리나라가 속한 도시화 단계와 그 특징으로 옳은 것은?', options: ['초기 단계 - 1차 산업 위주', '가속화 단계 - 도시 문제 발생', '종착 단계 - 교외화 현상', '가속화 단계 - 도시화율 감소'], answer: '종착 단계 - 교외화 현상' },
+                { question: '6. 중심 도시와 주변 지역이 기능적으로 연결되어 하나의 생활권을 이루는 범위는?', options: ['도심', '부도심', '대도시권', '그린벨트'], answer: '대도시권' },
+                { question: '7. 현재 전 세계에서 도시화율이 가장 높은 대륙은 어디인가?', options: ['아시아', '아프리카', '유럽', '앵글로아메리카'], answer: '앵글로아메리카' },
+                { question: '8. 라틴아메리카의 도시화율이 유럽보다 높은 이유로 적절하지 않은 것은?', options: ['높은 인구 자연 증가율', '안정적인 촌락 생활 환경', '소수 대도시로의 인구 집중', '급격한 이촌향도'], answer: '안정적인 촌락 생활 환경' }
+            ];
+            let currentQuestionIndex = 0;
+            let score = 0;
+            function loadQuiz() {
+                currentQuestionIndex = 0; score = 0;
+                quizContainer.innerHTML = '';
+                quizResult.classList.add('hidden');
+                quizRetryButton.classList.add('hidden');
+                showQuestion();
+            }
+            function showQuestion() {
+                 if (currentQuestionIndex >= quizData.length) {
+                    showResult(); return;
+                }
+                const q = quizData[currentQuestionIndex];
+                const progress = `${currentQuestionIndex + 1} / ${quizData.length}`;
+                const el = document.createElement('div');
+                el.className = 'mb-6';
+                el.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="font-bold text-lg text-slate-800">${q.question}</p>
+                        <span class="text-sm font-semibold text-slate-500 bg-slate-200 px-3 py-1 rounded-full">${progress}</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        ${q.options.map(o => `<button class="quiz-option w-full text-left p-3 border-2 border-slate-300 rounded-lg hover:bg-slate-100">${o}</button>`).join('')}
+                    </div>`;
+                quizContainer.appendChild(el);
+                el.querySelectorAll('.quiz-option').forEach(b => b.addEventListener('click', handleOptionClick));
+            }
+            function handleOptionClick(e) {
+                const selected = e.target;
+                const q = quizData[currentQuestionIndex];
+                const isCorrect = selected.textContent === q.answer;
+                if (isCorrect) {
+                    selected.classList.add('correct', 'bg-green-500', 'text-white', 'border-green-600');
+                    score++;
+                } else {
+                    selected.classList.add('incorrect', 'bg-red-500', 'text-white', 'border-red-600');
+                }
+                selected.parentElement.querySelectorAll('.quiz-option').forEach(b => {
+                    b.disabled = true;
+                    if (b.textContent === q.answer) b.classList.add('correct', 'bg-green-500', 'text-white', 'border-green-600');
+                });
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    quizContainer.innerHTML = '';
+                    showQuestion();
+                }, 1200);
+            }
+            function showResult() {
+                quizContainer.innerHTML = '';
+                quizResult.innerHTML = `🎉 퀴즈 완료! 총 ${quizData.length}문제 중 <span class="text-amber-500 text-3xl">${score}</span>문제를 맞혔습니다!`;
+                quizResult.classList.remove('hidden');
+                quizRetryButton.classList.remove('hidden');
+            }
+            quizRetryButton.addEventListener('click', loadQuiz);
+            loadQuiz();
+        });
+    </script>
+</body>
+</html>

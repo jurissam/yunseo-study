@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사회 핵심 정리: 세계의 문화권</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: World Map Tones - Blues, Greens, Tans -->
+    <!-- Application Structure Plan: A new SPA for the May 26th Social Studies lesson. The structure is designed to conquer the topic of cultural regions as emphasized by the teacher. 1. Defining Culture (Broad vs. Narrow sense). 2. The centerpiece: An "Interactive Cultural Regions Map." This section directly addresses the students' weakness with maps. 3. Deeper dive into key concepts like natural boundaries and transitional zones. 4. A comprehensive final quiz heavily focused on map identification and cultural characteristics. -->
+    <!-- Visualization & Content Choices: 
+        1. Defining Culture: Report Info -> Broad vs. Narrow definitions. Goal -> Clarify basic terms. Viz -> Two simple info cards. Interaction -> Static. Justification -> Clear, direct explanation.
+        2. Interactive Map: Report Info -> Detailed breakdown of 10+ cultural regions. Goal -> Help students memorize locations and features. Viz -> A clickable world map schematic built with HTML/CSS. Interaction -> User clicks a colored region on the map, which updates a dedicated information panel with details about that cultural region (religion, language, lifestyle, key countries). Justification -> This is the most effective, hands-on way to address the stated student weakness and the teacher's exam focus.
+        3. Key Concepts: Report Info -> Natural boundaries (mountains, rivers), transitional zones. Goal -> Explain how cultural regions are formed and separated. Viz -> Icon-based list and definition cards. Interaction -> Static. Justification -> Reinforces theoretical underpinnings.
+        4. Final Quiz: Report Info -> All key concepts and regions. Goal -> Assess and reinforce learning. Viz -> Interactive multiple-choice quiz. Interaction -> Click answers for immediate feedback. Justification -> Final check for exam readiness.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .exam-highlight {
+            background-color: #fefce8;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0.25rem;
+        }
+        .exam-marker {
+            color: #d97706;
+            font-weight: 700;
+        }
+        .nav-button {
+            transition: all 0.3s;
+        }
+        .nav-button.active {
+            background-color: #4338ca;
+            color: white;
+        }
+        .map-region {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+        .map-region:hover, .map-region.active {
+            opacity: 1;
+            transform: scale(1.05);
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25));
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+    <header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 py-3">
+            <ul class="flex flex-wrap justify-center items-center gap-2">
+                <li><button data-target="section-1" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-indigo-700 hover:text-white">1. 문화의 의미</button></li>
+                <li><button data-target="section-2" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-indigo-700 hover:text-white">2. 세계 문화권 지도</button></li>
+                <li><button data-target="section-3" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-indigo-700 hover:text-white">3. 문화 경관과 점이지대</button></li>
+                <li><button data-target="section-4" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-amber-200 hover:bg-amber-500 hover:text-white">★ 최종 암기 퀴즈 ★</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-12">
+        
+        <section id="section-1" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">1. 문화(文化)란 무엇일까?</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">문화는 두 가지 의미로 나뉩니다. '넓은 의미'는 이해의 대상, '좁은 의미'는 평가의 대상이 될 수 있어요.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-indigo-700">넓은 의미의 문화</h3>
+                    <div class="text-center text-6xl mb-4">🌍</div>
+                    <p class="text-center">한 사회 구성원들이 <span class="font-bold">자연 및 인문 환경과 상호작용</span>하며 만들어 낸 공통된 <span class="font-bold">생활 양식 전체</span>를 의미합니다. (예: 의식주, 언어, 종교, 풍습 등)</p>
+                    <p class="text-center mt-2 font-semibold text-indigo-600">→ 문화 상대주의적 관점 (이해의 대상)</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-indigo-700">좁은 의미의 문화</h3>
+                    <div class="text-center text-6xl mb-4">🎨</div>
+                    <p class="text-center">교양 있고 세련되거나 발전된 것을 의미하며, 주로 <span class="font-bold">예술, 학문 분야</span>를 지칭합니다. (예: 문화생활, 문화 예술, 문화인 등)</p>
+                     <p class="text-center mt-2 font-semibold text-indigo-600">→ 평가의 대상이 될 수 있음</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-2" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">2. 인터랙티브 세계 문화권 지도</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">지도에 약점을 보이면 안 돼요! 아래 지도에서 각 문화권을 클릭하여 특징을 확인하고 완벽하게 외워봅시다.</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <div class="flex flex-col lg:flex-row gap-6">
+                    <div class="w-full lg:w-2/3 relative h-[400px] md:h-[500px] bg-blue-100 rounded-lg overflow-hidden">
+                        <!-- Map Regions -->
+                        <div data-region="arctic" class="map-region absolute top-0 left-0 w-full h-1/6 bg-white"></div>
+                        <div data-region="anglo_america" class="map-region absolute top-1/6 left-[10%] w-[30%] h-[25%] bg-red-300"></div>
+                        <div data-region="latin_america" class="map-region absolute top-[calc(16.6%+25%)] left-[15%] w-[25%] h-[45%] bg-orange-300"></div>
+                        <div data-region="europe" class="map-region absolute top-1/6 left-[40%] w-[20%] h-[25%] bg-purple-300"></div>
+                        <div data-region="africa" class="map-region absolute top-[calc(16.6%+25%)] left-[40%] w-[20%] h-[40%] bg-yellow-300"></div>
+                        <div data-region="dry" class="map-region absolute top-[calc(16.6%+15%)] left-[48%] w-[22%] h-[20%] bg-amber-200 z-10"></div>
+                        <div data-region="east_asia" class="map-region absolute top-[calc(16.6%+10%)] left-[70%] w-[15%] h-[20%] bg-green-300"></div>
+                        <div data-region="south_asia" class="map-region absolute top-[calc(16.6%+30%)] left-[60%] w-[15%] h-[20%] bg-lime-300"></div>
+                        <div data-region="se_asia" class="map-region absolute top-[calc(16.6%+35%)] left-[70%] w-[15%] h-[20%] bg-teal-300"></div>
+                        <div data-region="oceania" class="map-region absolute top-[calc(16.6%+55%)] left-[70%] w-[15%] h-[15%] bg-sky-300"></div>
+                        <div data-region="russia" class="map-region absolute top-1/6 left-[60%] w-[30%] h-[20%] bg-indigo-200"></div>
+
+                        <!-- Labels -->
+                        <div class="absolute top-[8%] left-1/2 -translate-x-1/2 text-xs md:text-sm font-bold pointer-events-none">북극</div>
+                        <div class="absolute top-[28%] left-[25%] -translate-x-1/2 -translate-y-1/2 text-xs md:text-sm font-bold pointer-events-none">앵글로 아메리카</div>
+                        <div class="absolute top-[60%] left-[27%] -translate-x-1/2 -translate-y-1/2 text-xs md:text-sm font-bold pointer-events-none">라틴 아메리카</div>
+                        <div class="absolute top-[28%] left-[50%] -translate-x-1/2 -translate-y-1/2 text-xs md:text-sm font-bold pointer-events-none">유럽</div>
+                        <div class="absolute top-[60%] left-[50%] -translate-x-1/2 -translate-y-1/2 text-xs md:text-sm font-bold pointer-events-none">아프리카</div>
+                        <div class="absolute top-[35%] left-[60%] -translate-x-1/2 -translate-y-1/2 text-xs md:text-sm font-bold pointer-events-none z-20">건조</div>
+                        <div class="absolute top-[28%] left-[78%] -translate-x-1/2 -translate-y-1/2 text-xs md:text-sm font-bold pointer-events-none">동아시아</div>
+                        <div class="absolute top-[50%] left-[68%] -translate-x-1/2 -translate-y-1/2 text-xs md:text-sm font-bold pointer-events-none">남부아시아</div>
+                        <div class="absolute top-[65%] left-[78%] -translate-x-1/2 -translate-y-1/2 text-xs md:text-sm font-bold pointer-events-none">동남아시아</div>
+                        <div class="absolute top-[80%] left-[78%] -translate-x-1/2 -translate-y-1/2 text-xs md:text-sm font-bold pointer-events-none">오세아니아</div>
+                         <div class="absolute top-[25%] left-[75%] -translate-x-1/2 -translate-y-1/2 text-xs md:text-sm font-bold pointer-events-none">러시아/동유럽</div>
+                    </div>
+                    <div id="region-info" class="w-full lg:w-1/3 p-4 bg-slate-100 rounded-lg">
+                        <h3 class="font-bold text-xl mb-2">문화권 정보</h3>
+                        <p class="text-slate-600">지도에서 궁금한 문화권을 클릭하세요.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="section-3" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">3. 문화 경관과 점이 지대</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">문화권은 어떻게 나뉠까요? 자연 환경이 경계가 되기도 하고, 여러 문화가 섞이는 곳도 있습니다.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-indigo-700">문화 경관의 경계</h3>
+                    <p class="text-center mb-4">문화와 문화가 나뉘는 경계는 주로 이동을 방해하는 <span class="font-bold">자연 지물</span>이 기준이 됩니다.</p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-3"><span class="text-2xl">🏔️</span><div><span class="font-bold">높은 산맥:</span> 히말라야, 안데스, 로키, 태백산맥 등</div></li>
+                        <li class="flex items-start gap-3"><span class="text-2xl">🌊</span><div><span class="font-bold">큰 강과 바다:</span> 리오그란데 강, 지중해 등</div></li>
+                        <li class="flex items-start gap-3"><span class="text-2xl">🏜️</span><div><span class="font-bold">넓은 사막:</span> 사하라 사막, 데스밸리 등</div></li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-indigo-700">점이 지대 (Transitional Zone)</h3>
+                     <div class="text-center text-6xl mb-4">🔄</div>
+                    <p class="text-center">서로 다른 문화권이 만나는 경계 지역으로, <span class="font-bold">두 문화의 특징이 함께 나타나는 곳</span>입니다.</p>
+                    <p class="text-center mt-2 font-semibold text-indigo-600">예: 파키스탄(남부아시아+건조), 멕시코(앵글로+라틴), 동유럽(유럽+건조/아시아)</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="section-4" class="scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">★ 최종 암기 퀴즈 ★</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">이제 세계 문화권 박사가 되었을 시간! 퀴즈로 배운 내용을 최종 확인해 보세요.</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg max-w-3xl mx-auto">
+                <div id="quiz-container"></div>
+                <div id="quiz-result" class="text-center font-bold text-2xl mt-6 hidden"></div>
+                <button id="quiz-retry-button" class="w-full mt-4 bg-amber-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-amber-600 transition-colors hidden">다시 풀기</button>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="text-center py-6 bg-slate-100 mt-12">
+        <p class="text-slate-500 text-sm">사회 핵심 개념 학습용 인터랙티브 요약 자료</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const sections = document.querySelectorAll('main section');
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+                    document.getElementById(targetId).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            });
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    if (pageYOffset >= section.offsetTop - 90) { current = section.id; }
+                });
+                navButtons.forEach(button => {
+                    button.classList.remove('active');
+                    if (button.dataset.target === current) { button.classList.add('active'); }
+                });
+            });
+
+            const regionData = {
+                arctic: { name: '북극 문화권', color: 'bg-white', details: '• <b>주요 민족:</b> 이누이트<br>• <b>주요 종교:</b> 원시 종교(토테미즘, 샤머니즘)<br>• <b>생활 모습:</b> 순록 유목, 어로 활동' },
+                anglo_america: { name: '앵글로아메리카 문화권', color: 'bg-red-300', details: '• <b>주요 국가:</b> 미국, 캐나다<br>• <b>주요 민족/언어:</b> 앵글로색슨족, 영어<br>• <b>주요 종교:</b> 개신교<br>• <b>특징:</b> 유럽 문화가 이식됨' },
+                latin_america: { name: '라틴아메리카 문화권', color: 'bg-orange-300', details: '• <b>주요 국가:</b> 멕시코, 브라질, 칠레<br>• <b>주요 민족/언어:</b> 라틴족, 에스파냐어, 포르투갈어(브라질)<br>• <b>주요 종교:</b> 가톨릭<br>• <b>경계:</b> 리오그란데 강(북쪽)' },
+                europe: { name: '유럽 문화권', color: 'bg-purple-300', details: '• <b>북유럽:</b> 게르만족, 루터파 개신교<br>• <b>서유럽:</b> 앵글로색슨/게르만족, 가톨릭/개신교(영국 국교회)<br>• <b>남유럽:</b> 라틴족, 가톨릭<br>• <b>동유럽:</b> 슬라브족, 그리스정교 (점이 지대)' },
+                africa: { name: '아프리카 문화권', color: 'bg-yellow-300', details: '• <b>지역:</b> 사하라 사막 이남<br>• <b>주요 특징:</b> 매우 다양한 부족과 언어, 원시 종교 및 토착 신앙이 다수<br>• <b>생활 모습:</b> 부족 중심의 공동체 생활' },
+                dry: { name: '건조 문화권', color: 'bg-amber-200', details: '• <b>지역:</b> 북부 아프리카, 서남아시아, 중앙아시아<br>• <b>주요 종교:</b> 이슬람교<br>• <b>생활 모습:</b> 오아시스 농업, 유목<br>• <b>자원:</b> 석유 자원 풍부' },
+                east_asia: { name: '동아시아 문화권', color: 'bg-green-300', details: '• <b>주요 국가:</b> 한국, 중국, 일본<br>• <b>공통 요소:</b> 한자, 유교, 불교, 벼농사<br>• <b>생활 모습:</b> 젓가락 사용' },
+                south_asia: { name: '남부아시아 문화권', color: 'bg-lime-300', details: '• <b>주요 국가:</b> 인도, 파키스탄, 방글라데시<br>• <b>주요 종교:</b> 힌두교(인도), 이슬람교(파키스탄 등)<br>• <b>경계:</b> 히말라야 산맥' },
+                se_asia: { name: '동남아시아 문화권', color: 'bg-teal-300', details: '• <b>특징:</b> 다양한 문화의 점이 지대<br>• <b>주요 종교:</b> 불교(타이, 미얀마), 이슬람교(인도네시아, 말레이시아), 크리스트교(필리핀)<br>• <b>생활 모습:</b> 다양한 문화가 혼재' },
+                oceania: { name: '오세아니아 문화권', color: 'bg-sky-300', details: '• <b>주요 국가:</b> 오스트레일리아, 뉴질랜드<br>• <b>주요 특징:</b> 영국의 문화 이식, 영어 사용, 개신교<br>• <b>기타:</b> 원주민(어보리진) 문화 존재' },
+                russia: { name: '러시아/동유럽 문화권', color: 'bg-indigo-200', details: '• <b>주요 민족:</b> 슬라브족<br>• <b>주요 종교:</b> 그리스정교<br>• <b>특징:</b> 유럽과 아시아의 점이 지대 역할' },
+            };
+            const mapRegions = document.querySelectorAll('.map-region');
+            const infoPanel = document.getElementById('region-info');
+            mapRegions.forEach(region => {
+                region.addEventListener('click', () => {
+                    const regionId = region.dataset.region;
+                    const data = regionData[regionId];
+                    infoPanel.innerHTML = `<h3 class="font-bold text-xl mb-2 flex items-center gap-2"><div class="w-4 h-4 rounded-full ${data.color}"></div>${data.name}</h3><p class="text-slate-700 text-sm leading-relaxed">${data.details}</p>`;
+                    mapRegions.forEach(r => r.classList.remove('active'));
+                    region.classList.add('active');
+                });
+            });
+
+            const quizContainer = document.getElementById('quiz-container');
+            const quizResult = document.getElementById('quiz-result');
+            const quizRetryButton = document.getElementById('quiz-retry-button');
+            const quizData = [
+                { question: '1. 한 사회 구성원들의 공통된 생활 양식 전체를 가리키는 문화의 의미는?', options: ['좁은 의미의 문화', '넓은 의미의 문화', '물질 문화', '비물질 문화'], answer: '넓은 의미의 문화' },
+                { question: '2. 문화권을 나누는 자연적 경계로 보기 어려운 것은?', options: ['히말라야 산맥', '고속도로', '사하라 사막', '리오그란데 강'], answer: '고속도로' },
+                { question: '3. 앵글로아메리카와 라틴아메리카를 구분하는 가장 중요한 요소는?', options: ['기후와 식생', '주요 산업', '식민 지배 역사와 언어', '인구 밀도'], answer: '식민 지배 역사와 언어' },
+                { question: "4. 브라질에서 포르투갈어를 사용하여 '언어의 섬'이라고 불리는 이유는?", options: ['과거 포르투갈의 식민지였기 때문', '브라질 사람들이 포르투갈을 좋아해서', '에스파냐어와 비슷하기 때문', '지형이 섬 모양이라서'], answer: '과거 포르투갈의 식민지였기 때문' },
+                { question: '5. 유교, 불교, 한자, 벼농사 등의 문화 요소를 공유하는 문화권은?', options: ['남부아시아 문화권', '유럽 문화권', '동아시아 문화권', '건조 문화권'], answer: '동아시아 문화권' },
+                { question: '6. 이슬람교를 주로 믿으며 오아시스 농업이 발달한 문화권은?', options: ['아프리카 문화권', '건조 문화권', '라틴아메리카 문화권', '오세아니아 문화권'], answer: '건조 문화권' },
+                { question: '7. 서로 다른 문화의 특징이 함께 나타나는 경계 지역을 무엇이라고 하는가?', options: ['문화 중심', '문화 경관', '점이 지대', '고립 지역'], answer: '점이 지대' },
+                { question: '8. 유럽 문화권 중, 라틴족이 주로 거주하며 가톨릭을 믿는 지역은?', options: ['북유럽', '서유럽', '남유럽', '동유럽'], answer: '남유럽' },
+            ];
+            let currentQuestionIndex = 0;
+            let score = 0;
+            function loadQuiz() {
+                currentQuestionIndex = 0;
+                score = 0;
+                quizContainer.innerHTML = '';
+                quizResult.classList.add('hidden');
+                quizRetryButton.classList.add('hidden');
+                showQuestion();
+            }
+            function showQuestion() {
+                 if (currentQuestionIndex >= quizData.length) {
+                    showResult(); return;
+                }
+                const q = quizData[currentQuestionIndex];
+                const progress = `${currentQuestionIndex + 1} / ${quizData.length}`;
+                const el = document.createElement('div');
+                el.className = 'mb-6';
+                el.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="font-bold text-lg text-slate-800">${q.question}</p>
+                        <span class="text-sm font-semibold text-slate-500 bg-slate-200 px-3 py-1 rounded-full">${progress}</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        ${q.options.map(o => `<button class="quiz-option w-full text-left p-3 border-2 border-slate-300 rounded-lg hover:bg-slate-100">${o}</button>`).join('')}
+                    </div>`;
+                quizContainer.appendChild(el);
+                el.querySelectorAll('.quiz-option').forEach(b => b.addEventListener('click', handleOptionClick));
+            }
+            function handleOptionClick(e) {
+                const selected = e.target;
+                const q = quizData[currentQuestionIndex];
+                const isCorrect = selected.textContent === q.answer;
+                
+                if (isCorrect) {
+                    selected.classList.add('correct', 'bg-green-500', 'text-white', 'border-green-600');
+                    score++;
+                } else {
+                    selected.classList.add('incorrect', 'bg-red-500', 'text-white', 'border-red-600');
+                }
+                selected.parentElement.querySelectorAll('.quiz-option').forEach(b => {
+                    b.disabled = true;
+                    if (b.textContent === q.answer) {
+                        b.classList.add('correct', 'bg-green-500', 'text-white', 'border-green-600');
+                    }
+                });
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    quizContainer.innerHTML = '';
+                    showQuestion();
+                }, 1200);
+            }
+            function showResult() {
+                quizContainer.innerHTML = '';
+                quizResult.innerHTML = `🎉 퀴즈 완료! 총 ${quizData.length}문제 중 <span class="text-amber-500 text-3xl">${score}</span>문제를 맞혔습니다!`;
+                quizResult.classList.remove('hidden');
+                quizRetryButton.classList.remove('hidden');
+            }
+            quizRetryButton.addEventListener('click', loadQuiz);
+            loadQuiz();
+        });
+    </script>
+</body>
+</html>

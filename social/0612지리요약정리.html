@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사회 핵심 정리: 도시 내부 구조와 공간 분화</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Urban Grays with Vibrant Accent Colors -->
+    <!-- Application Structure Plan: A new SPA for the June 12th lesson. The structure logically dissects the internal structure of cities: 1. A review of urbanization's impact on city expansion. 2. The core "Interactive City Model," allowing users to click on different zones (CBD, suburbs, etc.) to learn their functions. 3. A dedicated section for the core principle: "Accessibility, Land Value, and Functional Differentiation," featuring a dynamic chart. 4. An exploration of the environmental changes due to urbanization. 5. A final, comprehensive quiz. -->
+    <!-- Visualization & Content Choices: 
+        1. City Expansion: Report Info -> Seoul's expansion from the 4 gates. Goal -> Visualize growth. Viz -> A simple before/after diagram. Interaction -> Static. Justification -> Clearly shows the scale of change.
+        2. Interactive City Model: Report Info -> Definitions of CBD, Sub-center, Suburbs, Greenbelt. Goal -> Teach the components of a city. Viz -> A clickable schematic map of a city. Interaction -> User clicks a zone to get a detailed explanation. Justification -> An intuitive way to learn spatial concepts.
+        3. Land Value Chart: Report Info -> Bid-rent theory (Commerce > Industry > Residence). Goal -> Explain the core mechanism of functional differentiation. Viz -> A dynamic Chart.js line chart. Interaction -> Hovering over the chart can highlight which function "wins" at which distance from the CBD. Justification -> Visualizes an economic theory effectively.
+        4. Environmental Impact: Report Info -> Increased runoff due to pavement. Goal -> Show consequences. Viz -> A simple before/after runoff diagram. Interaction -> Static. Justification -> Clear, impactful visual comparison.
+        5. Final Quiz: Report Info -> All concepts from the lesson. Goal -> Assess and reinforce learning. Viz -> Interactive multiple-choice quiz. Interaction -> Immediate feedback. Justification -> Essential for exam preparation.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .exam-highlight {
+            background-color: #fefce8;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0.25rem;
+        }
+        .exam-marker {
+            color: #d97706;
+            font-weight: 700;
+        }
+        .nav-button {
+            transition: all 0.3s;
+        }
+        .nav-button.active {
+            background-color: #0369a1;
+            color: white;
+        }
+        .city-zone {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .city-zone:hover, .city-zone.active {
+            filter: brightness(1.15);
+            transform: scale(1.03);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+    <header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 py-3">
+            <ul class="flex flex-wrap justify-center items-center gap-2">
+                <li><button data-target="section-1" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-sky-700 hover:text-white">1. 도시 내부 구조</button></li>
+                <li><button data-target="section-2" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-sky-700 hover:text-white">2. 기능 분화의 원리</button></li>
+                <li><button data-target="section-3" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-sky-700 hover:text-white">3. 도시의 환경 변화</button></li>
+                <li><button data-target="section-4" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-amber-200 hover:bg-amber-500 hover:text-white">★ 최종 암기 퀴즈 ★</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-12">
+        
+        <section id="section-1" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">1. 도시 내부는 어떻게 생겼을까?</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">도시가 성장하면서, 다양한 기능들이 각자의 위치를 찾아갑니다. 아래 도시 모형의 각 지역을 클릭해 보세요.</p>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <div class="flex flex-col lg:flex-row gap-6">
+                    <div class="w-full lg:w-2/3 relative h-[300px] md:h-[400px] bg-slate-200 rounded-lg p-4 overflow-hidden">
+                        <!-- City Structure -->
+                        <div data-zone="cbd" class="city-zone absolute top-1/2 left-1/2 w-16 h-16 md:w-20 md:h-20 -m-8 md:-m-10 bg-red-500 rounded-full z-10"></div>
+                        <div data-zone="subcenter" class="city-zone absolute top-1/4 left-1/4 w-10 h-10 md:w-12 md:h-12 -m-5 md:-m-6 bg-orange-500 rounded-full z-10"></div>
+                         <div data-zone="subcenter" class="city-zone absolute bottom-1/4 right-1/4 w-10 h-10 md:w-12 md:h-12 -m-5 md:-m-6 bg-orange-500 rounded-full z-10"></div>
+                        <div data-zone="intermediate" class="city-zone absolute inset-10 md:inset-16 bg-yellow-300 rounded-full"></div>
+                        <div data-zone="suburb" class="city-zone absolute inset-4 md:inset-6 bg-sky-300 rounded-full"></div>
+                        <div data-zone="greenbelt" class="city-zone absolute inset-0 bg-green-400"></div>
+                        
+                        <!-- Labels -->
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white font-bold text-xs md:text-sm text-center pointer-events-none z-10">도심<br>(CBD)</div>
+                        <div class="absolute top-[35%] left-[65%] text-slate-700 font-semibold text-xs md:text-sm pointer-events-none">중간 지역</div>
+                        <div class="absolute top-[20%] left-[80%] text-slate-700 font-semibold text-xs md:text-sm pointer-events-none">외곽 지역</div>
+                         <div class="absolute top-[5%] left-[50%] text-white font-semibold text-xs md:text-sm pointer-events-none">개발제한구역</div>
+                    </div>
+                    <div id="zone-info" class="w-full lg:w-1/3 p-4 bg-slate-100 rounded-lg">
+                        <!-- JS will populate this -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-2" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">2. 기능 분화의 원리: 접근성과 지대</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">도시의 기능들이 나뉘는 이유는 무엇일까요? '땅값(지대)'을 가장 많이 낼 수 있는 기능이 가장 좋은 자리를 차지하기 때문입니다.</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                 <div class="exam-highlight mb-6">
+                    <p><span class="exam-marker">★ 시험 포인트</span>: <span class="font-bold">접근성</span>(교통의 편리함)이 높을수록 <span class="font-bold">지대</span>(땅값)가 비싸집니다. 각 기능은 이익에 따라 지불할 수 있는 지대가 다르기 때문에, 도심에서부터 <span class="font-bold">상업 → 공업 → 주거</span> 순으로 자리를 잡게 됩니다. 이 원리는 시험에 반드시 나옵니다!</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="bidRentChart"></canvas>
+                </div>
+            </div>
+        </section>
+        
+        <section id="section-3" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">3. 도시의 환경 변화</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">도시화는 우리 생활을 편리하게 했지만, 자연 환경에는 큰 변화를 가져왔습니다. 특히 물의 흐름에 큰 영향을 주었죠.</p>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <h3 class="text-xl font-bold text-center mb-4">도시화 전후의 빗물 유출량 변화</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="text-center">
+                        <h4 class="font-semibold mb-2">🌳 도시화 이전 (숲, 흙)</h4>
+                        <div class="w-32 h-32 mx-auto bg-green-200 rounded-full flex items-center justify-center relative">
+                            <div class="absolute bottom-0 w-full h-1/2 bg-yellow-800/30"></div>
+                            <span class="font-bold text-4xl text-green-800">💧</span>
+                        </div>
+                        <p class="mt-2 text-sm">빗물의 약 50%가 땅으로 흡수되고, <span class="font-bold text-red-600">10%</span>만 지표면으로 흘러갑니다.</p>
+                    </div>
+                    <div class="text-center">
+                        <h4 class="font-semibold mb-2">🏙️ 도시화 이후 (아스팔트, 콘크리트)</h4>
+                         <div class="w-32 h-32 mx-auto bg-slate-600 rounded-full flex items-center justify-center relative">
+                            <div class="absolute bottom-0 w-full h-1/4 bg-slate-400/30"></div>
+                            <span class="font-bold text-4xl text-white">💧</span>
+                        </div>
+                        <p class="mt-2 text-sm">불투수층(물이 스며들지 못하는 땅)이 늘어나 빗물 흡수량이 15%로 줄고, <span class="font-bold text-red-600">55%</span>가 지표면으로 흘러갑니다.</p>
+                    </div>
+                </div>
+                 <div class="exam-highlight mt-6">
+                    <p><span class="exam-marker">★ 홍수 위험 증가</span>: 도시화로 인해 짧은 시간에 많은 양의 빗물이 하천으로 모이게 되어, <span class="font-bold">도시 홍수의 발생 위험이 크게 증가</span>합니다.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="section-4" class="scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">★ 최종 암기 퀴즈 ★</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">도시 내부 구조와 기능 분화의 원리, 이제 완벽히 이해했죠? 퀴즈로 최종 점검해 봅시다!</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg max-w-3xl mx-auto">
+                <div id="quiz-container"></div>
+                <div id="quiz-result" class="text-center font-bold text-2xl mt-6 hidden"></div>
+                <button id="quiz-retry-button" class="w-full mt-4 bg-amber-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-amber-600 transition-colors hidden">다시 풀기</button>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="text-center py-6 bg-slate-100 mt-12">
+        <p class="text-slate-500 text-sm">사회 핵심 개념 학습용 인터랙티브 요약 자료</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const sections = document.querySelectorAll('main section');
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    document.getElementById(button.dataset.target).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            });
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    if (pageYOffset >= section.offsetTop - 90) { current = section.id; }
+                });
+                navButtons.forEach(button => {
+                    button.classList.remove('active');
+                    if (button.dataset.target === current) { button.classList.add('active'); }
+                });
+            });
+
+            const zoneData = {
+                cbd: { name: '도심 (CBD)', desc: "Central Business District의 약자. 도시의 중심 업무 지구로, 접근성이 가장 높아 땅값이 최고! 대기업 본사, 행정 기관, 백화점 등 중추 기능이 모여있어요." },
+                subcenter: { name: '부도심', desc: "도심의 기능을 분담하는 곳. 도심 다음으로 교통이 편리하며, 대규모 상업 및 업무 시설이 들어서요." },
+                intermediate: { name: '중간 지역', desc: "도심과 외곽 지역 사이에 위치하며, 비교적 오래된 주택가나 소규모 공장 등이 혼재되어 있어요." },
+                suburb: { name: '외곽 지역', desc: "도심에서 떨어진 주변 지역. 땅값이 저렴하여 대규모 아파트 단지(주거 기능)나 넓은 부지가 필요한 공업 기능이 주로 입지해요." },
+                greenbelt: { name: '개발제한구역', desc: "도시의 무질서한 팽창을 막고 자연 환경을 보전하기 위해 개발이 제한된 녹지 공간입니다." }
+            };
+            const cityZones = document.querySelectorAll('.city-zone');
+            const zoneInfoPanel = document.getElementById('zone-info');
+            function updateZoneInfo(zoneId) {
+                const data = zoneData[zoneId];
+                zoneInfoPanel.innerHTML = `<h3 class="font-bold text-xl mb-2 text-sky-800">${data.name}</h3><p class="text-slate-700 text-sm">${data.desc}</p>`;
+                cityZones.forEach(z => z.classList.remove('active'));
+                document.querySelector(`.city-zone[data-zone="${zoneId}"]`).classList.add('active');
+            }
+            cityZones.forEach(zone => {
+                zone.addEventListener('click', (e) => {
+                    updateZoneInfo(e.currentTarget.dataset.zone);
+                });
+            });
+            updateZoneInfo('cbd');
+
+            const ctxBidRent = document.getElementById('bidRentChart').getContext('2d');
+            new Chart(ctxBidRent, {
+                type: 'line',
+                data: {
+                    labels: ['도심', '','','','','','','','','외곽'],
+                    datasets: [
+                        { label: '상업 기능', data: [100, 80, 60, 40, 20, 10, 5, 2, 1, 0], borderColor: '#ef4444', fill: false, tension: 0.1 },
+                        { label: '공업 기능', data: [60, 55, 50, 45, 40, 30, 20, 10, 5, 2], borderColor: '#3b82f6', fill: false, tension: 0.1 },
+                        { label: '주거 기능', data: [40, 38, 36, 34, 32, 30, 28, 26, 24, 22], borderColor: '#22c55e', fill: false, tension: 0.1 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { y: { title: { display: true, text: '지불 의사 지대(땅값)' } }, x: { title: { display: true, text: '도심으로부터의 거리' } } },
+                    plugins: { title: { display: true, text: '기능별 지대 지불 능력 곡선' } }
+                }
+            });
+
+            const quizContainer = document.getElementById('quiz-container');
+            const quizResult = document.getElementById('quiz-result');
+            const quizRetryButton = document.getElementById('quiz-retry-button');
+            const quizData = [
+                { question: '1. 도시의 핵심 기능이 모여있고 접근성이 가장 높아 지대가 비싼 곳은?', options: ['외곽 지역', '중간 지역', '도심(CBD)', '개발제한구역'], answer: '도심(CBD)' },
+                { question: '2. 지대 지불 능력이 가장 높아 도심에 주로 입지하는 기능은?', options: ['주거 기능', '공업 기능', '농업 기능', '상업 및 업무 기능'], answer: '상업 및 업무 기능' },
+                { question: '3. 대규모 아파트 단지나 넓은 부지를 필요로 하는 공장이 주로 위치하는 곳은?', options: ['도심', '부도심', '외곽 지역', '중간 지역'], answer: '외곽 지역' },
+                { question: '4. 기능들이 도심으로 모이려는 현상을 무엇이라고 하는가?', options: ['이심 현상', '집심 현상', '교외화', '공동화'], answer: '집심 현상' },
+                { question: '5. 도시화로 인해 아스팔트 포장 면적이 늘어나면서 발생하는 가장 큰 환경 문제는?', options: ['대기오염 심화', '소음 문제 증가', '토양 오염', '도시 홍수 위험 증가'], answer: '도시 홍수 위험 증가' },
+                { question: '6. 도심 지역의 인구가 밤에 줄어드는 현상을 무엇이라고 할까요?', options: ['인구 공동화', '인구 집중', '도시 재개발', '슬럼화'], answer: '인구 공동화' },
+                { question: '7. 도시의 무질서한 팽창을 막기 위해 설정된 녹지 공간은?', options: ['부도심', '위성도시', '외곽 지역', '개발제한구역'], answer: '개발제한구역' },
+                { question: '8. 다음 중 도심으로부터 거리에 따른 기능 입지 순서로 가장 적절한 것은?', options: ['주거-공업-상업', '상업-주거-공업', '공업-상업-주거', '상업-공업-주거'], answer: '상업-공업-주거' }
+            ];
+            let currentQuestionIndex = 0;
+            let score = 0;
+            function loadQuiz() {
+                currentQuestionIndex = 0; score = 0;
+                quizContainer.innerHTML = '';
+                quizResult.classList.add('hidden');
+                quizRetryButton.classList.add('hidden');
+                showQuestion();
+            }
+            function showQuestion() {
+                 if (currentQuestionIndex >= quizData.length) {
+                    showResult(); return;
+                }
+                const q = quizData[currentQuestionIndex];
+                const progress = `${currentQuestionIndex + 1} / ${quizData.length}`;
+                const el = document.createElement('div');
+                el.className = 'mb-6';
+                el.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="font-bold text-lg text-slate-800">${q.question}</p>
+                        <span class="text-sm font-semibold text-slate-500 bg-slate-200 px-3 py-1 rounded-full">${progress}</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        ${q.options.map(o => `<button class="quiz-option w-full text-left p-3 border-2 border-slate-300 rounded-lg hover:bg-slate-100">${o}</button>`).join('')}
+                    </div>`;
+                quizContainer.appendChild(el);
+                el.querySelectorAll('.quiz-option').forEach(b => b.addEventListener('click', handleOptionClick));
+            }
+            function handleOptionClick(e) {
+                const selected = e.target;
+                const q = quizData[currentQuestionIndex];
+                const isCorrect = selected.textContent === q.answer;
+                if (isCorrect) {
+                    selected.classList.add('correct', 'bg-green-500', 'text-white', 'border-green-600');
+                    score++;
+                } else {
+                    selected.classList.add('incorrect', 'bg-red-500', 'text-white', 'border-red-600');
+                }
+                selected.parentElement.querySelectorAll('.quiz-option').forEach(b => {
+                    b.disabled = true;
+                    if (b.textContent === q.answer) b.classList.add('correct', 'bg-green-500', 'text-white', 'border-green-600');
+                });
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    quizContainer.innerHTML = '';
+                    showQuestion();
+                }, 1200);
+            }
+            function showResult() {
+                quizContainer.innerHTML = '';
+                quizResult.innerHTML = `🎉 퀴즈 완료! 총 ${quizData.length}문제 중 <span class="text-amber-500 text-3xl">${score}</span>문제를 맞혔습니다!`;
+                quizResult.classList.remove('hidden');
+                quizRetryButton.classList.remove('hidden');
+            }
+            quizRetryButton.addEventListener('click', loadQuiz);
+            loadQuiz();
+        });
+    </script>
+</body>
+</html>

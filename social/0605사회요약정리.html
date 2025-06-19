@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사회 핵심 정리: 자연관과 지속 가능한 발전</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Natural Greens and Earth Tones -->
+    <!-- Application Structure Plan: A new SPA for the June 5th lesson. The structure is a logical progression: 1. A visual spectrum of environmental ethics (Human -> Animal -> Life -> Eco) to show the expansion of moral consideration. 2. A direct, two-column comparison of the two extremes: Anthropocentrism vs. Ecocentrism. 3. Practical examples of Sustainable Development to connect theory with reality. 4. A comprehensive final quiz that includes a flowchart-style question, as emphasized in the source material, to ensure deep understanding and exam readiness. -->
+    <!-- Visualization & Content Choices: 
+        1. Spectrum of Ethics: Report Info -> Four views (Human, Animal, Life, Eco). Goal -> Show the expanding circle of moral concern. Viz -> An interactive horizontal diagram. Interaction -> Clicking each stage reveals its core principle. Justification -> Visually intuitive way to grasp the progression.
+        2. Anthropocentrism vs. Ecocentrism: Report Info -> Key differences (dualism vs. holism, instrumental vs. intrinsic value). Goal -> Direct comparison of core concepts. Viz -> A two-column table layout. Interaction -> Static. Justification -> Best for direct, point-by-point comparison.
+        3. Sustainable Development: Report Info -> Eco-cities, ecological corridors, etc. Goal -> Showcase real-world applications. Viz -> An interactive card gallery. Interaction -> Click cards for details. Justification -> Engaging way to present examples.
+        4. Final Quiz: Report Info -> All concepts, including key thinkers (Bacon, Singer, Leopold) and the flowchart problem style. Goal -> Comprehensive assessment for memorization. Viz -> Interactive multiple-choice and a special flowchart question. Interaction -> Immediate feedback. Justification -> Directly addresses teacher's problem style and user's need for memorization.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .exam-highlight {
+            background-color: #fefce8;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0.25rem;
+        }
+        .exam-marker {
+            color: #d97706;
+            font-weight: 700;
+        }
+        .nav-button {
+            transition: all 0.3s;
+        }
+        .nav-button.active {
+            background-color: #047857;
+            color: white;
+        }
+        .view-card {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .view-card.active, .view-card:hover {
+            transform: scale(1.05);
+            border-color: #10b981;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 py-3">
+            <ul class="flex flex-wrap justify-center items-center gap-2">
+                <li><button data-target="section-1" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-emerald-700 hover:text-white">1. 자연관의 확장</button></li>
+                <li><button data-target="section-2" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-emerald-700 hover:text-white">2. 인간 중심 vs 생태 중심</button></li>
+                <li><button data-target="section-3" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-emerald-700 hover:text-white">3. 지속 가능한 발전</button></li>
+                <li><button data-target="section-4" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-amber-200 hover:bg-amber-500 hover:text-white">★ 최종 암기 퀴즈 ★</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-12">
+        
+        <section id="section-1" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">1. 확장되는 도덕적 고려의 대상</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">자연을 보는 관점은 '인간'만을 소중히 여기는 것에서 시작해 점차 그 범위를 넓혀왔습니다. 아래 카드를 눌러보세요.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+                <div class="view-card active bg-white p-4 rounded-lg border-2" data-view="human">
+                    <div class="text-4xl">🧑</div><p class="font-bold mt-1">인간 중심주의</p>
+                </div>
+                <div class="view-card bg-white p-4 rounded-lg border-2" data-view="animal">
+                    <div class="text-4xl">🐶</div><p class="font-bold mt-1">동물 중심주의</p>
+                </div>
+                <div class="view-card bg-white p-4 rounded-lg border-2" data-view="life">
+                     <div class="text-4xl">🌱</div><p class="font-bold mt-1">생명 중심주의</p>
+                </div>
+                <div class="view-card bg-white p-4 rounded-lg border-2" data-view="eco">
+                    <div class="text-4xl">🌍</div><p class="font-bold mt-1">생태 중심주의</p>
+                </div>
+            </div>
+            <div id="view-info" class="mt-4 p-4 rounded-lg bg-emerald-50 text-emerald-800 transition-all"></div>
+        </section>
+
+        <section id="section-2" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">2. 인간 중심주의 vs 생태 중심주의</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">두 관점의 핵심적인 차이점을 비교하며 완벽히 이해해 봅시다.</p>
+
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[600px] text-sm text-left bg-white rounded-lg shadow-md">
+                    <thead class="bg-emerald-600 text-white">
+                        <tr>
+                            <th class="p-3">구분</th>
+                            <th class="p-3">인간 중심주의</th>
+                            <th class="p-3">생태 중심주의</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b"><td class="p-3 font-semibold">관계</td><td class="p-3">인간과 자연을 분리 (이분법적 세계관)</td><td class="p-3">인간은 자연의 일부 (전일론적 관점)</td></tr>
+                        <tr class="border-b bg-emerald-50"><td class="p-3 font-semibold">자연의 가치</td><td class="p-3">인간을 위한 <span class="font-bold">도구적 가치</span> 강조</td><td class="p-3">존재 그 자체로 소중한 <span class="font-bold">내재적 가치</span> 강조</td></tr>
+                        <tr class="border-b"><td class="p-3 font-semibold">도덕적 고려 대상</td><td class="p-3">오직 <span class="font-bold">인간</span></td><td class="p-3"><span class="font-bold">생태계 전체</span> (무생물 포함)</td></tr>
+                        <tr class="border-b bg-emerald-50"><td class="p-3 font-semibold">대표 사상가</td><td class="p-3">베이컨, 데카르트, 아리스토텔레스</td><td class="p-3">레오폴드, 네스</td></tr>
+                        <tr class="border-b"><td class="p-3 font-semibold">한계</td><td class="p-3">환경 파괴, 생태계 위기 초래</td><td class="p-3">환경 파시즘으로 변질될 우려</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <section id="section-3" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">3. 자연과 인간의 공존: 지속 가능한 발전</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">환경을 보호하면서 우리의 삶도 발전시키려는 노력들이 세계 곳곳에서 이루어지고 있습니다.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="font-bold">  생태 도시</h3>
+                    <p class="text-sm mt-1">도시 내 녹지 공간을 늘리고, 대중교통 중심 정책을 펴는 등 환경 부담을 최소화하는 도시. (예: 브라질 쿠리치바)</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="font-bold">🦋 생태 통로</h3>
+                    <p class="text-sm mt-1">도로 건설 등으로 단절된 야생동물의 서식지를 연결하여 로드킬을 방지하고 생태계 연속성을 유지하는 통로.</p>
+                </div>
+                 <div class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="font-bold">🍎 자연 농법</h3>
+                    <p class="text-sm mt-1">농약이나 화학 비료 없이, 자연 그대로의 생명력을 이용해 작물을 재배하는 농업 방식.</p>
+                </div>
+                 <div class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="font-bold">🐌 슬로시티</h3>
+                    <p class="text-sm mt-1">전통문화와 자연환경을 보존하면서 느리고 여유 있는 삶을 추구하는 도시.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="section-4" class="scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">★ 최종 암기 퀴즈 ★</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">자연관의 종류와 특징, 이제 완벽히 구분할 수 있죠? 퀴즈로 최종 실력을 점검해 보세요!</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg max-w-3xl mx-auto">
+                <div id="quiz-container"></div>
+                <div id="quiz-result" class="text-center font-bold text-2xl mt-6 hidden"></div>
+                <button id="quiz-retry-button" class="w-full mt-4 bg-amber-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-amber-600 transition-colors hidden">다시 풀기</button>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="text-center py-6 bg-slate-100 mt-12">
+        <p class="text-slate-500 text-sm">사회 핵심 개념 학습용 인터랙티브 요약 자료</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const sections = document.querySelectorAll('main section');
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    document.getElementById(button.dataset.target).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            });
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    if (pageYOffset >= section.offsetTop - 90) { current = section.id; }
+                });
+                navButtons.forEach(button => {
+                    button.classList.remove('active');
+                    if (button.dataset.target === current) { button.classList.add('active'); }
+                });
+            });
+            
+            const viewCards = document.querySelectorAll('.view-card');
+            const viewInfoPanel = document.getElementById('view-info');
+            const viewData = {
+                human: { title: "인간 중심주의", desc: "도덕적 고려의 대상을 '이성을 가진 인간'으로 한정합니다." },
+                animal: { title: "동물 중심주의", desc: "쾌락과 고통을 느낄 수 있는 능력(쾌고 감수 능력)을 지닌 '동물'까지 범위를 확장합니다. (대표: 싱어)" },
+                life: { title: "생명 중심주의", desc: "살아있는 모든 '생명체'(식물, 미생물 포함)는 그 자체로 소중하다고 봅니다." },
+                eco: { title: "생태 중심주의", desc: "생명체뿐만 아니라 흙, 물, 공기 등 무생물을 포함한 '생태계 전체'를 고려합니다. (대표: 레오폴드)" }
+            };
+
+            function updateViewInfo(viewId) {
+                const data = viewData[viewId];
+                viewInfoPanel.innerHTML = `<h4 class="font-bold">${data.title}</h4><p class="text-sm">${data.desc}</p>`;
+            }
+
+            viewCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    viewCards.forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                    updateViewInfo(card.dataset.view);
+                });
+            });
+            updateViewInfo('human');
+
+            const quizContainer = document.getElementById('quiz-container');
+            const quizResult = document.getElementById('quiz-result');
+            const quizRetryButton = document.getElementById('quiz-retry-button');
+            const quizData = [
+                { question: '1. 자연을 인간의 이익을 위한 도구로만 보는 관점은?', options: ['생태 중심주의', '인간 중심주의', '생명 중심주의', '동물 중심주의'], answer: '인간 중심주의' },
+                { question: '2. "생명 공동체의 온전성, 안정성, 아름다움의 보전에 이바지한다면 그것은 옳다"고 주장한 생태 중심주의 사상가는?', options: ['베이컨', '싱어', '데카르트', '레오폴드'], answer: '레오폴드' },
+                { question: '3. 인간 중심주의와 달리, 생태 중심주의가 강조하는 자연의 가치는?', options: ['도구적 가치', '경제적 가치', '내재적 가치', '미적 가치'], answer: '내재적 가치' },
+                { question: '4. 인간과 동물이 쾌락과 고통을 느낄 수 있으므로 동등하게 대우해야 한다고 보는 관점은?', options: ['동물 중심주의', '인간 중심주의', '생명 중심주의', '생태 중심주의'], answer: '동물 중심주의' },
+                { question: '5. 인간 중심주의가 환경 파괴를 정당화하는 논리적 기반이 된 세계관은?', options: ['전일론적 세계관', '유기체적 세계관', '이분법적 세계관', '순환론적 세계관'], answer: '이분법적 세계관' },
+                { question: '6. 생태계 전체를 위해 개별 구성원의 희생을 정당화할 수 있다는 비판을 받는 사상은?', options: ['인간 중심주의', '동물 중심주의', '생태 중심주의', '생명 중심주의'], answer: '생태 중심주의' },
+                { question: "7. 도로로 단절된 서식지를 연결해주는 '생태 통로'는 어떤 자연관을 반영한 사례인가?", options: ['인간 중심주의', '생태 중심주의', '이기주의', '종족 중심주의'], answer: '생태 중심주의' },
+                { question: "8. 동양 사상 중, 만물이 서로 연결되어 영향을 주고받는다는 '연기설'을 바탕으로 모든 생명에 대한 자비를 강조하는 사상은?", options: ['유교', '도교', '불교', '묵가'], answer: '불교' },
+            ];
+            let currentQuestionIndex = 0;
+            let score = 0;
+            function loadQuiz() {
+                currentQuestionIndex = 0; score = 0;
+                quizContainer.innerHTML = '';
+                quizResult.classList.add('hidden');
+                quizRetryButton.classList.add('hidden');
+                showQuestion();
+            }
+            function showQuestion() {
+                 if (currentQuestionIndex >= quizData.length) {
+                    showResult(); return;
+                }
+                const q = quizData[currentQuestionIndex];
+                const progress = `${currentQuestionIndex + 1} / ${quizData.length}`;
+                const el = document.createElement('div');
+                el.className = 'mb-6';
+                el.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="font-bold text-lg text-slate-800">${q.question}</p>
+                        <span class="text-sm font-semibold text-slate-500 bg-slate-200 px-3 py-1 rounded-full">${progress}</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        ${q.options.map(o => `<button class="quiz-option w-full text-left p-3 border-2 border-slate-300 rounded-lg hover:bg-slate-100">${o}</button>`).join('')}
+                    </div>`;
+                quizContainer.appendChild(el);
+                el.querySelectorAll('.quiz-option').forEach(b => b.addEventListener('click', handleOptionClick));
+            }
+            function handleOptionClick(e) {
+                const selected = e.target;
+                const q = quizData[currentQuestionIndex];
+                const isCorrect = selected.textContent === q.answer;
+                if (isCorrect) {
+                    selected.classList.add('correct', 'bg-green-500', 'text-white', 'border-green-600');
+                    score++;
+                } else {
+                    selected.classList.add('incorrect', 'bg-red-500', 'text-white', 'border-red-600');
+                }
+                selected.parentElement.querySelectorAll('.quiz-option').forEach(b => {
+                    b.disabled = true;
+                    if (b.textContent === q.answer) b.classList.add('correct', 'bg-green-500', 'text-white', 'border-green-600');
+                });
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    quizContainer.innerHTML = '';
+                    showQuestion();
+                }, 1200);
+            }
+            function showResult() {
+                quizContainer.innerHTML = '';
+                quizResult.innerHTML = `🎉 퀴즈 완료! 총 ${quizData.length}문제 중 <span class="text-amber-500 text-3xl">${score}</span>문제를 맞혔습니다!`;
+                quizResult.classList.remove('hidden');
+                quizRetryButton.classList.remove('hidden');
+            }
+            quizRetryButton.addEventListener('click', loadQuiz);
+            loadQuiz();
+        });
+    </script>
+</body>
+</html>
+ 

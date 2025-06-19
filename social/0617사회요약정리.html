@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>산업화와 도시화: 대화형 학습 페이지</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony Neutrals -->
+    <!-- Application Structure Plan: A thematic single-page application with a sticky navigation bar for easy access to key sections: Environmental Change, Social Change, Urban Problems, Rural Problems, and a new Quiz section. This structure allows students to non-linearly jump to topics of interest. Key interactions include hover-to-reveal info cards, clickable diagrams to explain complex concepts like the heat island effect, a dynamic chart comparing urban vs. rural issues, and an interactive multiple-choice quiz for self-assessment. This design prioritizes active learning and engagement over passive reading, which is more effective for retaining educational content. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Environmental cause-effect -> Goal: Show process -> Viz: HTML/CSS flowchart -> Interaction: Hover to highlight -> Justification: Visualizes chain of events for better memory.
+        - Report Info: Urban Problems (Heat Island) -> Goal: Explain causes & solutions -> Viz: Interactive diagram (HTML/CSS) + Bar Chart (Chart.js) -> Interaction: Click icons to see details and update chart -> Justification: Connects concepts to a visual anchor and provides illustrative data comparison.
+        - Report Info: Spatial Differentiation -> Goal: Explain city zones -> Viz: Abstract map layout (HTML/CSS) -> Interaction: Click region to see info -> Justification: More intuitive than a simple list.
+        - Report Info: Urban vs. Rural issues -> Goal: Compare problems -> Viz: Dynamic Bar Chart (Chart.js) -> Interaction: Buttons to toggle data -> Justification: Allows direct visual comparison of key challenges.
+        - Report Info: Human relationships (Individualism vs. Egoism) -> Goal: Differentiate concepts -> Viz: Side-by-side text cards -> Interaction: Static display -> Justification: Clear, direct comparison is most effective.
+        - New Quiz Section -> Goal: Self-assessment and review -> Viz: Interactive multiple-choice questions -> Interaction: Select answer, check, get feedback, move to next, see final score -> Justification: Reinforces learning and identifies knowledge gaps.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f4f4f5; /* Warm neutral background */
+            color: #3f3f46;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+        .concept-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .concept-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .interactive-icon {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .interactive-icon:hover {
+            transform: scale(1.1);
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background-color: #3b82f6;
+            margin-top: 8px;
+        }
+        .quiz-option {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .quiz-option:hover {
+            background-color: #e2e8f0;
+        }
+        .quiz-option.selected {
+            background-color: #bfdbfe;
+            border-color: #60a5fa;
+        }
+        .quiz-option.correct {
+            background-color: #d1fae5;
+            border-color: #34d399;
+        }
+        .quiz-option.incorrect {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+        }
+        .quiz-option.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        .quiz-feedback {
+            min-height: 24px;
+            margin-top: 8px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-800">
+
+    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-xl md:text-2xl font-bold text-blue-600">산업화와 도시화 핵심 정리</h1>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#section-environment" class="nav-link border-b-2 border-transparent pb-1">환경 변화</a>
+                    <a href="#section-society" class="nav-link border-b-2 border-transparent pb-1">사회 변화</a>
+                    <a href="#section-urban-problems" class="nav-link border-b-2 border-transparent pb-1">도시 문제</a>
+                    <a href="#section-rural-problems" class="nav-link border-b-2 border-transparent pb-1">농촌 문제</a>
+                    <a href="#section-quiz" class="nav-link border-b-2 border-transparent pb-1">핵심 퀴즈</a>
+                </div>
+                <div class="md:hidden">
+                    <select id="mobile-nav" class="bg-white border border-stone-300 rounded-md p-2">
+                        <option value="#section-environment">환경 변화</option>
+                        <option value="#section-society">사회 변화</option>
+                        <option value="#section-urban-problems">도시 문제</option>
+                        <option value="#section-rural-problems">농촌 문제</option>
+                        <option value="#section-quiz">핵심 퀴즈</option>
+                    </select>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <section id="intro" class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">산업화와 도시화, 우리 생활을 어떻게 바꿨을까요?</h2>
+            <p class="text-lg text-stone-600 max-w-3xl mx-auto">산업화와 도시화는 우리 삶의 터전인 환경부터 사람들 사이의 관계, 그리고 도시와 농촌의 모습까지 모든 것을 바꾸어 놓았습니다. 이 페이지를 통해 주요 변화와 문제점들을 쉽고 재미있게 탐색해 보세요.</p>
+        </section>
+
+        <!-- 환경 변화 섹션 -->
+        <section id="section-environment" class="mb-20 pt-20 -mt-16">
+            <h2 class="text-2xl md:text-3xl font-bold mb-6 section-title">💧 환경 변화와 문제점</h2>
+            <p class="mb-8 text-stone-600">도시가 발전하면서 우리를 둘러싼 자연환경은 크게 변했습니다. 땅의 모습부터 강의 흐름까지, 도시화가 가져온 환경의 변화와 그로 인해 발생한 문제들을 시각적으로 살펴봅시다.</p>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="space-y-6">
+                    <div class="concept-card bg-white p-6 rounded-xl shadow">
+                        <h3 class="font-bold text-xl mb-2">땅의 변화: 불투수층 증가</h3>
+                        <p>도시의 땅은 아스팔트와 콘크리트로 덮여 빗물이 스며들지 못해요. 이로 인해 빗물이 하천으로 한꺼번에 몰려 <span class="font-bold text-red-500">홍수 위험이 증가</span>하고, 지하수는 부족해지는 문제가 발생합니다.</p>
+                    </div>
+                    <div class="concept-card bg-white p-6 rounded-xl shadow">
+                        <h3 class="font-bold text-xl mb-2">녹지 감소와 생태계 파괴</h3>
+                        <p>도시 개발로 숲과 공원이 줄어들면서 동식물이 서식지를 잃고, 이는 곧 <span class="font-bold text-red-500">생태계 파괴</span>로 이어집니다. 또한 도심의 공기를 정화하고 온도를 낮춰주는 기능도 약화됩니다.</p>
+                    </div>
+                </div>
+                <div>
+                    <div class="bg-white p-6 rounded-xl shadow">
+                        <h3 class="font-bold text-xl mb-4 text-center">★ 하천의 인위적 변화 (시험 출제 예상) ★</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="font-bold text-lg text-blue-600">하천 직강화</h4>
+                                <p class="text-sm">구불구불한 강을 직선으로 만들어 물의 흐름을 빠르게 하는 공사입니다. 유속이 빨라져 <span class="font-bold">하류 지역의 홍수 위험</span>이 커지고, 생물 서식지가 단조로워져 생태계에 변화를 줍니다.</p>
+                            </div>
+                            <hr>
+                            <div>
+                                <h4 class="font-bold text-lg text-blue-600">하천 복개</h4>
+                                <p class="text-sm">도로나 주차장 등 다른 용도로 사용하기 위해 하천 위를 콘크리트로 덮는 것입니다. 산소 공급이 차단되어 수질이 악화되고 <span class="font-bold">생태계가 심각하게 파괴</span>될 수 있습니다. (예: 과거 청계천)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 사회 변화 섹션 -->
+        <section id="section-society" class="mb-20 pt-20 -mt-16">
+            <h2 class="text-2xl md:text-3xl font-bold mb-6 section-title">👫 인간관계와 사회의 변화</h2>
+            <p class="mb-8 text-stone-600">수많은 사람이 모여 사는 도시는 우리의 관계 맺는 방식과 가치관에도 큰 영향을 미쳤습니다. 산업화된 사회에서 나타나는 직업의 분화부터 개인주의의 확산까지, 주요한 사회적 변화를 알아봅니다.</p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="concept-card bg-white p-6 rounded-xl shadow space-y-4">
+                    <h3 class="font-bold text-xl">2차적 인간관계의 증가</h3>
+                    <p>도시에서는 효율성과 목적을 중시하게 됩니다. 이로 인해 친밀한 감정 교류 중심의 1차적 관계(가족, 친구)보다, 특정 목적을 위한 <span class="font-bold text-blue-600">2차적 인간관계(회사 동료, 상점 직원 등)의 비중이 커집니다.</span></p>
+                    <p>이러한 익명성 속에서 <span class="font-bold">인간 소외 현상</span>이 나타나기도 합니다. (찰리 채플린의 영화 '모던 타임즈'를 떠올려 보세요!)</p>
+                </div>
+                <div class="concept-card bg-white p-6 rounded-xl shadow space-y-4">
+                    <h3 class="font-bold text-xl">★ 개인주의 vs 이기주의 (시험 포인트) ★</h3>
+                    <div>
+                        <h4 class="font-bold text-lg">개인주의 👍</h4>
+                        <p>개인의 자율성과 권리를 존중하는 태도입니다. <span class="font-bold">나의 권리가 소중한 만큼, 타인의 권리도 존중</span>하는 성숙한 가치관입니다.</p>
+                    </div>
+                     <div>
+                        <h4 class="font-bold text-lg">이기주의 👎</h4>
+                        <p>타인의 권리나 상황은 고려하지 않고 <span class="font-bold">오직 자신의 이익만을 추구</span>하는 태도입니다. 공동체의 조화를 해칠 수 있습니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 도시 문제 섹션 -->
+        <section id="section-urban-problems" class="mb-20 pt-20 -mt-16">
+            <h2 class="text-2xl md:text-3xl font-bold mb-6 section-title">🔥 도시화로 인한 문제점</h2>
+            <p class="mb-8 text-stone-600">도시로 인구가 집중되면서 주택, 교통, 환경 등 다양한 문제가 발생합니다. 특히 도시의 기온이 주변 지역보다 높아지는 '열섬 현상'은 대표적인 도시 환경 문제입니다. 아래 다이어그램을 클릭하여 원인과 해결 방안을 알아보세요.</p>
+            <div class="bg-white p-6 rounded-xl shadow">
+                <h3 class="font-bold text-xl mb-2 text-center">도시 열섬 현상 탐구</h3>
+                <p id="heat-island-info" class="text-center text-stone-600 min-h-[48px] mb-4">아이콘을 클릭하면 설명을 볼 수 있습니다.</p>
+                <div class="flex justify-center items-center gap-6 md:gap-12 mb-6 flex-wrap">
+                    <div>
+                        <h4 class="font-bold text-center mb-2 text-red-600">원인</h4>
+                        <div class="flex gap-4">
+                            <div class="text-center interactive-icon" data-info="자동차, 에어컨 등에서 나오는 인공열이 도심의 온도를 높입니다.">
+                                <div class="text-4xl">🚗</div><span class="text-sm">인공열</span>
+                            </div>
+                            <div class="text-center interactive-icon" data-info="아스팔트와 콘크리트는 낮 동안 열을 흡수했다가 밤에 방출합니다.">
+                                <div class="text-4xl">🏢</div><span class="text-sm">포장 면적</span>
+                            </div>
+                             <div class="text-center interactive-icon" data-info="고층 건물이 바람의 흐름을 막아 뜨거운 공기가 빠져나가지 못하게 합니다.">
+                                <div class="text-4xl">🏗️</div><span class="text-sm">바람길 차단</span>
+                            </div>
+                        </div>
+                    </div>
+                     <div>
+                        <h4 class="font-bold text-center mb-2 text-green-600">해결 방안</h4>
+                        <div class="flex gap-4">
+                            <div class="text-center interactive-icon" data-info="공원, 옥상 정원 등 녹지는 도시의 온도를 낮추는 효과가 있습니다.">
+                                <div class="text-4xl">🌳</div><span class="text-sm">녹지 확충</span>
+                            </div>
+                            <div class="text-center interactive-icon" data-info="건물 사이에 바람이 통할 수 있는 길을 만들어 뜨거운 공기를 순환시킵니다.">
+                                <div class="text-4xl">💨</div><span class="text-sm">바람길 조성</span>
+                            </div>
+                            <div class="text-center interactive-icon" data-info="대중교통 이용, 자전거 타기 등은 인공열 발생을 줄일 수 있습니다.">
+                                <div class="text-4xl">🚲</div><span class="text-sm">친환경 교통</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="heatIslandChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- 농촌 문제 및 지역 격차 섹션 -->
+        <section id="section-rural-problems" class="mb-20 pt-20 -mt-16">
+            <h2 class="text-2xl md:text-3xl font-bold mb-6 section-title">🧑‍🌾 농촌 문제와 지역 격차</h2>
+            <p class="mb-8 text-stone-600">도시가 발전하는 동안 농촌은 여러 어려움을 겪게 되었습니다. 도시와 농촌이 겪는 문제의 종류와 심각성은 어떻게 다를까요? 아래 버튼을 눌러 도시와 농촌의 주요 문제들을 차트로 비교해 보세요.</p>
+            <div class="bg-white p-6 rounded-xl shadow">
+                <div class="text-center mb-4">
+                    <button id="show-urban-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">도시 문제 보기</button>
+                    <button id="show-rural-btn" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition">농촌 문제 보기</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="regionalIssuesChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- 퀴즈 섹션 -->
+        <section id="section-quiz" class="pt-20 -mt-16">
+            <h2 class="text-2xl md:text-3xl font-bold mb-6 section-title">💡 핵심 퀴즈로 정리하기!</h2>
+            <p class="mb-8 text-stone-600">지금까지 배운 내용을 퀴즈를 통해 점검해 봅시다. 문제들을 풀면서 중요한 개념들을 다시 한번 되짚어 보세요!</p>
+            <div class="bg-white p-6 rounded-xl shadow max-w-2xl mx-auto">
+                <div id="quiz-container">
+                    <div id="quiz-question-number" class="text-sm text-blue-600 mb-2"></div>
+                    <h3 id="quiz-question" class="font-bold text-xl mb-4"></h3>
+                    <div id="quiz-options" class="space-y-2">
+                        <!-- Options will be rendered here by JS -->
+                    </div>
+                    <div id="quiz-feedback" class="quiz-feedback text-center text-sm"></div>
+                    <div class="flex justify-between mt-6">
+                        <button id="quiz-check-btn" class="bg-blue-500 text-white px-5 py-2 rounded-md hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed">정답 확인</button>
+                        <button id="quiz-next-btn" class="bg-gray-300 text-gray-700 px-5 py-2 rounded-md hover:bg-gray-400 transition disabled:opacity-50 disabled:cursor-not-allowed">다음 문제</button>
+                    </div>
+                </div>
+                <div id="quiz-result" class="hidden text-center">
+                    <h3 class="font-bold text-2xl mb-4">퀴즈 결과</h3>
+                    <p id="quiz-score" class="text-3xl font-bold text-blue-600 mb-6"></p>
+                    <button id="quiz-restart-btn" class="bg-green-500 text-white px-6 py-3 rounded-md hover:bg-green-600 transition">다시 시작</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center p-6 mt-12 bg-white/50">
+        <p class="text-stone-500">이 페이지는 학습 목적으로 제작되었습니다.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                if (!anchor.closest('#mobile-nav')) { // Exclude mobile nav select
+                    anchor.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        document.querySelector(this.getAttribute('href')).scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    });
+                }
+            });
+
+            // Mobile navigation
+            const mobileNav = document.getElementById('mobile-nav');
+            mobileNav.addEventListener('change', (e) => {
+                window.location.href = e.target.value;
+            });
+
+            // Sticky nav active state
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            // Heat Island Section Logic
+            const heatIslandInfo = document.getElementById('heat-island-info');
+            const interactiveIcons = document.querySelectorAll('.interactive-icon');
+            const originalInfoText = heatIslandInfo.textContent;
+
+            interactiveIcons.forEach(icon => {
+                icon.addEventListener('click', () => {
+                    heatIslandInfo.textContent = icon.dataset.info;
+                });
+            });
+
+            // Chart.js: Heat Island Chart
+            const ctxHeat = document.getElementById('heatIslandChart').getContext('2d');
+            new Chart(ctxHeat, {
+                type: 'bar',
+                data: {
+                    labels: ['교외 지역', '도심 지역'],
+                    datasets: [{
+                        label: '평균 기온 (°C)',
+                        data: [25, 29],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(255, 99, 132, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 99, 132, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '도심과 교외 지역의 기온 차이 (예시)'
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 20
+                        }
+                    }
+                }
+            });
+
+            // Chart.js: Regional Issues Chart
+            const regionalIssuesCtx = document.getElementById('regionalIssuesChart').getContext('2d');
+            const urbanData = {
+                labels: ['주택 부족', '교통 혼잡', '환경 오염', '실업 문제'],
+                datasets: [{
+                    label: '도시 문제 심각도 (가상 수치)',
+                    data: [9, 8, 7, 6],
+                    backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1
+                }]
+            };
+            const ruralData = {
+                labels: ['인구 감소', '고령화', '노동력 부족', '소득 격차'],
+                datasets: [{
+                    label: '농촌 문제 심각도 (가상 수치)',
+                    data: [8, 9, 7, 8],
+                    backgroundColor: 'rgba(34, 197, 94, 0.6)',
+                    borderColor: 'rgba(34, 197, 94, 1)',
+                    borderWidth: 1
+                }]
+            };
+
+            const regionalIssuesChart = new Chart(regionalIssuesCtx, {
+                type: 'bar',
+                data: urbanData, // Initial data
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '도시 문제 심각도'
+                        },
+                         legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 10
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('show-urban-btn').addEventListener('click', () => {
+                regionalIssuesChart.data = urbanData;
+                regionalIssuesChart.options.plugins.title.text = '도시 문제 심각도';
+                regionalIssuesChart.update();
+            });
+
+            document.getElementById('show-rural-btn').addEventListener('click', () => {
+                regionalIssuesChart.data = ruralData;
+                regionalIssuesChart.options.plugins.title.text = '농촌 문제 심각도';
+                regionalIssuesChart.update();
+            });
+
+            // Quiz Section Logic
+            const quizQuestions = [
+                {
+                    question: "도시화가 진행되면서 아스팔트와 콘크리트 포장 면적이 증가했습니다. 이로 인해 어떤 문제가 발생할 수 있나요?",
+                    options: ["지하수 증가", "홍수 위험 감소", "홍수 위험 증가", "토양 오염 감소"],
+                    correctAnswerIndex: 2,
+                    feedback: "아스팔트와 콘크리트 포장 면적이 늘어나면 빗물이 땅속으로 스며들지 못하고 하천으로 바로 흘러들어 홍수 위험이 증가합니다."
+                },
+                {
+                    question: "하천 직강화가 가져올 수 있는 결과로 옳지 않은 것은 무엇인가요?",
+                    options: ["물 흐름이 빨라진다", "하류 지역의 홍수 위험이 커진다", "생물 서식지가 다양해진다", "생태계에 변화를 준다"],
+                    correctAnswerIndex: 2,
+                    feedback: "하천 직강화는 생물 서식지를 단조롭게 만들어 생태계 다양성을 감소시킵니다."
+                },
+                {
+                    question: "하천 복개가 생태계에 미치는 가장 심각한 부정적인 영향은 무엇인가요?",
+                    options: ["수질 개선", "경관 개선", "생물 다양성 증가", "산소 공급 차단 및 수질 악화"],
+                    correctAnswerIndex: 3,
+                    feedback: "하천 복개는 산소 공급을 차단하여 물을 썩게 하고, 이는 곧 생태계 파괴로 이어집니다."
+                },
+                {
+                    question: "도시에서 감정적 관계보다 목적 중심의 2차적 인간관계가 증가하는 주요 원인은 무엇인가요?",
+                    options: ["친밀감 강조", "익명성 및 효율성 중시", "공동체 의식 강화", "가족 중심 사회"],
+                    correctAnswerIndex: 1,
+                    feedback: "도시에서는 익명성과 효율성이 강조되면서 특정 목적을 위한 관계가 발달합니다."
+                },
+                {
+                    question: "다음 설명 중 '개인주의'에 가장 부합하는 내용은 무엇인가요?",
+                    options: ["타인의 이익을 무시하고 나의 이익만 추구한다.", "오직 나의 자유만을 중요하게 생각한다.", "나의 권리가 소중한 만큼 타인의 권리도 존중한다.", "다른 사람들과 어울리지 않고 혼자 지내는 것을 선호한다."],
+                    correctAnswerIndex: 2,
+                    feedback: "개인주의는 나 자신의 권리뿐만 아니라 타인의 권리도 존중하는 성숙한 가치관입니다. 이기주의와는 다릅니다."
+                },
+                {
+                    question: "도시 열섬 현상의 주요 원인 중 하나가 아닌 것은 무엇인가요?",
+                    options: ["인공열 발생 증가", "포장 면적 증가", "고층 건물의 바람길 차단", "녹지 공간 확충"],
+                    correctAnswerIndex: 3,
+                    feedback: "녹지 공간 확충은 열섬 현상의 원인이 아니라 해결 방안 중 하나입니다."
+                },
+                {
+                    question: "도시 열섬 현상을 해결하기 위한 방안으로 적절하지 않은 것은 무엇인가요?",
+                    options: ["녹지 공간 확충", "친환경 교통 이용 장려", "바람길 조성", "고층 건물 건설 확대"],
+                    correctAnswerIndex: 3,
+                    feedback: "고층 건물 건설 확대는 오히려 바람길을 차단하여 열섬 현상을 심화시킬 수 있습니다."
+                },
+                {
+                    question: "도시화로 인해 발생하는 주택 부족 및 집값 상승 문제의 결과로 나타날 수 있는 것은 무엇인가요?",
+                    options: ["도시 미관 개선", "슬럼가 형성 및 우범지역 증가", "주거 환경의 평등화", "도시 인구 감소"],
+                    correctAnswerIndex: 1,
+                    feedback: "주택 부족과 집값 상승은 저소득층의 주거 불안정을 심화시켜 슬럼가 형성 및 우범지역 증가로 이어질 수 있습니다."
+                },
+                {
+                    question: "산업 구조의 변화로 인해 기존 일자리가 사라지는 실업의 형태는 무엇인가요? (예: 기계 대체)",
+                    options: ["마찰적 실업", "경기적 실업", "구조적 실업", "계절적 실업"],
+                    correctAnswerIndex: 2,
+                    feedback: "산업 구조의 변화로 발생하는 실업은 구조적 실업에 해당합니다. 기계화로 인한 일자리 감소가 대표적인 예입니다."
+                },
+                {
+                    question: "농촌 지역이 겪는 가장 대표적인 문제점으로 짝지어진 것은 무엇인가요?",
+                    options: ["교통 혼잡, 환경 오염", "인구 감소, 고령화", "주택 부족, 집값 상승", "노동력 과잉, 생산성 저하"],
+                    correctAnswerIndex: 1,
+                    feedback: "농촌은 청년층의 도시 유출로 인한 인구 감소와 고령화 문제가 심각하게 나타납니다."
+                }
+            ];
+
+            let currentQuestionIndex = 0;
+            let score = 0;
+            let selectedOptionIndex = -1;
+            let quizActive = false; // To prevent multiple selections after checking answer
+
+            const quizContainer = document.getElementById('quiz-container');
+            const quizResult = document.getElementById('quiz-result');
+            const quizQuestionNumber = document.getElementById('quiz-question-number');
+            const quizQuestion = document.getElementById('quiz-question');
+            const quizOptions = document.getElementById('quiz-options');
+            const quizFeedback = document.getElementById('quiz-feedback');
+            const quizCheckBtn = document.getElementById('quiz-check-btn');
+            const quizNextBtn = document.getElementById('quiz-next-btn');
+            const quizScore = document.getElementById('quiz-score');
+            const quizRestartBtn = document.getElementById('quiz-restart-btn');
+
+            function displayQuestion() {
+                quizActive = true;
+                quizFeedback.textContent = '';
+                selectedOptionIndex = -1;
+                quizCheckBtn.disabled = true;
+                quizNextBtn.disabled = true;
+                quizNextBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600', 'text-white');
+                quizNextBtn.classList.add('bg-gray-300', 'text-gray-700', 'hover:bg-gray-400');
+
+
+                if (currentQuestionIndex < quizQuestions.length) {
+                    const questionData = quizQuestions[currentQuestionIndex];
+                    quizQuestionNumber.textContent = `문제 ${currentQuestionIndex + 1} / ${quizQuestions.length}`;
+                    quizQuestion.textContent = questionData.question;
+                    quizOptions.innerHTML = '';
+                    questionData.options.forEach((option, index) => {
+                        const optionDiv = document.createElement('div');
+                        optionDiv.classList.add('quiz-option');
+                        optionDiv.textContent = option;
+                        optionDiv.dataset.index = index;
+                        optionDiv.addEventListener('click', () => selectOption(optionDiv, index));
+                        quizOptions.appendChild(optionDiv);
+                    });
+                } else {
+                    showResult();
+                }
+            }
+
+            function selectOption(selectedDiv, index) {
+                if (!quizActive) return;
+
+                document.querySelectorAll('.quiz-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                selectedDiv.classList.add('selected');
+                selectedOptionIndex = index;
+                quizCheckBtn.disabled = false;
+            }
+
+            function checkAnswer() {
+                if (selectedOptionIndex === -1 || !quizActive) return;
+
+                quizActive = false;
+                quizCheckBtn.disabled = true;
+                quizNextBtn.disabled = false;
+                quizNextBtn.classList.remove('bg-gray-300', 'text-gray-700', 'hover:bg-gray-400');
+                quizNextBtn.classList.add('bg-blue-500', 'hover:bg-blue-600', 'text-white');
+
+                const questionData = quizQuestions[currentQuestionIndex];
+                const options = document.querySelectorAll('.quiz-option');
+
+                options.forEach(opt => {
+                    opt.classList.add('disabled');
+                    if (parseInt(opt.dataset.index) === questionData.correctAnswerIndex) {
+                        opt.classList.add('correct');
+                    }
+                    if (parseInt(opt.dataset.index) === selectedOptionIndex && selectedOptionIndex !== questionData.correctAnswerIndex) {
+                        opt.classList.add('incorrect');
+                    }
+                });
+
+                if (selectedOptionIndex === questionData.correctAnswerIndex) {
+                    score++;
+                    quizFeedback.textContent = '정답입니다! 😊';
+                    quizFeedback.classList.remove('text-red-500');
+                    quizFeedback.classList.add('text-green-600');
+                } else {
+                    quizFeedback.textContent = `틀렸습니다. 정답은 '${questionData.options[questionData.correctAnswerIndex]}' 입니다. 😟`;
+                    quizFeedback.classList.remove('text-green-600');
+                    quizFeedback.classList.add('text-red-500');
+                }
+            }
+
+            function nextQuestion() {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < quizQuestions.length) {
+                    displayQuestion();
+                } else {
+                    showResult();
+                }
+            }
+
+            function showResult() {
+                quizContainer.classList.add('hidden');
+                quizResult.classList.remove('hidden');
+                quizScore.textContent = `${score} / ${quizQuestions.length} 점`;
+            }
+
+            function restartQuiz() {
+                currentQuestionIndex = 0;
+                score = 0;
+                quizResult.classList.add('hidden');
+                quizContainer.classList.remove('hidden');
+                displayQuestion();
+            }
+
+            quizCheckBtn.addEventListener('click', checkAnswer);
+            quizNextBtn.addEventListener('click', nextQuestion);
+            quizRestartBtn.addEventListener('click', restartQuiz);
+
+            displayQuestion(); // Initial display
+        });
+    </script>
+</body>
+</html>

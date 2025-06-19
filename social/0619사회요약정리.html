@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사회 핵심 정리: 도시화와 공간 분화</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals with Calm Blue Accent -->
+    <!-- Application Structure Plan: The application is structured as a single-page scrolling experience, divided into four thematic sections. This step-by-step flow (from basic concepts like urbanization to complex ones like metropolitan areas) is designed for progressive learning. Key interactions include a clickable chart for urbanization stages, an interactive diagram for spatial differentiation, a side-by-side comparison for urban forces, and a process visualization for metropolitan formation. This structure was chosen over a direct report copy to create a more intuitive and memorable learning path for students preparing for an exam. -->
+    <!-- Visualization & Content Choices: 
+        1. Urbanization Curve: Report Info -> 3 stages of urbanization. Goal -> Show change/process. Viz -> Line chart (Chart.js). Interaction -> Click segments to show details. Justification -> Visualizes the S-curve pattern effectively.
+        2. Spatial Differentiation: Report Info -> CBD/Suburbs functional differences based on land value. Goal -> Organize/Compare spatial zones. Viz -> Interactive concentric circle diagram (HTML/CSS). Interaction -> Click zones to update details panel. Justification -> Makes abstract spatial concepts tangible.
+        3. Urban Forces: Report Info -> Centripetal vs. Centrifugal forces. Goal -> Compare contrasting concepts. Viz -> Two-column layout (HTML/Tailwind). Interaction -> Static comparison for clarity. Justification -> Best way to learn opposing ideas.
+        4. Metropolitan Formation: Report Info -> Role of transportation in creating metropolitan areas. Goal -> Show cause-and-effect relationship. Viz -> Simple process diagram (HTML/CSS/JS). Interaction -> Button click reveals transport links and explanation. Justification -> Clearly visualizes the core connection.
+        5. Review Quiz: Report Info -> All key concepts from the report. Goal -> Assess and reinforce learning for memorization. Viz -> Expanded interactive multiple-choice quiz (HTML/JS). Interaction -> Click answers for immediate feedback. Justification -> Provides a comprehensive self-assessment tool to prepare for an exam.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .exam-highlight {
+            background-color: #fffde7;
+            border-left: 4px solid #f9a825;
+            padding: 1rem;
+            margin-top: 0.5rem;
+            border-radius: 0.25rem;
+        }
+        .exam-marker {
+            color: #f9a825;
+            font-weight: 700;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-button {
+            transition: all 0.3s;
+        }
+        .nav-button.active {
+            background-color: #1e3a8a;
+            color: white;
+        }
+        .city-zone {
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        .city-zone:hover, .city-zone.active {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+        .transport-line {
+            position: absolute;
+            background-color: #3b82f6;
+            transform-origin: left center;
+            transition: all 1s ease-out;
+            border-radius: 2px;
+            opacity: 0;
+            transform: scaleX(0);
+        }
+        .quiz-option {
+            transition: background-color 0.3s;
+        }
+        .quiz-option.correct {
+            background-color: #22c55e;
+            color: white;
+            border-color: #16a34a;
+        }
+        .quiz-option.incorrect {
+            background-color: #ef4444;
+            color: white;
+            border-color: #dc2626;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 py-3">
+            <ul class="flex flex-wrap justify-center items-center gap-2">
+                <li><button data-target="section-1" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-blue-700 hover:text-white">1. 도시화 과정</button></li>
+                <li><button data-target="section-2" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-blue-700 hover:text-white">2. 도시 공간 분화</button></li>
+                <li><button data-target="section-3" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-blue-700 hover:text-white">3. 도시를 움직이는 힘</button></li>
+                <li><button data-target="section-4" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-blue-700 hover:text-white">4. 대도시권의 형성</button></li>
+                <li><button data-target="section-5" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-amber-200 hover:bg-amber-500 hover:text-white">★ 최종 암기 퀴즈 ★</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-12">
+        
+        <section id="section-1" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">1. 도시화 과정: 사람들은 왜 도시로 모일까?</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">도시화는 한 나라의 인구가 도시로 집중되는 현상을 말합니다. 특히 산업이 발달하면서 일자리를 찾아 많은 사람이 도시로 이동했죠. 이 과정은 보통 3단계를 거치며, 각 단계별 특징을 알아두는 것이 중요합니다.</p>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <div class="chart-container">
+                    <canvas id="urbanizationChart"></canvas>
+                </div>
+                <div id="urbanization-info" class="mt-6 p-4 bg-blue-50 rounded-lg text-center">
+                    <p class="text-blue-800 font-semibold">차트의 각 단계를 클릭하여 설명을 확인해보세요.</p>
+                </div>
+                <div class="exam-highlight">
+                    <p><span class="exam-marker">★ 시험 출제 포인트</span>: 우리나라는 현재 도시화율 90% 이상인 <span class="font-bold">종착 단계</span>에 해당한다는 점을 꼭 기억하세요! 인구 증가는 둔화되었지만, 도시적 생활 양식은 계속 확산되고 있습니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-2" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">2. 도시의 구조: 기능에 따라 나뉘는 공간</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">도시가 커지면서 주거, 상업, 공업 등 다양한 기능들이 각기 유리한 곳에 자리를 잡게 됩니다. 이를 '공간 분화'라고 부릅니다. 접근성과 땅값(지대)이 공간 분화에 가장 큰 영향을 미칩니다.</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <div class="flex flex-col lg:flex-row gap-8 items-center">
+                    <div class="w-full lg:w-1/2 flex justify-center items-center p-4 min-h-[300px]">
+                        <div id="city-diagram" class="relative w-72 h-72 md:w-80 md:h-80">
+                            <div data-zone="cbd" class="city-zone active absolute top-1/2 left-1/2 w-28 h-28 md:w-32 md:h-32 -m-14 md:-m-16 rounded-full bg-red-500 flex justify-center items-center text-white font-bold text-center p-2">도심<br>(중심업무지구)</div>
+                            <div data-zone="intermediate" class="city-zone absolute top-1/2 left-1/2 w-52 h-52 md:w-56 md:h-56 -m-26 md:-m-28 rounded-full bg-blue-500 flex justify-center items-center"></div>
+                            <div data-zone="intermediate" class="city-zone absolute top-1/2 left-1/2 w-48 h-48 md:w-52 md:h-52 -m-24 md:-m-26 rounded-full bg-white flex justify-center items-center text-blue-800 font-bold p-2 text-center">중간<br>지역</div>
+                            <div data-zone="suburb" class="city-zone absolute top-1/2 left-1/2 w-72 h-72 md:w-80 md:h-80 -m-36 md:-m-40 rounded-full bg-green-500 flex justify-center items-center"></div>
+                            <div data-zone="suburb" class="city-zone absolute top-1/2 left-1/2 w-68 h-68 md:w-76 md:h-76 -m-34 md:-m-38 rounded-full bg-white flex justify-center items-center text-green-800 font-bold p-2 text-center">외곽<br>지역</div>
+                        </div>
+                    </div>
+                    <div class="w-full lg:w-1/2">
+                        <div id="zone-info" class="p-4 rounded-lg bg-slate-100 min-h-[250px]">
+                        </div>
+                        <div class="exam-highlight mt-4">
+                            <p><span class="exam-marker">★ 시험 출제 포인트</span>: <span class="font-bold">접근성</span>이 높은 곳은 경쟁이 치열해 <span class="font-bold">지대</span>가 비싸집니다. 이 때문에 높은 수익을 내야 하는 <span class="font-bold">상업·업무 기능</span>은 도심에, 넓은 땅이 필요한 <span class="font-bold">주거·공업 기능</span>은 외곽에 입지하는 경향이 있습니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="section-3" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">3. 도시를 움직이는 힘: 집심 vs 이심</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">도시의 공간 분화는 서로 다른 두 가지 힘에 의해 일어납니다. 도심으로 모이려는 '집심 현상'과 도심에서 벗어나려는 '이심 현상'이 바로 그것이죠. 두 현상의 특징을 비교하며 이해해 보세요.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-blue-700">🎯 집심(集心) 현상</h3>
+                    <p class="text-center mb-4 text-slate-600">기능들이 도시의 중심으로 모여드는 현상</p>
+                    <ul class="space-y-2 list-disc list-inside bg-blue-50 p-4 rounded-lg">
+                        <li><span class="font-bold">원인:</span> 교통의 편리함, 정보 획득의 용이함</li>
+                        <li><span class="font-bold">주요 기능:</span></li>
+                        <li class="ml-4">대기업 본사</li>
+                        <li class="ml-4">금융 기관</li>
+                        <li class="ml-4">백화점, 고급 상점</li>
+                        <li class="ml-4">정부 기관</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-4 text-red-700">💨 이심(離心) 현상</h3>
+                    <p class="text-center mb-4 text-slate-600">기능들이 도심에서 벗어나 외곽으로 나가는 현상</p>
+                    <ul class="space-y-2 list-disc list-inside bg-red-50 p-4 rounded-lg">
+                        <li><span class="font-bold">원인:</span> 비싼 땅값, 교통 체증, 환경 오염</li>
+                        <li><span class="font-bold">주요 기능:</span></li>
+                        <li class="ml-4">주거 시설(아파트 단지)</li>
+                        <li class="ml-4">공장</li>
+                        <li class="ml-4">대학교</li>
+                        <li class="ml-4">대규모 창고</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="exam-highlight mt-8">
+                <p><span class="exam-marker">★ 시험 출제 포인트</span>: <span class="font-bold">집심 현상</span>과 <span class="font-bold">이심 현상</span>은 도시 내부 구조를 형성하는 핵심 원리입니다. 각 현상의 원인과 대표적인 기능들을 반드시 구분해서 암기해야 합니다.</p>
+            </div>
+        </section>
+        
+        <section id="section-4" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">4. 확장하는 도시: 교외화와 대도시권</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">도시의 인구와 기능이 주변 지역으로 퍼져나가는 현상을 '교외화'라고 합니다. 교외화가 활발해지면 중심 도시와 주변 지역이 하나의 생활권으로 묶이는데, 이를 '대도시권'이라고 부릅니다.</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                 <div class="flex flex-col md:flex-row gap-8 items-center justify-center">
+                    <div class="w-full md:w-2/3 relative h-64 bg-slate-100 rounded-lg p-4" id="metro-area">
+                        <div id="central-city" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-red-500 rounded-full flex items-center justify-center text-white font-bold">중심도시</div>
+                        <div id="suburb1" class="absolute top-8 left-8 w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm">교외1</div>
+                        <div id="suburb2" class="absolute bottom-8 right-8 w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm">교외2</div>
+                        <div id="suburb3" class="absolute bottom-8 left-24 w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm">교외3</div>
+                        <div id="suburb4" class="absolute top-8 right-24 w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm">교외4</div>
+                    </div>
+                    <div class="w-full md:w-1/3">
+                        <button id="develop-transport" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors mb-4 text-lg">🚇 교통망 발달!</button>
+                        <div id="metro-info" class="p-4 bg-amber-50 rounded-lg text-amber-900 min-h-[120px]">
+                            <p class="font-semibold">교통망 발달 버튼을 눌러 대도시권이 어떻게 형성되는지 확인해보세요.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="exam-highlight mt-6">
+                    <p><span class="exam-marker">★ 시험 출제 포인트</span>: <span class="font-bold">대도시권 형성의 핵심 조건은 '교통의 발달'</span>입니다. 교통망이 중심 도시와 주변 지역을 연결해주어야 통근, 통학이 가능해져 하나의 생활권이 될 수 있습니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-5" class="scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">★ 최종 암기 퀴즈 ★</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">지금까지 학습한 내용을 퀴즈로 확인해 보세요. 정답이라고 생각하는 보기를 클릭하면 됩니다.</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg max-w-3xl mx-auto">
+                <div id="quiz-container"></div>
+                <div id="quiz-result" class="text-center font-bold text-2xl mt-6 hidden"></div>
+                <button id="quiz-retry-button" class="w-full mt-4 bg-amber-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-amber-600 transition-colors hidden">다시 풀기</button>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="text-center py-6 bg-slate-100 mt-12">
+        <p class="text-slate-500 text-sm">사회 핵심 개념 학습용 인터랙티브 요약 자료</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urbanizationData = {
+                labels: ['시간', '초기 단계', '가속화 단계', '종착 단계', ''],
+                datasets: [{
+                    label: '도시화율(%)',
+                    data: [5, 10, 80, 90, 91],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 6,
+                    pointBackgroundColor: '#3b82f6',
+                    pointHoverRadius: 8
+                }]
+            };
+
+            const urbanizationInfo = {
+                1: { title: '1️⃣ 초기 단계', desc: '대부분의 인구가 농촌에 거주하며, 도시화가 매우 더디게 진행됩니다. (산업화 이전)' },
+                2: { title: '2️⃣ 가속화 단계', desc: '산업화로 일자리가 늘어나면서 농촌 인구가 도시로 급격히 이동(이촌향도)하는 시기입니다.' },
+                3: { title: '3️⃣ 종착 단계', desc: '도시화율이 매우 높아져 더딘 증가세를 보입니다. 교외화, 역도시화 현상이 나타나기도 합니다.' }
+            };
+
+            const ctx = document.getElementById('urbanizationChart').getContext('2d');
+            const urbanizationChart = new Chart(ctx, {
+                type: 'line',
+                data: urbanizationData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, max: 100, title: { display: true, text: '도시화율 (%)' } },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            if(urbanizationInfo[index]){
+                                document.getElementById('urbanization-info').innerHTML = `<h4 class="font-bold text-lg text-blue-900">${urbanizationInfo[index].title}</h4><p class="mt-1 text-blue-800">${urbanizationInfo[index].desc}</p>`;
+                            }
+                        }
+                    }
+                }
+            });
+
+            const zoneData = {
+                cbd: {
+                    title: '🎯 도심 (중심업무지구)',
+                    desc: '접근성이 가장 뛰어나 상업, 금융, 업무 등 도시의 핵심 기능이 밀집된 곳입니다. 땅값이 가장 비싸고, 낮에는 붐비지만 밤에는 인구가 줄어드는 인구 공동화 현상이 나타나기도 합니다.',
+                    examples: '예: 서울 중구, 종로구, 강남구(테헤란로)'
+                },
+                intermediate: {
+                    title: '🏭 중간 지역',
+                    desc: '도심의 비싼 땅값을 감당하기 어려운 공업 기능이나, 도심으로 출퇴근하는 사람들의 주거지가 형성됩니다. 도심과 외곽의 성격이 섞여 있습니다.',
+                    examples: '예: 서울 구로구(과거 공업지대), 영등포구'
+                },
+                suburb: {
+                    title: '🏡 외곽 지역',
+                    desc: '쾌적한 환경과 비교적 저렴한 땅값을 찾아 대규모 아파트 단지 등 주거 기능이 주로 발달합니다. 교통 발달로 도심 접근성이 개선되면서 인구가 급증했습니다.',
+                    examples: '예: 서울 노원구, 강서구, 송파구'
+                }
+            };
+            
+            const cityDiagram = document.getElementById('city-diagram');
+            const zoneInfoPanel = document.getElementById('zone-info');
+            const cityZones = cityDiagram.querySelectorAll('.city-zone');
+
+            function updateZoneInfo(zoneId) {
+                const data = zoneData[zoneId];
+                zoneInfoPanel.innerHTML = `<h3 class="text-xl font-bold mb-2">${data.title}</h3><p class="text-slate-700 mb-3">${data.desc}</p><p class="font-semibold text-sm text-slate-500">${data.examples}</p>`;
+                cityZones.forEach(z => {
+                    z.classList.remove('active');
+                    if (z.dataset.zone === zoneId) { z.classList.add('active'); }
+                });
+            }
+
+            cityDiagram.addEventListener('click', (e) => {
+                const targetZone = e.target.closest('.city-zone');
+                if (targetZone) { updateZoneInfo(targetZone.dataset.zone); }
+            });
+            updateZoneInfo('cbd');
+
+            const developTransportBtn = document.getElementById('develop-transport');
+            const metroArea = document.getElementById('metro-area');
+            const metroInfo = document.getElementById('metro-info');
+            let transportDeveloped = false;
+
+            developTransportBtn.addEventListener('click', () => {
+                if (transportDeveloped) return;
+                transportDeveloped = true;
+                const centralCity = document.getElementById('central-city');
+                const suburbs = metroArea.querySelectorAll('[id^="suburb"]');
+                const centralRect = centralCity.getBoundingClientRect();
+                const containerRect = metroArea.getBoundingClientRect();
+                suburbs.forEach(suburb => {
+                    const suburbRect = suburb.getBoundingClientRect();
+                    const line = document.createElement('div');
+                    line.className = 'transport-line';
+                    const x1 = centralRect.left + centralRect.width / 2 - containerRect.left;
+                    const y1 = centralRect.top + centralRect.height / 2 - containerRect.top;
+                    const x2 = suburbRect.left + suburbRect.width / 2 - containerRect.left;
+                    const y2 = suburbRect.top + suburbRect.height / 2 - containerRect.top;
+                    const length = Math.sqrt((x2-x1)**2 + (y2-y1)**2);
+                    const angle = Math.atan2(y2-y1, x2-x1) * 180 / Math.PI;
+                    line.style.width = `${length}px`;
+                    line.style.height = '4px';
+                    line.style.left = `${x1}px`;
+                    line.style.top = `${y1 - 2}px`;
+                    line.style.transform = `rotate(${angle}deg)`;
+                    metroArea.appendChild(line);
+                    setTimeout(() => {
+                        line.style.opacity = '1';
+                        line.style.transform = `rotate(${angle}deg) scaleX(1)`;
+                    }, 100);
+                });
+                metroInfo.innerHTML = `<h4 class="font-bold text-lg text-amber-900">대도시권 형성!</h4><p class="mt-1">교통망이 발달하면서 중심 도시와 주변 지역이 통근, 통학 등으로 연결되어 하나의 거대한 생활권, 즉 대도시권을 이루게 됩니다.</p>`;
+                developTransportBtn.disabled = true;
+                developTransportBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                developTransportBtn.textContent = '✅ 연결 완료!';
+            });
+
+            const navButtons = document.querySelectorAll('.nav-button');
+            const sections = document.querySelectorAll('section');
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.dataset.target;
+                    const targetSection = document.getElementById(targetId);
+                    if(targetSection) {
+                        window.scrollTo({ top: targetSection.offsetTop - 80, behavior: 'smooth' });
+                    }
+                });
+            });
+            
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) { current = section.getAttribute('id'); }
+                });
+                navButtons.forEach(button => {
+                    button.classList.remove('active');
+                    if (button.dataset.target === current) { button.classList.add('active'); }
+                });
+            });
+
+            const quizContainer = document.getElementById('quiz-container');
+            const quizResult = document.getElementById('quiz-result');
+            const quizRetryButton = document.getElementById('quiz-retry-button');
+            
+            const quizData = [
+                {
+                    question: '1. 도시화가 빠르게 진행되는 가속화 단계에서 나타나는 대표적인 인구 이동 현상은?',
+                    options: ['이촌향도', '귀농', 'U턴 현상', '역도시화'],
+                    answer: '이촌향도'
+                },
+                {
+                    question: '2. 도시가 성장하면서 주거, 상업, 공업 기능이 분리되는 현상을 무엇이라고 하는가?',
+                    options: ['도시화', '집심 현상', '공간 분화', '교외화'],
+                    answer: '공간 분화'
+                },
+                {
+                    question: '3. 다음 중 접근성이 가장 높아 지대가 가장 비싼 곳은 어디인가?',
+                    options: ['도심', '중간 지역', '외곽 지역', '개발제한구역'],
+                    answer: '도심'
+                },
+                {
+                    question: '4. 다음 중 이심 현상을 유발하는 원인으로 보기 어려운 것은?',
+                    options: ['비싼 땅값', '교통 체증', '정보 획득의 용이함', '환경 오염'],
+                    answer: '정보 획득의 용이함'
+                },
+                 {
+                    question: '5. 대한민국은 현재 도시화 과정의 어느 단계에 속하는가?',
+                    options: ['초기 단계', '가속화 단계', '종착 단계', '성숙 단계'],
+                    answer: '종착 단계'
+                },
+                {
+                    question: '6. 넓은 부지와 저렴한 땅값이 필요하여 주로 도시 외곽으로 이전하는 기능은?',
+                    options: ['백화점', '은행 본점', '공장', '정부 기관'],
+                    answer: '공장'
+                },
+                {
+                    question: '7. 중심 도시와 주변 지역이 교통망 발달로 하나의 생활권을 이루는 공간 범위를 무엇이라 하는가?',
+                    options: ['도심', '부도심', '위성도시', '대도시권'],
+                    answer: '대도시권'
+                },
+                {
+                    question: '8. 도심 지역에 상주 인구는 적고, 낮에만 활동 인구가 많은 현상은?',
+                    options: ['인구 공동화 현상', '인구 폭발 현상', '슬럼화', '젠트리피케이션'],
+                    answer: '인구 공동화 현상'
+                },
+                {
+                    question: '9. 다음 중 집심 현상으로 인해 도심에 입지하는 기능이 아닌 것은?',
+                    options: ['금융 기관', '대규모 아파트 단지', '고급 상점', '대기업 본사'],
+                    answer: '대규모 아파트 단지'
+                },
+                {
+                    question: '10. 도시 인구와 기능이 주변 교외 지역으로 확산되는 현상은?',
+                    options: ['도시 재개발', '교외화', '집중화', '슬럼화'],
+                    answer: '교외화'
+                },
+                {
+                    question: '11. 도시 내부의 공간 분화에 가장 큰 영향을 미치는 두 가지 요인은?',
+                    options: ['인구와 문화', '정치와 경제', '접근성과 지대', '역사와 전통'],
+                    answer: '접근성과 지대'
+                },
+                {
+                    question: '12. 대도시권이 형성되고 확대될 수 있는 가장 결정적인 기반 시설은?',
+                    options: ['대규모 공원', '광역 교통망', '초고층 빌딩', '대형 쇼핑몰'],
+                    answer: '광역 교통망'
+                }
+            ];
+
+            let currentQuestionIndex = 0;
+            let score = 0;
+
+            function loadQuiz() {
+                currentQuestionIndex = 0;
+                score = 0;
+                quizContainer.innerHTML = '';
+                quizResult.classList.add('hidden');
+                quizRetryButton.classList.add('hidden');
+                showQuestion();
+            }
+
+            function showQuestion() {
+                if (currentQuestionIndex >= quizData.length) {
+                    showResult();
+                    return;
+                }
+                
+                const questionData = quizData[currentQuestionIndex];
+                const progress = `${currentQuestionIndex + 1} / ${quizData.length}`;
+                const questionElement = document.createElement('div');
+                questionElement.className = 'mb-6';
+                questionElement.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="font-bold text-lg text-slate-800">${questionData.question}</p>
+                        <span class="text-sm font-semibold text-slate-500 bg-slate-200 px-3 py-1 rounded-full">${progress}</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        ${questionData.options.map(option => `
+                            <button class="quiz-option w-full text-left p-3 border-2 border-slate-300 rounded-lg hover:bg-slate-100">${option}</button>
+                        `).join('')}
+                    </div>
+                `;
+                quizContainer.appendChild(questionElement);
+
+                const optionButtons = questionElement.querySelectorAll('.quiz-option');
+                optionButtons.forEach(button => {
+                    button.addEventListener('click', handleOptionClick);
+                });
+            }
+
+            function handleOptionClick(event) {
+                const selectedOption = event.target;
+                const questionData = quizData[currentQuestionIndex];
+                const isCorrect = selectedOption.textContent === questionData.answer;
+
+                if (isCorrect) {
+                    selectedOption.classList.add('correct');
+                    score++;
+                } else {
+                    selectedOption.classList.add('incorrect');
+                }
+
+                const optionButtons = selectedOption.parentElement.querySelectorAll('.quiz-option');
+                optionButtons.forEach(button => {
+                    button.disabled = true;
+                    if (button.textContent === questionData.answer) {
+                        button.classList.add('correct');
+                    }
+                });
+
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    quizContainer.innerHTML = '';
+                    showQuestion();
+                }, 1200);
+            }
+
+            function showResult() {
+                quizContainer.innerHTML = '';
+                quizResult.innerHTML = `🎉 퀴즈 완료! 총 ${quizData.length}문제 중 <span class="text-amber-500 text-3xl">${score}</span>문제를 맞혔습니다!`;
+                quizResult.classList.remove('hidden');
+                quizRetryButton.classList.remove('hidden');
+            }
+
+            quizRetryButton.addEventListener('click', loadQuiz);
+
+            loadQuiz();
+        });
+    </script>
+</body>
+</html>

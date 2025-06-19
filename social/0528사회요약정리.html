@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사회 핵심 정리: 세계의 축제 문화</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Vibrant Festival Tones -->
+    <!-- Application Structure Plan: A new SPA for the May 28th lesson, focusing on world festivals. The structure is designed for exploration and retention: 1. Categorization of Festivals (the "why" behind them). 2. The main "Interactive Festival Gallery," using clickable cards for engagement. 3. A dedicated "Festival Meanings" section to reinforce the connection between festivals and culture/environment. 4. A comprehensive final quiz to test knowledge for the exam. -->
+    <!-- Visualization & Content Choices: 
+        1. Festival Categories: Report Info -> Festivals linked to religion, season, local products. Goal -> Provide a conceptual framework. Viz -> Icon-based info cards. Interaction -> Static. Justification -> Simple and clear categorization.
+        2. Festival Gallery: Report Info -> Venice Carnival, Inti Raymi, Songkran, Holi, etc. Goal -> Allow users to explore details of each festival. Viz -> A grid of clickable cards. Interaction -> Clicking a card reveals a modal or detail panel with information (location, time, meaning, key features). Justification -> More engaging and organized than a long text list.
+        3. Festival Meanings: Report Info -> Deeper meanings like Carnival before Lent. Goal -> Reinforce learning. Viz -> Simple Q&A style cards. Interaction -> Static comparison. Justification -> Directly addresses key points from the lecture.
+        4. Final Quiz: Report Info -> All festival details. Goal -> Assess learning. Viz -> Interactive multiple-choice quiz. Interaction -> Immediate feedback. Justification -> Essential for exam prep.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .exam-highlight {
+            background-color: #fefce8;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0.25rem;
+        }
+        .exam-marker {
+            color: #d97706;
+            font-weight: 700;
+        }
+        .nav-button {
+            transition: all 0.3s;
+        }
+        .nav-button.active {
+            background-color: #be185d;
+            color: white;
+        }
+        .festival-card {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .festival-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        #festival-modal-backdrop {
+            transition: opacity 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-rose-50 text-slate-800">
+
+    <header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 py-3">
+            <ul class="flex flex-wrap justify-center items-center gap-2">
+                <li><button data-target="section-1" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-pink-700 hover:text-white">1. 축제의 유형</button></li>
+                <li><button data-target="section-2" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-pink-700 hover:text-white">2. 세계 축제 갤러리</button></li>
+                <li><button data-target="section-3" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-amber-200 hover:bg-amber-500 hover:text-white">★ 최종 암기 퀴즈 ★</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-12">
+        
+        <section id="section-1" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">1. 세계 축제는 왜 열릴까?</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">세계의 다양한 축제는 그 지역의 자연환경, 종교, 특산물 등과 깊은 관련을 맺고 있습니다.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-md text-center">
+                    <div class="text-5xl mb-3">⛪</div>
+                    <h3 class="text-xl font-bold">종교적 의미</h3>
+                    <p class="text-slate-600 mt-2 text-sm">특정 종교의 중요한 시기를 기념하거나 신에게 축복을 기원. (예: 사육제, 홀리)</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-md text-center">
+                    <div class="text-5xl mb-3">☀️</div>
+                    <h3 class="text-xl font-bold">계절과 자연</h3>
+                    <p class="text-slate-600 mt-2 text-sm">계절의 변화를 기념하고 풍요와 안녕을 기원. (예: 인티 라이미, 송끄란, 하지제)</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-md text-center">
+                    <div class="text-5xl mb-3">🍅</div>
+                    <h3 class="text-xl font-bold">지역 특산물</h3>
+                    <p class="text-slate-600 mt-2 text-sm">지역의 특산물을 알리고 수확의 기쁨을 나누기 위해 시작. (예: 망통 레몬 축제, 토마토 축제)</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-2" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">2. 세계 축제 갤러리</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">아래의 축제 카드를 클릭하여 각 축제의 유래와 특징을 자세히 알아보세요!</p>
+
+            <div id="festival-gallery" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                <!-- Festival cards will be injected here by JS -->
+            </div>
+        </section>
+        
+        <section id="section-3" class="scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">★ 최종 암기 퀴즈 ★</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">이제 세계 축제 전문가! 퀴즈를 통해 학습 내용을 최종 점검하고 시험에 대비하세요.</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg max-w-3xl mx-auto">
+                <div id="quiz-container"></div>
+                <div id="quiz-result" class="text-center font-bold text-2xl mt-6 hidden"></div>
+                <button id="quiz-retry-button" class="w-full mt-4 bg-amber-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-amber-600 transition-colors hidden">다시 풀기</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal -->
+    <div id="festival-modal-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
+        <div id="festival-modal" class="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h2 id="modal-title" class="text-2xl font-bold text-pink-700"></h2>
+                        <p id="modal-location" class="text-slate-500 font-semibold"></p>
+                    </div>
+                    <button id="modal-close" class="text-3xl text-slate-400 hover:text-slate-800">&times;</button>
+                </div>
+                <div class="mt-4">
+                    <div id="modal-tags" class="flex flex-wrap gap-2 mb-4"></div>
+                    <p id="modal-description" class="text-slate-700 leading-relaxed"></p>
+                </div>
+                 <div id="modal-exam-highlight" class="exam-highlight mt-4"></div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="text-center py-6 bg-rose-100 mt-12">
+        <p class="text-slate-500 text-sm">사회 핵심 개념 학습용 인터랙티브 요약 자료</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const sections = document.querySelectorAll('main section');
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    document.getElementById(button.dataset.target).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            });
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    if (pageYOffset >= section.offsetTop - 90) { current = section.id; }
+                });
+                navButtons.forEach(button => {
+                    button.classList.remove('active');
+                    if (button.dataset.target === current) { button.classList.add('active'); }
+                });
+            });
+
+            const festivals = [
+                { id: 'venice', name: '베네치아 카니발', country: '이탈리아', emoji: '🎭', tags: ['종교', '문화융합'], desc: "기독교의 금식 기간인 '사순절' 전에 고기를 먹고 즐기는 '사육제'에서 유래했습니다. 화려한 가면을 쓰는 것이 특징인데, 이는 과거 이슬람 문화의 영향을 받아 형성된 독특한 문화 융합의 결과입니다.", exam: "사순절 전 고기를 즐기는 '사육제', 이슬람 문화의 영향을 받은 '가면'이 핵심!" },
+                { id: 'inti', name: '인티 라이미', country: '페루', emoji: '☀️', tags: ['계절', '종교'], desc: "잉카 문명에서 태양신에게 제사를 지내던 것에서 유래했습니다. 남반구에 위치한 페루에서는 1년 중 밤이 가장 긴 동지(6월 말)가 지나고, 다시 해가 길어지는 것을 기념하며 태양신에게 감사하는 축제입니다.", exam: "'태양신' 숭배, 남반구의 '동지'에 다시 길어지는 해를 기념하는 것이 포인트." },
+                { id: 'songkran', name: '송끄란 축제', country: '타이', emoji: '💧', tags: ['계절', '종교'], desc: "타이의 새해맞이 축제로, 건기가 끝나고 우기가 시작되는 시기(4월)에 열립니다. 서로에게 물을 뿌려주며 지난 해의 나쁜 기운을 씻어내고 복을 빌어주는 불교적 의미를 담고 있습니다.", exam: "타이의 '새해', 건기에서 우기로 넘어가는 시점에 '물'로 축복하는 불교 문화." },
+                { id: 'holi', name: '홀리 축제', country: '인도', emoji: '🎨', tags: ['종교', '사회'], desc: "봄이 오는 것을 기념하고, 신의 축복을 빌며 다채로운 색 가루나 물감을 서로에게 뿌리는 힌두교 축제입니다. 이 날 만큼은 카스트 제도와 같은 신분 차별 없이 모두가 평등하게 어울린다는 중요한 의미가 있습니다.", exam: "'봄맞이' 힌두교 축제, '색 가루'를 통해 신분 차별 없는 '평등'을 상징." },
+                { id: 'midsummer', name: '하지제', country: '스웨덴', emoji: '🌸', tags: ['계절'], desc: "북유럽의 긴 겨울이 끝나고, 1년 중 낮이 가장 긴 '하지'를 기념하는 축제입니다. 백야 현상으로 해가 지지 않는 여름을 즐기기 위해 꽃으로 장식한 기둥 주위를 돌며 춤을 춥니다.", exam: "긴 겨울이 끝난 북유럽, '하지'와 '백야'를 기념하는 축제." },
+                { id: 'menton', name: '망통 레몬 축제', country: '프랑스', emoji: '🍋', tags: ['특산물'], desc: "프랑스 남부의 지중해 연안 도시 망통에서 열리는 축제로, 지역 특산물인 레몬과 오렌지를 이용해 거대한 조형물을 만들어 전시합니다. 지역 경제 활성화를 위한 목적도 큽니다.", exam: "프랑스 망통의 지역 '특산물'인 '레몬'과 오렌지를 활용한 축제." },
+                { id: 'tomatina', name: '라 토마티나', country: '에스파냐', emoji: '🍅', tags: ['특산물'], desc: "에스파냐 발렌시아 지방의 부뇰에서 매년 8월 마지막 주 수요일에 열리는 축제입니다. 잘 익은 토마토를 서로에게 던지며 즐기는 것으로 유명하며, 지역 특산물을 알리기 위해 시작되었습니다.", exam: "에스파냐 부뇰의 지역 '특산물'인 '토마토'를 던지는 유쾌한 축제." },
+                { id: 'rio', name: '리우 카니발', country: '브라질', emoji: '💃', tags: ['종교', '문화융합'], desc: "이탈리아의 카니발과 마찬가지로 사순절을 앞두고 열리는 사육제입니다. 포르투갈에서 전래된 사육제 문화에 아프리카 노예들의 전통 춤과 음악, 원주민 문화가 결합되어 매우 정열적이고 화려한 삼바 축제로 발전했습니다.", exam: "포르투갈의 '사육제'와 아프리카, 원주민 문화가 결합된 '삼바' 축제." }
+            ];
+
+            const gallery = document.getElementById('festival-gallery');
+            festivals.forEach(f => {
+                const card = document.createElement('div');
+                card.className = 'festival-card bg-white p-4 rounded-xl shadow text-center';
+                card.dataset.id = f.id;
+                card.innerHTML = `<div class="text-5xl">${f.emoji}</div><h3 class="font-bold mt-2">${f.name}</h3><p class="text-sm text-slate-500">${f.country}</p>`;
+                gallery.appendChild(card);
+            });
+            
+            const modalBackdrop = document.getElementById('festival-modal-backdrop');
+            const modal = document.getElementById('festival-modal');
+            const modalClose = document.getElementById('modal-close');
+            
+            gallery.addEventListener('click', e => {
+                const card = e.target.closest('.festival-card');
+                if (card) {
+                    const festival = festivals.find(f => f.id === card.dataset.id);
+                    document.getElementById('modal-title').textContent = festival.name;
+                    document.getElementById('modal-location').textContent = festival.country;
+                    document.getElementById('modal-description').textContent = festival.desc;
+                    const tagsContainer = document.getElementById('modal-tags');
+                    tagsContainer.innerHTML = '';
+                    festival.tags.forEach(tag => {
+                        const tagEl = document.createElement('span');
+                        tagEl.className = 'bg-pink-100 text-pink-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full';
+                        tagEl.textContent = tag;
+                        tagsContainer.appendChild(tagEl);
+                    });
+                    document.getElementById('modal-exam-highlight').innerHTML = `<span class="exam-marker">★ 시험 포인트</span>: ${festival.exam}`;
+                    modalBackdrop.classList.remove('hidden');
+                }
+            });
+            
+            const closeModal = () => modalBackdrop.classList.add('hidden');
+            modalClose.addEventListener('click', closeModal);
+            modalBackdrop.addEventListener('click', (e) => {
+                if (e.target === modalBackdrop) closeModal();
+            });
+
+            const quizContainer = document.getElementById('quiz-container');
+            const quizResult = document.getElementById('quiz-result');
+            const quizRetryButton = document.getElementById('quiz-retry-button');
+            const quizData = [
+                { question: "1. 기독교의 금식 기간 '사순절' 전에 고기를 먹고 즐기던 '사육제'에서 유래한 축제는?", options: ['송끄란 축제', '베네치아 카니발', '인티 라이미', '홀리 축제'], answer: '베네치아 카니발' },
+                { question: "2. 남반구의 '동지'에 태양신에게 감사하며 지내는 페루의 축제는?", options: ['리우 카니발', '라 토마티나', '인티 라이미', '하지제'], answer: '인티 라이미' },
+                { question: '3. 타이의 새해에 물을 뿌리며 서로의 복을 빌어주는 불교적 의미의 축제는?', options: ['송끄란 축제', '홀리 축제', '망통 레몬 축제', '베네치아 카니발'], answer: '송끄란 축제' },
+                { question: '4. 신분 차별 없이 모두가 평등하게 색 가루를 뿌리는 인도의 힌두교 축제는?', options: ['송끄란 축제', '인티 라이미', '리우 카니발', '홀리 축제'], answer: '홀리 축제' },
+                { question: '5. 다음 중 지역 특산물과 관련된 축제로 짝지어진 것은?', options: ['홀리 - 색가루', '송끄란 - 물', '라 토마티나 - 토마토', '카니발 - 가면'], answer: '라 토마티나 - 토마토' },
+                { question: "6. 북유럽에서 긴 겨울이 끝나고 낮이 가장 긴 '하지'를 기념하는 축제는?", options: ['인티 라이미', '하지제', '송끄란 축제', '리우 카니발'], answer: '하지제' },
+                { question: "7. 베네치아 카니발의 상징인 '가면'은 어떤 문화의 영향을 받아 형성되었을까요?", options: ['이슬람 문화', '불교 문화', '힌두교 문화', '유교 문화'], answer: '이슬람 문화' },
+                { question: '8. 타이의 송끄란 축제가 4월에 열리는 주된 자연환경적 이유는 무엇일까요?', options: ['가장 추운 시기라서', '건기가 끝나고 우기가 시작되는 시기라서', '수확이 끝나는 시기라서', '해가 가장 긴 시기라서'], answer: '건기가 끝나고 우기가 시작되는 시기라서' },
+                { question: '9. 브라질의 리우 카니발은 포르투갈의 사육제 문화와 어떤 문화가 결합된 것일까요?', options: ['아프리카 및 원주민 문화', '아시아의 불교 문화', '북미의 개신교 문화', '이슬람 문화'], answer: '아프리카 및 원주민 문화' },
+                { question: '10. 다음 중 그 성격이 나머지 셋과 가장 다른 축제는?', options: ['베네치아 카니발', '홀리 축제', '망통 레몬 축제', '인티 라이미'], answer: '망통 레몬 축제' },
+                { question: "11. 잉카 문명에서 유래했으며, '태양신'을 숭배하는 축제는 무엇일까요?", options: ['리우 카니발', '인티 라이미', '홀리 축제', '송끄란 축제'], answer: '인티 라이미' },
+                { question: "12. 스웨덴의 하지제에서 기념하는 '백야' 현상은 무엇을 의미하나요?", options: ['밤이 낮보다 길어지는 현상', '일 년 내내 밤만 계속되는 현상', '여름에 해가 지지 않는 현상', '일 년 내내 낮만 계속되는 현상'], answer: '여름에 해가 지지 않는 현상' }
+            ];
+            let currentQuestionIndex = 0;
+            let score = 0;
+            function loadQuiz() {
+                currentQuestionIndex = 0; score = 0;
+                quizContainer.innerHTML = '';
+                quizResult.classList.add('hidden');
+                quizRetryButton.classList.add('hidden');
+                showQuestion();
+            }
+            function showQuestion() {
+                 if (currentQuestionIndex >= quizData.length) {
+                    showResult(); return;
+                }
+                const q = quizData[currentQuestionIndex];
+                const progress = `${currentQuestionIndex + 1} / ${quizData.length}`;
+                const el = document.createElement('div');
+                el.className = 'mb-6';
+                el.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="font-bold text-lg text-slate-800">${q.question}</p>
+                        <span class="text-sm font-semibold text-slate-500 bg-slate-200 px-3 py-1 rounded-full">${progress}</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        ${q.options.map(o => `<button class="quiz-option w-full text-left p-3 border-2 border-slate-300 rounded-lg hover:bg-slate-100">${o}</button>`).join('')}
+                    </div>`;
+                quizContainer.appendChild(el);
+                el.querySelectorAll('.quiz-option').forEach(b => b.addEventListener('click', handleOptionClick));
+            }
+            function handleOptionClick(e) {
+                const selected = e.target;
+                const q = quizData[currentQuestionIndex];
+                const isCorrect = selected.textContent === q.answer;
+                if (isCorrect) {
+                    selected.classList.add('correct', 'bg-green-500', 'text-white', 'border-green-600');
+                    score++;
+                } else {
+                    selected.classList.add('incorrect', 'bg-red-500', 'text-white', 'border-red-600');
+                }
+                selected.parentElement.querySelectorAll('.quiz-option').forEach(b => {
+                    b.disabled = true;
+                    if (b.textContent === q.answer) b.classList.add('correct', 'bg-green-500', 'text-white', 'border-green-600');
+                });
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    quizContainer.innerHTML = '';
+                    showQuestion();
+                }, 1200);
+            }
+            function showResult() {
+                quizContainer.innerHTML = '';
+                quizResult.innerHTML = `🎉 퀴즈 완료! 총 ${quizData.length}문제 중 <span class="text-amber-500 text-3xl">${score}</span>문제를 맞혔습니다!`;
+                quizResult.classList.remove('hidden');
+                quizRetryButton.classList.remove('hidden');
+            }
+            quizRetryButton.addEventListener('click', loadQuiz);
+            loadQuiz();
+        });
+    </script>
+</body>
+</html>

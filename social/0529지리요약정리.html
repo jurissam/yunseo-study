@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>지리 핵심 정리: 빙하 지형과 자연관</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Icy Blues and Natural Greens -->
+    <!-- Application Structure Plan: A new SPA for the May 29th Geography lesson. The structure logically progresses from specific landforms to broader philosophical concepts: 1. Glacial Landforms, featuring interactive diagrams for key formations (Fjord, Horn) as these are visual and complex. 2. A section on other landforms (Dry, Coastal) for comprehensive review. 3. A dedicated section on Human-Nature Perspectives, breaking down complex philosophies like anthropocentrism into digestible points. 4. A final, comprehensive quiz covering all topics. -->
+    <!-- Visualization & Content Choices: 
+        1. Fjord Formation: Report Info -> Step-by-step process of glacial carving and sea-level rise. Goal -> Visualize a process. Viz -> A multi-stage process diagram using HTML/CSS. Interaction -> Static visual flow. Justification -> A step-by-step diagram is the clearest way to explain this chronological process.
+        2. Horn Formation: Report Info -> Glaciers carving a mountain from multiple sides. Goal -> Explain a 3D process. Viz -> A simplified 3D-like diagram (HTML/CSS). Interaction -> Static. Justification -> Helps students visualize the carving action from multiple directions.
+        3. Human-Nature Perspectives: Report Info -> Anthropocentrism (human-centered view). Goal -> Explain a philosophical concept. Viz -> Info cards with key thinkers and principles. Interaction -> Static. Justification -> Organizes abstract ideas into clear, memorable points.
+        4. Final Quiz: Report Info -> All key concepts from the lesson. Goal -> Assess and reinforce learning. Viz -> Interactive multiple-choice quiz (HTML/JS). Interaction -> Immediate feedback. Justification -> Essential for exam preparation.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .exam-highlight {
+            background-color: #fefce8;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0.25rem;
+        }
+        .exam-marker {
+            color: #d97706;
+            font-weight: 700;
+        }
+        .nav-button {
+            transition: all 0.3s;
+        }
+        .nav-button.active {
+            background-color: #0d9488;
+            color: white;
+        }
+        .perspective-card.active {
+            border-color: #0d9488;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 py-3">
+            <ul class="flex flex-wrap justify-center items-center gap-2">
+                <li><button data-target="section-1" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-teal-700 hover:text-white">1. 빙하 지형</button></li>
+                <li><button data-target="section-2" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-teal-700 hover:text-white">2. 기타 지형</button></li>
+                <li><button data-target="section-3" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-slate-200 hover:bg-teal-700 hover:text-white">3. 자연을 보는 관점</button></li>
+                <li><button data-target="section-4" class="nav-button font-semibold px-4 py-2 rounded-full text-sm bg-amber-200 hover:bg-amber-500 hover:text-white">★ 최종 암기 퀴즈 ★</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-12">
+        
+        <section id="section-1" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">1. 빙하가 만든 거대한 지형</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">우리나라에서는 볼 수 없는 거대한 빙하 지형! 피오르와 호른이 어떻게 만들어지는지 과정을 중심으로 이해해 봅시다.</p>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
+                <h3 class="text-2xl font-bold mb-4 text-teal-700">피오르(Fjord)의 형성 과정</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+                    <div class="p-2">
+                        <div class="text-4xl">1️⃣</div>
+                        <p class="font-bold mt-1">빙하 성장</p>
+                        <p class="text-sm text-slate-600">빙하기에 산지 골짜기가 두꺼운 빙하로 뒤덮입니다.</p>
+                    </div>
+                    <div class="p-2">
+                        <div class="text-4xl">2️⃣</div>
+                        <p class="font-bold mt-1">빙하 침식 (U자곡 형성)</p>
+                        <p class="text-sm text-slate-600">빙하가 이동하면서 바닥과 옆면을 깎아 U자 모양의 깊은 골짜기(빙식곡)를 만듭니다.</p>
+                    </div>
+                    <div class="p-2">
+                        <div class="text-4xl">3️⃣</div>
+                        <p class="font-bold mt-1">빙하 후퇴</p>
+                        <p class="text-sm text-slate-600">후빙기가 되어 기온이 오르면 빙하가 녹아 뒤로 물러나고, U자곡이 드러납니다.</p>
+                    </div>
+                    <div class="p-2">
+                        <div class="text-4xl">4️⃣</div>
+                        <p class="font-bold mt-1">해수면 상승</p>
+                        <p class="text-sm text-slate-600">녹은 빙하로 해수면이 상승하면서 U자곡에 바닷물이 들어차 피오르 해안이 완성됩니다.</p>
+                    </div>
+                </div>
+                 <div class="exam-highlight mt-4">
+                    <p><span class="exam-marker">★ 피오르 특징</span>: 내륙으로 들어갈수록 빙하의 두께가 두꺼웠기 때문에 <span class="font-bold">수심이 더 깊어지는</span> 특징이 있습니다. (예: 노르웨이 송네 피오르)</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <h3 class="text-2xl font-bold mb-4 text-teal-700">호른(Horn)의 형성 과정</h3>
+                <div class="flex flex-col md:flex-row items-center gap-6">
+                    <div class="w-full md:w-1/2">
+                        <div class="relative w-48 h-48 mx-auto">
+                            <div class="absolute w-full h-full" style="clip-path: polygon(50% 0%, 0% 100%, 100% 100%); background-color: #9ca3af;"></div>
+                            <div class="absolute w-full h-full text-center flex items-center justify-center font-bold text-white text-4xl">🏔️</div>
+                            <div class="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 text-2xl animate-pulse">❄️➡️</div>
+                            <div class="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 text-2xl animate-pulse">⬅️❄️</div>
+                             <div class="absolute top-1/4 right-0 translate-x-1/4 -translate-y-1/2 text-2xl animate-pulse transform -rotate-45">⬅️❄️</div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <p>산 정상부 주변의 여러 골짜기에서 형성된 빙하가 각기 다른 방향으로 산을 깎아 내립니다. 이 과정에서 침식을 덜 받은 부분이 남아 <span class="font-bold">날카롭고 뾰족한 산봉우리</span>가 만들어지는데, 이것이 바로 호른입니다.</p>
+                         <div class="exam-highlight mt-4">
+                            <p><span class="exam-marker">★ 호른 예시</span>: 스위스와 이탈리아 국경의 <span class="font-bold">마터호른</span>이 대표적이며, 유명 초콜릿 로고에도 사용됩니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-2" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">2. 다양한 기타 지형들</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">석회암, 화산, 건조, 해안 지역에는 어떤 독특한 지형들이 나타날까요?</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="font-bold text-xl mb-2">① 카르스트 지형</h3>
+                    <p class="text-sm">석회암이 빗물이나 지하수에 녹아(용식) 형성됩니다. 지표에는 돌리네, 지표 아래에는 석회동굴이 만들어지며, 동굴 안에는 종유석, 석순, 석주 등이 발달합니다.</p>
+                </div>
+                 <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="font-bold text-xl mb-2">② 화산 지형</h3>
+                    <p class="text-sm">화산 활동으로 형성됩니다. 화산 폭발은 재해를 일으키기도 하지만, 비옥한 화산재 토양은 농사에 유리하고 독특한 경관은 관광 자원으로 활용됩니다.</p>
+                </div>
+                 <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="font-bold text-xl mb-2">③ 건조 지형</h3>
+                    <p class="text-sm">강수량이 적어 주로 바람의 작용으로 지형이 형성됩니다. 모래 언덕(사구)이나 버섯바위 등이 대표적입니다.</p>
+                </div>
+                 <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="font-bold text-xl mb-2">④ 해안 지형</h3>
+                    <p class="text-sm">파도의 침식 작용으로 형성됩니다. 파도가 암석을 깎아 해식애(해안 절벽), 해식동굴, 시스택(암석 기둥) 등을 만듭니다.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="section-3" class="mb-16 scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">3. 자연을 보는 관점: 인간 중심주의</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">인간은 자연을 어떻게 대해야 할까요? 먼저 '인간'만이 가장 중요하다고 보는 관점을 알아봅시다.</p>
+            
+            <div class="perspective-card active bg-white p-6 rounded-2xl shadow-lg border-4">
+                <h3 class="text-2xl font-bold mb-2 text-teal-800">인간 중심주의 자연관</h3>
+                <p class="mb-4">인간을 자연보다 우월하고 가치 있는 존재로 보며, 자연은 인간의 이익을 위한 <span class="font-bold">도구</span>에 불과하다고 여기는 관점입니다.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-teal-50 p-4 rounded-lg">
+                        <h4 class="font-bold text-teal-900">👍 긍정적 측면</h4>
+                        <p class="text-sm mt-1">자연을 적극적으로 개발하고 이용하여 과학 기술을 발전시키고 인간의 삶을 풍요롭게 만드는 데 기여했습니다.</p>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg">
+                        <h4 class="font-bold text-red-900">👎 부정적 측면</h4>
+                        <p class="text-sm mt-1">자연에 대한 무분별한 개발과 착취를 정당화하여 심각한 환경오염과 생태계 파괴를 초래했습니다.</p>
+                    </div>
+                </div>
+                <div class="exam-highlight mt-4">
+                    <p><span class="exam-marker">★ 핵심 사상가</span>: 아리스토텔레스("동물은 인간을 위해 존재한다"), 베이컨("아는 것이 힘이다", 자연을 노예로 만들어라), 데카르트("인간은 자연의 지배자이자 소유자") 등이 대표적입니다.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="section-4" class="scroll-mt-24">
+            <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-slate-900">★ 최종 암기 퀴즈 ★</h1>
+            <p class="text-center text-slate-600 mb-8 max-w-3xl mx-auto">빙하 지형과 자연관, 이제 자신 있죠? 퀴즈로 배운 내용을 최종 점검하고 시험 만점에 도전하세요!</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg max-w-3xl mx-auto">
+                <div id="quiz-container"></div>
+                <div id="quiz-result" class="text-center font-bold text-2xl mt-6 hidden"></div>
+                <button id="quiz-retry-button" class="w-full mt-4 bg-amber-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-amber-600 transition-colors hidden">다시 풀기</button>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="text-center py-6 bg-slate-100 mt-12">
+        <p class="text-slate-500 text-sm">사회 핵심 개념 학습용 인터랙티브 요약 자료</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navButtons = document.querySelectorAll('.nav-button');
+            const sections = document.querySelectorAll('main section');
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    document.getElementById(button.dataset.target).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            });
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    if (pageYOffset >= section.offsetTop - 90) { current = section.id; }
+                });
+                navButtons.forEach(button => {
+                    button.classList.remove('active');
+                    if (button.dataset.target === current) { button.classList.add('active'); }
+                });
+            });
+            
+            const quizContainer = document.getElementById('quiz-container');
+            const quizResult = document.getElementById('quiz-result');
+            const quizRetryButton = document.getElementById('quiz-retry-button');
+            const quizData = [
+                { question: '1. 빙하의 침식으로 만들어진 U자곡에 바닷물이 들어차 형성된 지형은?', options: ['호른', '돌리네', '피오르', '해식애'], answer: '피오르' },
+                { question: '2. 빙하가 산 정상부의 여러 방향을 깎아내려 뾰족하게 남은 산봉우리는?', options: ['피오르', '호른', '석순', '시스택'], answer: '호른' },
+                { question: "3. 석회암이 빗물에 녹는 '용식' 작용으로 만들어지는 지형은?", options: ['화산 지형', '빙하 지형', '카르스트 지형', '해안 지형'], answer: '카르스트 지형' },
+                { question: '4. 자연은 인간의 이익을 위한 도구라고 보는 자연관은?', options: ['생태 중심주의', '동물 중심주의', '생명 중심주의', '인간 중심주의'], answer: '인간 중심주의' },
+                { question: '5. "아는 것이 힘이다"라고 말하며 자연에 대한 지식을 활용해 인간의 복지를 추구해야 한다고 주장한 사상가는?', options: ['칸트', '아리스토텔레스', '베이컨', '데카르트'], answer: '베이컨' },
+                { question: '6. 다음 중 인간 중심주의 자연관의 긍정적 측면으로 볼 수 있는 것은?', options: ['생태계 파괴', '환경오염 심화', '과학 기술의 발전', '동물권 존중'], answer: '과학 기술의 발전' },
+                { question: '7. 피오르 해안의 특징으로 옳은 것은?', options: ['해안선이 단조롭다.', '수심이 얕다.', '내륙으로 갈수록 수심이 깊어진다.', '주로 하천의 퇴적 작용으로 만들어진다.'], answer: '내륙으로 갈수록 수심이 깊어진다.' },
+                { question: '8. 석회 동굴 안에서 천장에 고드름처럼 매달린 지형의 이름은?', options: ['석주', '석순', '돌리네', '종유석'], answer: '종유석' },
+                { question: '9. 건조 기후 지역에서 모래 언덕(사구)이나 버섯바위 등을 만드는 주된 힘은?', options: ['물의 흐름', '파도', '바람', '빙하의 이동'], answer: '바람' },
+                { question: '10. 다음 중 인간 중심주의 사상가로 보기 어려운 사람은?', options: ['아리스토텔레스', '베이컨', '데카르트', '레오폴드'], answer: '레오폴드' }
+            ];
+
+            let currentQuestionIndex = 0;
+            let score = 0;
+            function loadQuiz() {
+                currentQuestionIndex = 0; score = 0;
+                quizContainer.innerHTML = '';
+                quizResult.classList.add('hidden');
+                quizRetryButton.classList.add('hidden');
+                showQuestion();
+            }
+            function showQuestion() {
+                 if (currentQuestionIndex >= quizData.length) {
+                    showResult(); return;
+                }
+                const q = quizData[currentQuestionIndex];
+                const progress = `${currentQuestionIndex + 1} / ${quizData.length}`;
+                const el = document.createElement('div');
+                el.className = 'mb-6';
+                el.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="font-bold text-lg text-slate-800">${q.question}</p>
+                        <span class="text-sm font-semibold text-slate-500 bg-slate-200 px-3 py-1 rounded-full">${progress}</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        ${q.options.map(o => `<button class="quiz-option w-full text-left p-3 border-2 border-slate-300 rounded-lg hover:bg-slate-100">${o}</button>`).join('')}
+                    </div>`;
+                quizContainer.appendChild(el);
+                el.querySelectorAll('.quiz-option').forEach(b => b.addEventListener('click', handleOptionClick));
+            }
+            function handleOptionClick(e) {
+                const selected = e.target;
+                const q = quizData[currentQuestionIndex];
+                const isCorrect = selected.textContent === q.answer;
+                if (isCorrect) {
+                    selected.classList.add('correct', 'bg-green-500', 'text-white', 'border-green-600');
+                    score++;
+                } else {
+                    selected.classList.add('incorrect', 'bg-red-500', 'text-white', 'border-red-600');
+                }
+                selected.parentElement.querySelectorAll('.quiz-option').forEach(b => {
+                    b.disabled = true;
+                    if (b.textContent === q.answer) b.classList.add('correct', 'bg-green-500', 'text-white', 'border-green-600');
+                });
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    quizContainer.innerHTML = '';
+                    showQuestion();
+                }, 1200);
+            }
+            function showResult() {
+                quizContainer.innerHTML = '';
+                quizResult.innerHTML = `🎉 퀴즈 완료! 총 ${quizData.length}문제 중 <span class="text-amber-500 text-3xl">${score}</span>문제를 맞혔습니다!`;
+                quizResult.classList.remove('hidden');
+                quizRetryButton.classList.remove('hidden');
+            }
+            quizRetryButton.addEventListener('click', loadQuiz);
+            loadQuiz();
+        });
+    </script>
+</body>
+</html>

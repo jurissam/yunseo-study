@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대화형 국어 발음 규칙 학습 (0619)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Study Palette -->
+    <!-- Application Structure Plan: This SPA serves as an interactive guide for 06/19 Korean phonology rules, focusing on common pitfalls and exceptions. It starts with a comprehensive overview of the "Final Consonant Rule" and "Consonant Cluster Simplification" via interactive examples. Then, it contrasts "Substitution" vs. "Deletion" to clarify common confusion points. A dedicated section highlights "Irregular Consonant Clusters." Finally, a "Parts of Speech & Morpheme" section introduces grammatical basics crucial for understanding phonology. This structure prioritizes interactive demonstration and direct comparison to facilitate deeper understanding and memorization of exam-critical rules and exceptions. -->
+    <!-- Visualization & Content Choices: 1. 비음화 (Nasalization): Report Info -> Goal: Inform/Highlight Exceptions -> Viz: Collapsible text sections with bolded key terms -> Interaction: Click to expand details, emphasizes "용언" condition -> Justification: Directly addresses teacher's emphasis on specific cases and conditions. -> Library/Method: HTML/Tailwind, JS. 2. 끝소리 규칙과 연음 (Final Consonant Rule & Liaison): Report Info -> Goal: Explain Process/Highlight Order -> Viz: Step-by-step ordered list -> Interaction: None, focus on clear linear presentation of sequence and distinction -> Justification: Sequence is critical for this rule, and visual ordering reinforces it. -> Library/Method: HTML/Tailwind. 3. 형식 형태소 vs 실질 형태소 (Formal vs. Real Morphemes): Report Info -> Goal: Compare/Apply Rule -> Viz: Side-by-side comparison with examples and interactive rule application (e.g., '꽃이' vs '꼬튀') -> Interaction: Click to reveal pronunciation rules for each type -> Justification: Crucial for differentiating pronunciation based on morpheme type. -> Library/Method: HTML/Tailwind, JS. 4. 유음화 (Liquidation): Report Info -> Goal: Inform/Highlight Exceptions -> Viz: Expandable definition and examples, specific exception rules -> Interaction: Click to expand details -> Justification: Clear explanation of a related phonological change and its conditions. -> Library/Method: HTML/Tailwind, JS. 5. Quiz: Report Info -> Goal: Test Understanding -> Viz: Multiple-choice questions -> Interaction: Select answer, get feedback -> Justification: Essential for self-assessment based on emphasized points. -> Library/Method: JS. CONFIRMING NO SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8f7f2;
+            color: #3e3c3b;
+        }
+        .teacher-quote {
+            background-color: #fffde7;
+            border-left: 5px solid #f9a825;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .interactive-section-card {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            position: relative; /* For positioning the arrow and text */
+        }
+        .interactive-section-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.1);
+        }
+        .explanation-content {
+            display: none;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        .explanation-content.active {
+            display: block;
+        }
+        .quiz-option-label {
+            transition: background-color 0.2s ease-in-out;
+        }
+        .quiz-option-label.correct {
+            background-color: #d4edda !important;
+        }
+        .quiz-option-label.incorrect {
+            background-color: #f8d7da !important;
+        }
+        .quiz-option-label.correct-highlight {
+            background-color: #ffe0b2 !important;
+        }
+        .click-indicator {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            display: flex;
+            align-items: center;
+            color: #888;
+            font-size: 0.875rem;
+        }
+        .click-indicator span {
+            margin-left: 0.25rem;
+        }
+        .arrow-icon {
+            font-size: 1.2rem;
+            transition: transform 0.2s ease-in-out;
+        }
+        .active .arrow-icon {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">기말고사 대비: 국어 발음 규칙 심화 (2025.06.19)</h1>
+            <p class="text-lg text-gray-600">선생님의 강조 포인트를 중심으로 핵심 규칙을 완벽 마스터해요!</p>
+        </header>
+
+        <main class="space-y-16">
+
+            <!-- Section 1: 비음화와 관련된 발음 규칙 -->
+            <section id="nasalization-rules">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2 text-center">1. 비음화 (Nasalization)와 예외</h2>
+                <p class="text-center text-gray-600 mb-8">
+                    비음(ㅁ, ㄴ, ㅇ)의 영향을 받아 다른 자음이 비음으로 바뀌는 현상이에요. 특히 **'용언'일 때의 예외**를 주목하세요!
+                </p>
+
+                <div class="space-y-6">
+                    <div class="interactive-section-card" id="card-nasalization-basic" onclick="toggleSection('nasalization-basic', this)">
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-700">비음화란?</h3>
+                        <div class="click-indicator">
+                            <span class="arrow-icon">▼</span>
+                            <span class="indicator-text">클릭하여 자세히 보기</span>
+                        </div>
+                        <div id="nasalization-basic" class="explanation-content">
+                            <p class="mt-4"><strong class="font-semibold">비음(ㅁ, ㄴ, ㅇ) 때문에 다른 자음이 비음으로 바뀌는 현상</strong></p>
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li>예: 국물 → [궁물]</li>
+                                <li>예: 잡는다 → [잠는다]</li>
+                            </ul>
+                            <p class="mt-4 text-gray-700">
+                                <span class="font-bold">핵심:</span> 비음화는 조음 **"방식"**만 바뀌는 거예요~ 위치는 그대로!
+                            </p>
+                            <div class="teacher-quote mt-4">
+                                <p class="font-bold">★ 이거! 시험에 잘 나와요!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="interactive-section-card" id="card-nasalization-exceptions" onclick="toggleSection('nasalization-exceptions', this)">
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-700">★ 비음화 예외: '넙죽, 넙적'</h3>
+                        <p class="text-gray-600 mt-2">이 단어들은 비음으로 소리 나는 특별한 경우에요. <span class="text-red-500 font-bold">꼭 외워야 해요!</span></p>
+                        <div class="click-indicator">
+                            <span class="arrow-icon">▼</span>
+                            <span class="indicator-text">클릭하여 자세히 보기</span>
+                        </div>
+                        <div id="nasalization-exceptions" class="explanation-content">
+                            <p class="mt-4"><strong class="font-semibold">발음:</strong> 넙죽 → [넙쭉], 넙적 → [넙쩍], 넙죽하다 → [넙쭈카다]</p>
+                            <p class="mt-2 text-gray-700">이 단어들은 특이하게 비음으로 소리 나지 않습니다. **그냥 외워야 돼요!**</p>
+                            <div class="teacher-quote mt-4">
+                                <p class="font-bold">★★ 이거 시험에 나온다! 꼭 외워!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="interactive-section-card" id="card-yongon-exception" onclick="toggleSection('yongon-exception', this)">
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-700">★ 용언일 때의 예외 발음 변화</h3>
+                        <p class="text-gray-600 mt-2">"동사나 형용사, 즉 용언일 때만 특정 발음 변화가 있어요!"</p>
+                        <div class="click-indicator">
+                            <span class="arrow-icon">▼</span>
+                            <span class="indicator-text">클릭하여 자세히 보기</span>
+                        </div>
+                        <div id="yongon-exception" class="explanation-content">
+                            <p class="mt-4"><strong class="font-semibold">어간이 'ㄱ'으로 끝날 때 'ㄹ' 앞에서 'ㄱ'이 'ㅇ'으로 바뀌는 경우 (비음화)</strong></p>
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li>예: 긁는 → [극는] → [긍는] (비음화)</li>
+                                <li>예: 읽는 → [잉는]</li>
+                            </ul>
+                            <p class="mt-4 text-red-500 font-bold">★★ 요건 꼭 구분해야 돼. 시험에 나온다!</p>
+                            <div class="teacher-quote mt-4">
+                                <p class="font-bold">선생님 강조!</p>
+                                <p class="mt-2">"기억 앞에 리을로 바뀌는 건 어간이 기억으로 끝날 때만! 그리고 동사나 형용사, 즉 '용언'일 때만!"</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: 끝소리 규칙과 연음 적용 순서 -->
+            <section id="rule-application-order">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2 text-center">2. 끝소리 규칙과 연음의 적용 순서</h2>
+                <p class="text-center text-gray-600 mb-8">
+                    발음 규칙은 적용되는 순서가 있어요. 이 순서를 정확히 알아야 올바른 발음을 이해할 수 있습니다!
+                </p>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <p class="font-bold text-xl text-gray-700 mb-4">★★ 중요 순서: <span class="text-blue-600">음절의 끝소리 규칙 → 된소리되기 → 연음</span></p>
+                    <div class="teacher-quote mt-4">
+                        <p class="font-bold">★ 순서 중요! 시험에 무조건 나와요.</p>
+                        <p class="mt-2">"자자~ 이건 꼭 순서대로 가야 돼요~ 순서 안 맞으면? 설명이 안 돼!"</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: 형식 형태소 vs 실질 형태소 -->
+            <section id="morpheme-types">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2 text-center">3. 형식 형태소 vs 실질 형태소</h2>
+                <p class="text-center text-gray-600 mb-8">
+                    형태소의 종류에 따라 발음 규칙 적용이 달라져요. 실제 의미 유무가 중요합니다!
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="interactive-section-card" id="card-real-morpheme" onclick="toggleSection('real-morpheme', this)">
+                        <h3 class="text-xl md:text-2xl font-bold text-center text-gray-700">실질 형태소</h3>
+                        <p class="text-center text-gray-600 mt-2">실제 의미가 있는 형태소</p>
+                        <div class="click-indicator">
+                            <span class="arrow-icon">▼</span>
+                            <span class="indicator-text">클릭하여 자세히 보기</span>
+                        </div>
+                        <div id="real-morpheme" class="explanation-content text-center">
+                            <p class="mt-4 font-semibold">예: 꽃, 나무, 책 등</p>
+                            <p class="mt-2 text-gray-700">✓ 실질 형태소끼리 연결될 땐 **대표음으로 바꿔서 발음**해요~</p>
+                            <p class="text-xl font-mono text-blue-600">예: 꽃+위 → [꼬뒤]</p>
+                        </div>
+                    </div>
+                    <div class="interactive-section-card" id="card-formal-morpheme" onclick="toggleSection('formal-morpheme', this)">
+                        <h3 class="text-xl md:text-2xl font-bold text-center text-gray-700">형식 형태소</h3>
+                        <p class="text-center text-gray-600 mt-2">의미보다는 문법 역할만 하는 형태소</p>
+                        <div class="click-indicator">
+                            <span class="arrow-icon">▼</span>
+                            <span class="indicator-text">클릭하여 자세히 보기</span>
+                        </div>
+                        <div id="formal-morpheme" class="explanation-content text-center">
+                            <p class="mt-4 font-semibold">예: 조사, 어미 등</p>
+                            <p class="mt-2 text-gray-700">✓ 형식 형태소는 **그냥 이어서 발음**해요~</p>
+                            <p class="text-xl font-mono text-blue-600">예: 꽃+이 → [꼬치]</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="teacher-quote mt-8">
+                    <p class="font-bold">★ 구분 잘해야 돼요! 시험에 잘 나와요!</p>
+                </div>
+            </section>
+
+            <!-- Section 4: 유음화 (Liquidation) -->
+            <section id="liquidation-rules">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2 text-center">4. 유음화 (Liquidation)와 예외</h2>
+                <p class="text-center text-gray-600 mb-8">
+                    비음 'ㄴ'이 유음 'ㄹ'의 영향을 받아 'ㄹ'로 바뀌는 현상이에요. '선행 유음화'와 '역행 유음화' 개념을 정확히 이해하고 예외도 꼭 확인하세요!
+                </p>
+
+                <div class="space-y-6">
+                    <div class="interactive-section-card" id="card-liquidation-basic" onclick="toggleSection('liquidation-basic', this)">
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-700">유음화란?</h3>
+                        <div class="click-indicator">
+                            <span class="arrow-icon">▼</span>
+                            <span class="indicator-text">클릭하여 자세히 보기</span>
+                        </div>
+                        <div id="liquidation-basic" class="explanation-content">
+                            <p class="mt-4"><strong class="font-semibold">비음 'ㄴ'이 유음 'ㄹ'의 영향을 받아 'ㄹ'로 바뀌는 현상</strong></p>
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li>예: 신라 → [실라]</li>
+                                <li>예: 한라산 → [할라산]</li>
+                            </ul>
+                            <p class="mt-4 text-gray-700">
+                                <span class="font-bold">유형:</span>
+                                <ul>
+                                    <li>✓ 앞에서 바뀌면 **선행 유음화** (예: 난로 → [날로])</li>
+                                    <li>✓ 뒤에서 바뀌면 **역행 유음화** (예: 신라 → [실라])</li>
+                                </ul>
+                            </p>
+                            <div class="teacher-quote mt-4">
+                                <p class="font-bold">★ 개념 정확히! 출제 빈도 높아요!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="interactive-section-card" id="card-liquidation-exceptions" onclick="toggleSection('liquidation-exceptions', this)">
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-700">★ 유음화 예외</h3>
+                        <p class="text-gray-600 mt-2">일부 단어는 유음화가 일어나지 않아요. '단어 성립 여부'가 중요 기준!</p>
+                        <div class="click-indicator">
+                            <span class="arrow-icon">▼</span>
+                            <span class="indicator-text">클릭하여 자세히 보기</span>
+                        </div>
+                        <div id="liquidation-exceptions" class="explanation-content">
+                            <p class="mt-4"><strong class="font-semibold">단어로 성립되는지 여부에 따라 예외 발생!</strong></p>
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li>예: 생산량 (하나의 단어) → [생산냥] (유음화 X, 비음화)</li>
+                                <li>예: 광한루 (고유 명사, 단어 성립 X) → [광한루] (유음화 X)</li>
+                            </ul>
+                            <p class="mt-4 text-gray-700">
+                                <span class="font-bold">설명:</span> 단어로 인정되느냐가 기준입니다. 단어 내부에서 결합할 때와는 다르게, 개별 단어가 이어질 때는 유음화가 일어나지 않을 수 있어요.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: 핵심 요약 -->
+            <section id="summary" class="text-center">
+                <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center">핵심 요약 (선생님 마지막 강조!)</h2>
+                <div class="teacher-quote max-w-3xl mx-auto">
+                    <ul class="list-disc list-inside mt-4 text-left space-y-2">
+                        <li><strong>★★ 비음화는 조음 '방식'만 바뀜 (위치 그대로!)</strong></li>
+                        <li><strong>★★ 넙죽, 넙적 등 비음화 예외 단어는 암기 필수!</strong></li>
+                        <li><strong>★★ 용언의 어간이 'ㄱ'으로 끝날 때의 비음화 예외 조건 (용언일 때만!)</strong></li>
+                        <li><strong>★★ 끝소리 규칙 적용 순서: 끝소리 규칙 → 된소리되기 → 연음 (순서 중요!)</strong></li>
+                        <li><strong>★★ 형식 형태소 vs 실질 형태소 발음 규칙 차이 구분 필수!</strong></li>
+                        <li><strong>★★ 유음화 개념 (선행/역행) 및 예외 (단어 성립 여부) 정확히 이해!</strong></li>
+                    </ul>
+                    <p class="mt-6 font-bold text-red-600 text-xl">"지금 정리 안 하면 다음 시간에 놓친다. 선생님이 직접 말했어."</p>
+                    <p class="font-bold text-red-700 text-2xl mt-2">★★★ 시험 나옵니다. 진짜임. ★★★</p>
+                </div>
+            </section>
+
+            <!-- Section 6: Quiz -->
+            <section id="quiz">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2 text-center">5. 최종 점검 퀴즈</h2>
+                <p class="text-center text-gray-600 mb-8">
+                    선생님 강조 포인트를 중심으로, 핵심 내용을 잘 이해했는지 확인해 보세요.
+                </p>
+                <div class="bg-white p-6 rounded-xl shadow-lg max-w-2xl mx-auto">
+                    <div id="quiz-container" class="space-y-6">
+                        <!-- Quiz Questions will be injected by JS -->
+                    </div>
+                    <div class="text-center mt-6">
+                        <button id="submit-quiz" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded-full transition-colors">결과 확인</button>
+                    </div>
+                    <div id="quiz-result" class="text-center mt-6 font-bold text-xl"></div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+<script>
+    function toggleSection(id, cardElement) {
+        const content = document.getElementById(id);
+        if (content && cardElement) {
+            const indicatorText = cardElement.querySelector('.indicator-text');
+            const arrowIcon = cardElement.querySelector('.arrow-icon');
+
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                indicatorText.textContent = '클릭하여 자세히 보기';
+                arrowIcon.textContent = '▼';
+            } else {
+                content.classList.add('active');
+                indicatorText.textContent = '닫기';
+                arrowIcon.textContent = '▲';
+            }
+        }
+    }
+
+    // 겹받침 예외 단어 클릭 시 발음 표시 (이전 Canvas에서 가져옴)
+    const exceptionList = document.getElementById('exception-list');
+    if (exceptionList) {
+        exceptionList.addEventListener('click', (e) => {
+            if (e.target.tagName === 'LI' && e.target.dataset.pronunciation) {
+                const pronunciation = e.target.dataset.pronunciation;
+                const originalText = e.target.textContent.split('→')[0].trim();
+                e.target.innerHTML = `${originalText} → <span class="font-bold text-green-600">[${pronunciation}]</span>`;
+            }
+        });
+    }
+
+    // Quiz Questions for 6월 19일 내용
+    const quizContainer = document.getElementById('quiz-container');
+    const submitQuizBtn = document.getElementById('submit-quiz');
+    const quizResult = document.getElementById('quiz-result');
+
+    const quizQuestions = [
+        {
+            question: "비음화 현상에 대한 설명으로 옳은 것은?",
+            options: ["조음 위치가 바뀌는 현상이다.", "비음이 아닌 다른 자음이 비음으로 바뀌는 현상이다.", "항상 뒤에 오는 음운에 영향을 받는다.", "조음 방식과 조음 위치가 모두 바뀐다."],
+            answer: "비음이 아닌 다른 자음이 비음으로 바뀌는 현상이다."
+        },
+        {
+            question: "선생님께서 '그냥 외워야 돼요!'라고 강조한 비음화 예외 단어 중 하나는?",
+            options: ["국물", "잡는다", "넙죽", "감기"],
+            answer: "넙죽"
+        },
+        {
+            question: "어간이 'ㄱ'으로 끝나고 'ㄹ' 앞에서 'ㄱ'이 'ㅇ'으로 바뀌는 현상이 일어나는 품사는?",
+            options: ["명사일 때만", "체언일 때만", "용언일 때만", "조사일 때만"],
+            answer: "용언일 때만"
+        },
+        {
+            question: "끝소리 규칙, 된소리되기, 연음이 적용되는 올바른 순서는?",
+            options: ["연음 → 된소리되기 → 끝소리 규칙", "된소리되기 → 연음 → 끝소리 규칙", "끝소리 규칙 → 된소리되기 → 연음", "끝소리 규칙 → 연음 → 된소리되기"],
+            answer: "끝소리 규칙 → 된소리되기 → 연음"
+        },
+        {
+            question: "다음 중 '실질 형태소끼리 연결될 때 대표음으로 바꿔서 발음하는' 원칙에 해당하는 예시는?",
+            options: ["꽃이 → 꼬치", "꽃+위 → 꼬뒤", "하늘+이 → 하느리", "책+을 → 채글"],
+            answer: "꽃+위 → 꼬뒤"
+        },
+        {
+            question: "조사나 어미처럼 의미보다는 문법적 역할만 하는 형태소를 무엇이라고 하나요?",
+            options: ["실질 형태소", "형식 형태소", "자유 형태소", "의존 형태소"],
+            answer: "형식 형태소"
+        },
+        {
+            question: "'신라'가 [실라]로 발음되는 것처럼 비음 'ㄴ'이 유음 'ㄹ'의 영향을 받아 'ㄹ'로 바뀌는 현상을 무엇이라고 하나요?",
+            options: ["비음화", "구개음화", "유음화", "된소리되기"],
+            answer: "유음화"
+        },
+        {
+            question: "유음화 현상 중, 'ㄹ'이 앞에 와서 'ㄴ'을 'ㄹ'로 바꾸는 것을 무엇이라고 하나요?",
+            options: ["역행 유음화", "순행 유음화", "선행 유음화", "동화 유음화"],
+            answer: "선행 유음화"
+        },
+        {
+            question: "다음 중 유음화의 예외에 해당하는 단어는?",
+            options: ["한라산", "난로", "콜라", "생산량"],
+            answer: "생산량"
+        },
+        {
+            question: "용언의 변하지 않는 부분으로 뜻을 담고 있는 형태소를 무엇이라고 하나요?",
+            options: ["어미", "어간", "조사", "접사"],
+            answer: "어간"
+        }
+    ];
+
+    function buildQuiz() {
+        quizContainer.innerHTML = quizQuestions.map((q, index) => `
+            <div>
+                <p class="font-bold mb-2">${index + 1}. ${q.question}</p>
+                <div class="flex flex-col space-y-2">
+                    ${q.options.map(opt => `
+                        <label class="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 cursor-pointer transition-colors quiz-option-label">
+                            <input type="radio" name="question${index}" value="${opt}" class="mr-2">
+                            ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    submitQuizBtn.addEventListener('click', () => {
+        let score = 0;
+        quizQuestions.forEach((q, index) => {
+            const selected = quizContainer.querySelector(`input[name="question${index}"]:checked`);
+            // Clear previous highlighting
+            document.querySelectorAll(`input[name="question${index}"]`).forEach(input => {
+                input.parentElement.classList.remove('correct', 'incorrect', 'correct-highlight');
+            });
+
+            if (selected && selected.value === q.answer) {
+                score++;
+                selected.parentElement.classList.add('correct');
+            } else if (selected) {
+                selected.parentElement.classList.add('incorrect');
+                // Highlight correct answer if incorrect
+                document.querySelectorAll(`input[name="question${index}"]`).forEach(input => {
+                    if (input.value === q.answer) {
+                        input.parentElement.classList.add('correct-highlight');
+                    }
+                });
+            } else {
+                // If no answer selected, just highlight the correct one
+                document.querySelectorAll(`input[name="question${index}"]`).forEach(input => {
+                    if (input.value === q.answer) {
+                        input.parentElement.classList.add('correct-highlight');
+                    }
+                });
+            }
+        });
+        quizResult.textContent = `결과: ${quizQuestions.length}문제 중 ${score}개를 맞혔습니다!`;
+    });
+
+
+    // Initial renders
+    buildQuiz(); // Call buildQuiz initially to populate questions
+</script>
+</body>
+</html>

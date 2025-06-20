@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대화형 국어 음운 규칙 학습</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Study Palette -->
+    <!-- Application Structure Plan: This SPA is designed as an "Interactive Rulebook" for 6/12 Korean phonology, focusing on core rules and tricky exceptions. It starts with a comprehensive overview of the "Final Consonant Rule" and "Consonant Cluster Simplification" via interactive examples. Then, it contrasts "Substitution" vs. "Deletion" to clarify common confusion points. A dedicated section highlights "Irregular Consonant Clusters." Finally, a "Parts of Speech & Morpheme" section introduces grammatical basics crucial for understanding phonology. This structure prioritizes interactive demonstration and direct comparison to facilitate deeper understanding and memorization of exam-critical rules and exceptions. -->
+    <!-- Visualization & Content Choices: 1. Final Consonant Rule/Consonant Cluster: Report Info -> Goal: Inform/Apply Rule -> Viz: Interactive text examples with hidden explanations -> Interaction: Click to reveal rule and detailed explanation -> Justification: Breaks down complex rules into digestible, interactive pieces. -> Library/Method: HTML/Tailwind, JS. 2. Substitution vs. Deletion: Report Info -> Goal: Compare -> Viz: Side-by-side example cards -> Interaction: Click to reveal key differences and examples -> Justification: Directly addresses a reported confusion point. -> Library/Method: HTML/Tailwind, JS. 3. Irregular Consonant Clusters: Report Info -> Goal: Highlight Exceptions -> Viz: Clickable list of exceptions with correct pronunciation -> Interaction: Click to hear/see correct pronunciation -> Justification: Directly addresses a critical exam point. -> Library/Method: HTML/Tailwind, JS. 4. Parts of Speech/Morpheme: Report Info -> Goal: Inform -> Viz: Highlighted text with expandable definitions -> Interaction: Click to expand definitions -> Justification: Provides necessary grammatical context. -> Library/Method: HTML/Tailwind, JS. CONFIRMING NO SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8f7f2;
+            color: #3e3c3b;
+        }
+        .teacher-quote {
+            background-color: #fffde7;
+            border-left: 5px solid #f9a825;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .interactive-section-card {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .interactive-section-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.1);
+        }
+        .explanation-content {
+            display: none;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        .explanation-content.active {
+            display: block;
+        }
+        .quiz-option-label {
+            transition: background-color 0.2s ease-in-out;
+        }
+        .quiz-option-label.correct {
+            background-color: #d4edda !important;
+        }
+        .quiz-option-label.incorrect {
+            background-color: #f8d7da !important;
+        }
+        .quiz-option-label.correct-highlight {
+            background-color: #ffe0b2 !important;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">기말고사 대비: 음운 규칙 심화 학습</h1>
+            <p class="text-lg text-gray-600">음절의 끝소리 규칙과 자음군 단순화, 그리고 품사/형태소 기초까지!</p>
+        </header>
+
+        <main class="space-y-16">
+
+            <!-- Section 1: 음절의 끝소리 규칙 & 자음군 단순화 -->
+            <section id="phoneme-rules">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2 text-center">1. 음절의 끝소리 규칙과 자음군 단순화</h2>
+                <p class="text-center text-gray-600 mb-8">
+                    음절의 끝에서 소리 나는 자음은 정해져 있어요. 그리고 겹받침은 항상 하나만 소리 나죠. 클릭하여 자세한 규칙과 예시를 확인해보세요!
+                </p>
+
+                <div class="space-y-6">
+                    <!-- 음절의 끝소리 규칙 Card -->
+                    <div class="interactive-section-card" onclick="toggleSection('final-consonant-rule')">
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-700">음절의 끝소리 규칙</h3>
+                        <p class="text-gray-600 mt-2">"얘들아~ 음절의 끝소리는 딱 7개 소리만 가능해요~" <span class="text-red-500 font-bold">[★ 시험 출제 포인트]</span></p>
+                        <div id="final-consonant-rule" class="explanation-content">
+                            <p class="mt-4"><strong class="font-semibold">종성으로 발음되는 7개 자음:</strong> ㄱ, ㄴ, ㄷ, ㄹ, ㅁ, ㅂ, ㅇ</p>
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li>'밖' → [박] (ㅋ→ㄱ)</li>
+                                <li>'옷' → [옫] (ㅅ→ㄷ)</li>
+                                <li>'부엌' → [부억] (ㅋ→ㄱ)</li>
+                                <li>'빚' → [빋] (ㅈ→ㄷ)</li>
+                            </ul>
+                            <p class="mt-4 text-gray-700">
+                                <span class="font-bold">설명:</span> 받침이 여러 개이거나 다른 자음이 오더라도, 음절의 끝에서는 위에 제시된 7개의 대표음 중 하나로만 발음되는 규칙입니다. 이는 주로 '평음화' 또는 '평파열 현상'으로 불리기도 합니다.
+                            </p>
+                            <div class="teacher-quote mt-4">
+                                <p class="font-bold">선생님 어조 반영</p>
+                                <p class="mt-2">"얘들아, 발음은 다 파열음으로 바뀌는 거야! 드드드~"</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 자음군 단순화 Card -->
+                    <div class="interactive-section-card" onclick="toggleSection('consonant-cluster-simplification')">
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-700">자음군 단순화</h3>
+                        <p class="text-gray-600 mt-2">"얘들아~ 두 개 중 하나는 떨어져 나가야 돼~" <span class="text-red-500 font-bold">[★ 시험 출제 포인트]</span></p>
+                        <div id="consonant-cluster-simplification" class="explanation-content">
+                            <p class="mt-4"><strong class="font-semibold">겹받침(자음 두 개) → 하나 탈락하여 단순화</strong></p>
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li>'흙' → [흑] (ㄹ 탈락)</li>
+                                <li>'삶' → [삼] (ㄹ 탈락)</li>
+                                <li>'값' → [갑] (ㅅ 탈락)</li>
+                            </ul>
+                            <p class="mt-4 text-gray-700">
+                                <span class="font-bold">설명:</span> 겹받침은 두 자음 중 보통 앞의 자음만 발음되고, 하나가 탈락하여 발음하기 쉽게 만드는 현상입니다. 이는 음운 변동 중 '탈락'에 해당합니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: 교체와 탈락의 차이 -->
+            <section id="diff-substitution-deletion">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2 text-center">2. 교체와 탈락의 결정적인 차이</h2>
+                <p class="text-center text-gray-600 mb-8">
+                    음운 변동에서 가장 헷갈리는 교체와 탈락! 두 개념을 예시와 함께 명확히 비교해 봐요.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="interactive-section-card" onclick="toggleSection('substitution-detail')">
+                        <h3 class="text-xl md:text-2xl font-bold text-center text-gray-700">교체 현상</h3>
+                        <p class="text-center text-gray-600 mt-2">소리가 다른 음으로 **바뀜**</p>
+                        <div id="substitution-detail" class="explanation-content text-center">
+                            <p class="text-xl font-mono text-blue-600">'옷' → [옫]</p>
+                            <p class="mt-2 text-gray-700">ㅅ이 ㄷ으로 **바뀐** 것이므로 교체</p>
+                        </div>
+                    </div>
+                    <div class="interactive-section-card" onclick="toggleSection('deletion-detail')">
+                        <h3 class="text-xl md:text-2xl font-bold text-center text-gray-700">탈락 현상</h3>
+                        <p class="text-center text-gray-600 mt-2">음운이 **사라짐**</p>
+                        <div id="deletion-detail" class="explanation-content text-center">
+                            <p class="text-xl font-mono text-blue-600">'값' → [갑]</p>
+                            <p class="mt-2 text-gray-700">겹받침 'ㅄ' 중 ㅅ이 **없어진** 것이므로 탈락</p>
+                        </div>
+                    </div>
+                </div>
+                 <div class="teacher-quote mt-8">
+                    <p class="font-bold text-xl">★★ 선생님 강조! 진짜 중요!</p>
+                    <p class="mt-2">교체는 7개 종성 중 하나로 소리가 '바뀌는' 규칙이고, 탈락은 겹받침 중 하나가 '아예 없어지는' 것이야. 이 차이를 정확히 이해해야 해!</p>
+                </div>
+            </section>
+
+            <!-- Section 3: 겹받침 발음 원칙 + 예외 -->
+            <section id="irregular-consonants">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2 text-center">3. 겹받침 발음의 원칙과 ★예외★</h2>
+                <p class="text-center text-gray-600 mb-8">
+                    겹받침은 보통 앞 자음만 발음되지만, **시험에 꼭 나오는 예외 단어들**이 있어요. 클릭해서 정확한 발음을 확인하고 꼭 외우세요!
+                </p>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="mb-4">
+                        <h3 class="font-bold text-lg text-gray-700">일반적인 경우 (앞 자음 발음)</h3>
+                        <ul class="list-disc list-inside mt-2 space-y-1">
+                            <li>'읽다' → [익따]</li>
+                            <li>'앉다' → [안따]</li>
+                        </ul>
+                    </div>
+                    <div class="mt-6">
+                        <h3 class="font-bold text-lg text-red-600">★★ 시험 출제 포인트 - 예외 단어 암기 필수!</h3>
+                        <p class="text-gray-700 mt-2">이 단어들은 **뒤 자음**이 발음돼요!</p>
+                        <ul class="list-disc list-inside mt-2 space-y-1" id="exception-list">
+                            <li class="cursor-pointer hover:text-blue-600 transition-colors" data-pronunciation="밥따">밟다 → [밥따]</li>
+                            <li class="cursor-pointer hover:text-blue-600 transition-colors" data-pronunciation="넙따">넓다 → [넙따]</li>
+                            <li class="cursor-pointer hover:text-blue-600 transition-colors" data-pronunciation="널쭉하다">넓죽하다 → [널쭉하다]</li>
+                            <li class="cursor-pointer hover:text-blue-600 transition-colors" data-pronunciation="넙쩌카다">넙적하다 → [넙쩌카다]</li>
+                        </ul>
+                        <div class="teacher-quote mt-4">
+                            <p class="font-bold">선생님 강조!</p>
+                            <p class="mt-2">"일반적으로 겹받침은 앞 자음만 발음하지만, 예외 단어는 꼭 외워야 해. 시험에 나옴!"</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: 품사 + 형태소 기초 -->
+            <section id="grammar-basics">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2 text-center">4. 품사 & 형태소 기초 (선생님 중요 표시!)</h2>
+                <p class="text-center text-gray-600 mb-8">
+                    음운 변동을 이해하려면 품사와 형태소의 기본 개념도 알아야 해요. 특히 용언의 어간과 어미 구분이 중요해요!
+                </p>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="font-bold text-lg text-gray-700">품사 분류 기억법</h3>
+                    <ul class="list-disc list-inside mt-2 space-y-1">
+                        <li>**체언:** 명사, 대명사, 수사 (이름을 나타내는 말)</li>
+                        <li>**용언:** 동사, 형용사 (움직임이나 성질을 나타내는 말)</li>
+                    </ul>
+                    <div class="mt-6">
+                        <h3 class="font-bold text-lg text-gray-700">용언 = 어간 + 어미</h3>
+                        <ul class="list-disc list-inside mt-2 space-y-1">
+                            <li><strong class="text-red-500">어간:</strong> 뜻을 담고 있는 **변하지 않는 부분**</li>
+                            <li><strong class="text-blue-500">어미:</strong> 시제·높임 등 문법 기능을 가진 **변화하는 부분**</li>
+                        </ul>
+                        <p class="mt-2 text-gray-700">예: '간다' → 어간: '가-', 어미: '-ㄴ다'</p>
+                        <div class="teacher-quote mt-4">
+                            <p class="font-bold text-xl">★★ 시험 출제 포인트 - 어간/어미 구분!</p>
+                            <p class="mt-2">"어간은 뜻을 담고 있는 변하지 않는 부분, 어미는 시제·높임 등 문법 기능을 가진 변화하는 부분이야. 이거 모르면 안 돼!"</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: 핵심 요약 -->
+            <section id="summary" class="text-center">
+                <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center">핵심 요약 (선생님 마지막 강조!)</h2>
+                <div class="teacher-quote max-w-3xl mx-auto">
+                    <ul class="list-disc list-inside mt-4 text-left space-y-2">
+                        <li><strong>★★ 종성은 7자음만 발음 가능 (ㄱ, ㄴ, ㄷ, ㄹ, ㅁ, ㅂ, ㅇ)</strong></li>
+                        <li><strong>★★ 자음군 단순화는 탈락, 음절의 끝소리 규칙은 교체</strong></li>
+                        <li><strong>★★ 겹받침은 대부분 앞 자음만 발음, 예외 단어는 꼭 암기!</strong></li>
+                        <li><strong>★★ 용언의 어간 + 어미 구분 필수 (어간은 변하지 않음!)</strong></li>
+                    </ul>
+                    <p class="mt-6 font-bold text-red-600 text-xl">"지금 정리 안 하면 다음 시간에 놓친다. 선생님이 직접 말했어."</p>
+                    <p class="font-bold text-red-700 text-2xl mt-2">★★★ 시험 나옵니다. 진짜임. ★★★</p>
+                </div>
+            </section>
+
+            <!-- Section 6: Quiz -->
+            <section id="quiz">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2 text-center">5. 최종 점검 퀴즈</h2>
+                <p class="text-center text-gray-600 mb-8">
+                    선생님 강조 포인트를 중심으로, 핵심 내용을 잘 이해했는지 확인해 보세요.
+                </p>
+                <div class="bg-white p-6 rounded-xl shadow-lg max-w-2xl mx-auto">
+                    <div id="quiz-container" class="space-y-6">
+                        <!-- Quiz Questions will be injected by JS -->
+                    </div>
+                    <div class="text-center mt-6">
+                        <button id="submit-quiz" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded-full transition-colors">결과 확인</button>
+                    </div>
+                    <div id="quiz-result" class="text-center mt-6 font-bold text-xl"></div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+<script>
+    function toggleSection(id) {
+        const content = document.getElementById(id);
+        if (content) {
+            content.classList.toggle('active');
+        }
+    }
+
+    // 겹받침 예외 단어 클릭 시 발음 표시
+    const exceptionList = document.getElementById('exception-list');
+    if (exceptionList) {
+        exceptionList.addEventListener('click', (e) => {
+            if (e.target.tagName === 'LI' && e.target.dataset.pronunciation) {
+                const pronunciation = e.target.dataset.pronunciation;
+                const originalText = e.target.textContent.split('→')[0].trim();
+                e.target.innerHTML = `${originalText} → <span class="font-bold text-green-600">[${pronunciation}]</span>`;
+            }
+        });
+    }
+
+    // Quiz Questions for 6월 12일 내용
+    const quizContainer = document.getElementById('quiz-container');
+    const submitQuizBtn = document.getElementById('submit-quiz');
+    const quizResult = document.getElementById('quiz-result');
+
+    const quizQuestions = [
+        {
+            question: "음절의 끝소리 규칙에 따라 종성으로 발음되는 7개 자음은 무엇인가요?",
+            options: ["ㄱ, ㄴ, ㄷ, ㄹ, ㅁ, ㅂ, ㅅ", "ㄱ, ㄴ, ㄷ, ㄹ, ㅁ, ㅂ, ㅇ", "ㄱ, ㄷ, ㅂ, ㅅ, ㅇ, ㅈ, ㅊ", "ㄱ, ㄴ, ㅌ, ㄹ, ㅁ, ㅍ, ㅎ"],
+            answer: "ㄱ, ㄴ, ㄷ, ㄹ, ㅁ, ㅂ, ㅇ"
+        },
+        {
+            question: "'밖'이 [박]으로 발음될 때 적용되는 음운 규칙은 무엇인가요?",
+            options: ["자음군 단순화", "음절의 끝소리 규칙", "연음 현상", "경음화"],
+            answer: "음절의 끝소리 규칙"
+        },
+        {
+            question: "'흙'이 [흑]으로, '값'이 [갑]으로 발음되는 현상을 무엇이라고 하나요?",
+            options: ["교체", "탈락", "첨가", "축약"],
+            answer: "탈락"
+        },
+        {
+            question: "음절의 끝소리 규칙을 다른 이름으로 부를 때 해당하지 않는 것은?",
+            options: ["평음화", "평파열 현상", "경음화"],
+            answer: "경음화"
+        },
+        {
+            question: "교체 현상에 대한 설명으로 옳은 것은?",
+            options: ["음운이 완전히 사라지는 현상", "소리가 다른 음으로 바뀌는 현상", "음운이 더해지는 현상", "두 음운이 줄어들어 하나가 되는 현상"],
+            answer: "소리가 다른 음으로 바뀌는 현상"
+        },
+        {
+            question: "다음 중 자음군 단순화에 해당하는 예시는?",
+            options: ["'옷' → [옫]", "'국물' → [궁물]", "'삶' → [삼]", "'솜이불' → [솜니불]"],
+            answer: "'삶' → [삼]"
+        },
+        {
+            question: "겹받침 발음의 일반적인 원칙은 무엇인가요?",
+            options: ["뒤 자음이 발음된다.", "두 자음이 모두 발음된다.", "앞 자음이 발음된다.", "모음이 발음된다."],
+            answer: "앞 자음이 발음된다."
+        },
+        {
+            question: "다음 중 겹받침 발음의 예외 단어로, '뒤 자음'이 발음되는 것은?",
+            options: ["읽다", "앉다", "밟다", "맑다"],
+            answer: "밟다"
+        },
+        {
+            question: "용언의 '어간'에 대한 설명으로 옳은 것은?",
+            options: ["문법적인 기능을 가진 변화하는 부분이다.", "시제나 높임을 나타내는 부분이다.", "뜻을 담고 있는 변하지 않는 부분이다.", "항상 명사 뒤에 붙어 사용된다."],
+            answer: "뜻을 담고 있는 변하지 않는 부분이다."
+        },
+        {
+            question: "용언 '먹는다'에서 어미는 무엇인가요?",
+            options: ["먹-", "-는-", "-다", "먹는다"],
+            answer: "-다"
+        },
+        {
+            question: "다음 중 품사 분류에서 '체언'에 해당하는 것들로만 묶인 것은?",
+            options: ["명사, 동사", "대명사, 형용사", "명사, 대명사, 수사", "동사, 형용사, 부사"],
+            answer: "명사, 대명사, 수사"
+        },
+        {
+            question: "선생님께서 '시험에 나옵니다. 진짜임.'이라고 특히 강조하신 내용이 아닌 것은?",
+            options: ["종성은 7자음만 발음 가능", "자음군 단순화는 탈락, 끝소리 규칙은 교체", "겹받침은 대부분 앞 자음만 발음, 예외 단어는 꼭 암기", "모음의 총 개수는 21개이다."],
+            answer: "모음의 총 개수는 21개이다." // This was from 0610, not 0612.
+        }
+    ];
+
+    function buildQuiz() {
+        quizContainer.innerHTML = quizQuestions.map((q, index) => `
+            <div>
+                <p class="font-bold mb-2">${index + 1}. ${q.question}</p>
+                <div class="flex flex-col space-y-2">
+                    ${q.options.map(opt => `
+                        <label class="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 cursor-pointer transition-colors quiz-option-label">
+                            <input type="radio" name="question${index}" value="${opt}" class="mr-2">
+                            ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    submitQuizBtn.addEventListener('click', () => {
+        let score = 0;
+        quizQuestions.forEach((q, index) => {
+            const selected = quizContainer.querySelector(`input[name="question${index}"]:checked`);
+            // Clear previous highlighting
+            document.querySelectorAll(`input[name="question${index}"]`).forEach(input => {
+                input.parentElement.classList.remove('correct', 'incorrect', 'correct-highlight');
+            });
+
+            if (selected && selected.value === q.answer) {
+                score++;
+                selected.parentElement.classList.add('correct');
+            } else if (selected) {
+                selected.parentElement.classList.add('incorrect');
+                // Highlight correct answer if incorrect
+                document.querySelectorAll(`input[name="question${index}"]`).forEach(input => {
+                    if (input.value === q.answer) {
+                        input.parentElement.classList.add('correct-highlight');
+                    }
+                });
+            } else {
+                // If no answer selected, just highlight the correct one
+                document.querySelectorAll(`input[name="question${index}"]`).forEach(input => {
+                    if (input.value === q.answer) {
+                        input.parentElement.classList.add('correct-highlight');
+                    }
+                });
+            }
+        });
+        quizResult.textContent = `결과: ${quizQuestions.length}문제 중 ${score}개를 맞혔습니다!`;
+    });
+
+
+    // Initial renders
+    buildQuiz(); // Call buildQuiz initially to populate questions
+</script>
+</body>
+</html>

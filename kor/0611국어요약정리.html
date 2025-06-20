@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대화형 음운 변동 학습</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Study Palette -->
+    <!-- Application Structure Plan: The SPA is designed as an "Interactive Explainer" to demystify phonological changes. It progresses from a concrete example ('흙') to abstract rules. 1) 'Why Change?' section uses interactive cards for the '흙' variations to build intuition. 2) 'Change Classifier' allows users to filter examples by type (교체, 탈락, etc.), actively engaging them in categorization. 3) 'Final Consonant Simulator' provides a hands-on tool to test the 7-consonant rule. 4) A quiz reinforces learning. This task-oriented structure (explore -> classify -> apply -> test) is more effective for studying than a linear report. -->
+    <!-- Visualization & Content Choices: 1. Pronunciation Variation: Report Info -> Goal: Compare -> Viz: Interactive HTML cards -> Interaction: Click to reveal rule name & explanation -> Justification: Makes the '흙' example tangible and easy to compare. -> Library/Method: HTML/Tailwind, JS. 2. Change Types: Report Info -> Goal: Organize/Classify -> Viz: Filterable list of examples -> Interaction: Click filters (교체, 탈락 etc.) to show relevant examples -> Justification: Active learning through categorization is better than passive reading. -> Library/Method: JS. 3. Final Consonant Rule: Report Info -> Goal: Apply Rule -> Viz: Input field with output display -> Interaction: User types a word, app shows pronunciation change -> Justification: Provides instant feedback and reinforces a key exam topic. -> Library/Method: JS. CONFIRMING NO SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8f7f2;
+            color: #3e3c3b;
+        }
+        .teacher-quote {
+            background-color: #fffde7;
+            border-left: 5px solid #f9a825;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .interactive-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .interactive-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .filter-btn.active {
+            background-color: #a49e8a;
+            color: #ffffff;
+        }
+        .example-card {
+            display: block;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .hidden-card {
+            display: none;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">기말고사 대비: 음운 변동의 모든 것</h1>
+            <p class="text-lg text-gray-600">헷갈리는 음운 변동, 원리부터 차근차근 정복해 봐요!</p>
+        </header>
+
+        <main class="space-y-16">
+
+            <!-- Section 1: Why does pronunciation change? -->
+            <section id="why-change">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2 text-center">1. 맞춤법과 발음, 왜 다를까?</h2>
+                <p class="text-center text-gray-600 mb-8">
+                    '흙'이라는 글자는 뒤에 어떤 말이 오느냐에 따라 발음이 달라져요. 카드를 클릭해서 직접 확인해 보세요!
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- '흙이' Card -->
+                    <div class="interactive-card bg-white p-6 rounded-xl shadow-lg cursor-pointer" onclick="toggleExplanation(this)">
+                        <h3 class="text-2xl font-bold text-center">흙이</h3>
+                        <div class="explanation hidden mt-4 text-center">
+                            <p class="text-xl font-mono text-blue-600">[흘기]</p>
+                            <p class="mt-2 text-gray-700 font-semibold">연음 현상</p>
+                            <p class="text-sm text-gray-500">앞 음절의 끝 자음이<br>뒤 음절의 첫소리로 이어짐</p>
+                        </div>
+                    </div>
+                    <!-- '흙도' Card -->
+                    <div class="interactive-card bg-white p-6 rounded-xl shadow-lg cursor-pointer" onclick="toggleExplanation(this)">
+                        <h3 class="2xl font-bold text-center">흙도</h3>
+                        <div class="explanation hidden mt-4 text-center">
+                            <p class="text-xl font-mono text-blue-600">[흑또]</p>
+                            <p class="mt-2 text-gray-700 font-semibold">끝소리 규칙 & 경음화</p>
+                            <p class="text-sm text-gray-500">'흙'이 [흑]으로 바뀌고,<br>'도'가 [또]로 세게 발음됨</p>
+                        </div>
+                    </div>
+                    <!-- '흙만' Card -->
+                    <div class="interactive-card bg-white p-6 rounded-xl shadow-lg cursor-pointer" onclick="toggleExplanation(this)">
+                        <h3 class="text-2xl font-bold text-center">흙만</h3>
+                        <div class="explanation hidden mt-4 text-center">
+                            <p class="text-xl font-mono text-blue-600">[흥만]</p>
+                             <p class="mt-2 text-gray-700 font-semibold">끝소리 규칙 & 비음화</p>
+                            <p class="text-sm text-gray-500">'흙'이 [흑]으로 바뀌고,<br>'만'의 'ㅁ' 때문에 [흥]으로 바뀜</p>
+                        </div>
+                    </div>
+                </div>
+                 <div class="mt-8 teacher-quote">
+                    <p class="font-bold text-xl">★★ 선생님 강조!</p>
+                    <p class="mt-2">"얘들아, 왜 '흙'이 상황에 따라 다르게 소리 나는지 그 원리를 설명할 수 있어야 돼~ 그냥 외우지 말고!"</p>
+                </div>
+            </section>
+
+            <!-- Section 2: Classification -->
+            <section id="classification">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2 text-center">2. 음운 변동, 어떻게 나눌까?</h2>
+                <p class="text-center text-gray-600 mb-8">
+                    음운 변동은 결과에 따라 크게 네 가지로 나눌 수 있어요. 필터 버튼을 눌러 각 종류의 예시를 확인해 보세요.
+                </p>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <div class="flex flex-wrap justify-center gap-2 mb-6" id="filter-buttons">
+                        <button class="filter-btn active px-4 py-2 bg-gray-200 rounded-full font-semibold" data-filter="all">전체보기</button>
+                        <button class="filter-btn px-4 py-2 bg-gray-200 rounded-full font-semibold" data-filter="교체">교체</button>
+                        <button class="filter-btn px-4 py-2 bg-gray-200 rounded-full font-semibold" data-filter="탈락">탈락</button>
+                        <button class="filter-btn px-4 py-2 bg-gray-200 rounded-full font-semibold" data-filter="첨가">첨가</button>
+                        <button class="filter-btn px-4 py-2 bg-gray-200 rounded-full font-semibold" data-filter="축약">축약</button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="example-grid">
+                        <!-- Examples will be injected by JS -->
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section 3: Final Consonant Rule -->
+            <section id="final-consonant">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2 text-center">3. 끝소리 규칙 시뮬레이터</h2>
+                <p class="text-center text-gray-600 mb-8">
+                    우리말의 끝소리는 **'ㄱ, ㄴ, ㄷ, ㄹ, ㅁ, ㅂ, ㅇ'** 7개로만 발음돼요. <br>단어를 입력하고 어떻게 변하는지 직접 확인해 보세요.
+                </p>
+                <div class="bg-white p-8 rounded-xl shadow-lg max-w-md mx-auto">
+                    <div class="flex gap-2">
+                        <input type="text" id="word-input" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-yellow-500" placeholder="예: 부엌, 숲, 옷...">
+                        <button id="convert-btn" class="px-6 py-2 bg-yellow-500 text-white font-bold rounded-lg hover:bg-yellow-600">변환!</button>
+                    </div>
+                    <div id="result-display" class="mt-6 text-center h-16">
+                        <p class="text-2xl font-bold text-gray-800"></p>
+                        <p class="text-sm text-gray-500"></p>
+                    </div>
+                    <div class="text-center mt-4 p-3 bg-gray-50 rounded-lg">
+                        <p class="font-bold text-gray-700">대표음 7개: <span class="font-mono">ㄱ, ㄴ, ㄷ, ㄹ, ㅁ, ㅂ, ㅇ</span></p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section 4: Quiz -->
+            <section id="quiz">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2 text-center">4. 최종 점검 퀴즈</h2>
+                <p class="text-center text-gray-600 mb-8">
+                    선생님 강조 포인트를 중심으로, 핵심 내용을 잘 이해했는지 확인해 보세요.
+                </p>
+                <div class="bg-white p-6 rounded-xl shadow-lg max-w-2xl mx-auto">
+                    <div id="quiz-container" class="space-y-6">
+                        <!-- Quiz Questions will be injected by JS -->
+                    </div>
+                    <div class="text-center mt-6">
+                        <button id="submit-quiz" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded-full transition-colors">결과 확인</button>
+                    </div>
+                    <div id="quiz-result" class="text-center mt-6 font-bold text-xl"></div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+<script>
+    // Section 1: Interactive Cards
+    function toggleExplanation(card) {
+        const explanation = card.querySelector('.explanation');
+        explanation.classList.toggle('hidden');
+    }
+
+    // Section 2: Classification Examples
+    const examples = [
+        { word: '국물 → [궁물]', type: '교체', desc: '비음화' },
+        { word: '신라 → [실라]', type: '교체', desc: '유음화' },
+        { word: '같이 → [가치]', type: '교체', desc: '구개음화' },
+        { word: '좋은 → [조은]', type: '탈락', desc: 'ㅎ 탈락' },
+        { word: '쓰어 → [써]', type: '탈락', desc: 'ㅡ 탈락' },
+        { word: '솔+나무 → [소나무]', type: '탈락', desc: 'ㄹ 탈락' },
+        { word: '솜+이불 → [솜니불]', type: '첨가', desc: 'ㄴ 첨가' },
+        { word: '맨+입 → [맨닙]', type: '첨가', desc: 'ㄴ 첨가' },
+        { word: '놓+고 → [노코]', type: '축약', desc: '자음 축약' },
+        { word: '법+학 → [버팍]', type: '축약', desc: '자음 축약' },
+        { word: '오+아서 → [와서]', type: '축약', desc: '모음 축약' }
+    ];
+
+    const exampleGrid = document.getElementById('example-grid');
+    const filterButtons = document.getElementById('filter-buttons');
+    
+    function renderExamples(filter = 'all') {
+        exampleGrid.innerHTML = '';
+        const filteredExamples = filter === 'all' ? examples : examples.filter(ex => ex.type === filter);
+        
+        filteredExamples.forEach(ex => {
+            const card = document.createElement('div');
+            card.className = 'example-card p-4 border rounded-lg bg-gray-50';
+            card.innerHTML = `
+                <p class="font-bold text-lg text-center">${ex.word}</p>
+                <p class="text-sm text-center text-gray-500">${ex.desc}</p>
+            `;
+            exampleGrid.appendChild(card);
+        });
+    }
+
+    filterButtons.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            renderExamples(e.target.dataset.filter);
+        }
+    });
+
+    // Section 3: Final Consonant Rule Simulator
+    const wordInput = document.getElementById('word-input');
+    const convertBtn = document.getElementById('convert-btn');
+    const resultDisplay = document.getElementById('result-display');
+    const finalConsonants = {
+        'ㄱㅋㄲ': 'ㄱ', 'ㅂㅍ': 'ㅂ', 'ㄷㅌㅅㅆㅈㅊㅎ': 'ㄷ',
+        'ㄴ': 'ㄴ', 'ㄹ': 'ㄹ', 'ㅁ': 'ㅁ', 'ㅇ': 'ㅇ'
+    };
+    
+    function getFinalPronunciation(char) {
+        if (!char) return '';
+        const lastChar = char.charCodeAt(char.length - 1);
+        if (lastChar < 0xAC00 || lastChar > 0xD7A3) { // Not a Hangul syllable
+            return { original: char, changed: char, rule: '한글 음절이 아님' };
+        }
+        
+        const finalJongseongCode = (lastChar - 0xAC00) % 28;
+        if (finalJongseongCode === 0) { // No final consonant
+             return { original: char, changed: char, rule: '받침 없음' };
+        }
+        
+        const jongseong = " ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ"[finalJongseongCode];
+
+        for (const key in finalConsonants) {
+            if (key.includes(jongseong)) {
+                const representative = finalConsonants[key];
+                if(jongseong === representative) {
+                    return { original: jongseong, changed: representative, rule: '대표음으로 발음됨' };
+                }
+                return { original: jongseong, changed: representative, rule: `'${jongseong}'이(가) 대표음 [${representative}]으로 교체` };
+            }
+        }
+        return { original: jongseong, changed: jongseong, rule: '알 수 없음' };
+    }
+
+    convertBtn.addEventListener('click', () => {
+        const word = wordInput.value.trim();
+        const lastSyllable = word.slice(-1);
+        if (!word) return;
+        
+        const result = getFinalPronunciation(lastSyllable);
+        
+        const baseCode = lastSyllable.charCodeAt(0) - (lastSyllable.charCodeAt(0) - 0xAC00) % 28;
+        const newJongseongCode = " ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ".indexOf(result.changed);
+        const newPronunciationSyllable = String.fromCharCode(baseCode + newJongseongCode);
+        
+        let pronunPrefix = word.slice(0, -1);
+
+        resultDisplay.innerHTML = `
+            <p class="text-2xl font-bold text-gray-800">${word} <span class="font-mono text-blue-600">[${pronunPrefix}${newPronunciationSyllable}]</span></p>
+            <p class="text-sm text-gray-500">${result.rule}</p>
+        `;
+    });
+    
+    // Section 4: Quiz
+    const quizContainer = document.getElementById('quiz-container');
+    const submitQuizBtn = document.getElementById('submit-quiz');
+    const quizResult = document.getElementById('quiz-result');
+
+    const quizQuestions = [
+        {
+            question: "끝소리 규칙에 따라 발음될 수 있는 대표음 7개에 속하지 않는 것은?",
+            options: ["ㄱ", "ㄴ", "ㅅ", "ㅇ"],
+            answer: "ㅅ"
+        },
+        {
+            question: "'법학'이 [버팍]으로 발음되는 현상은 음운 변동 결과에 따라 어떻게 분류되나요?",
+            options: ["교체", "탈락", "첨가", "축약"],
+            answer: "축약"
+        },
+        {
+            question: "다음 중 표준어를 설정하는 가장 중요한 원리는?",
+            options: ["가장 발음하기 편한 형태", "가장 오래된 형태", "가장 설명이 가능한 형태", "가장 짧은 형태"],
+            answer: "가장 설명이 가능한 형태"
+        },
+        {
+            question: "'솜이불'이 [솜니불]로 발음될 때 일어나는 음운 변동은?",
+            options: ["교체", "탈락", "첨가", "축약"],
+            answer: "첨가"
+        },
+        {
+            question: "'흙이'가 [흘기]로 발음되는 음운 변동 현상은 무엇인가요?",
+            options: ["연음 현상", "비음화", "경음화", "축약"],
+            answer: "연음 현상"
+        },
+        {
+            question: "'좋은'이 [조은]으로 발음되는 것처럼 음운이 사라지는 현상을 무엇이라고 하나요?",
+            options: ["교체", "탈락", "첨가", "축약"],
+            answer: "탈락"
+        },
+        {
+            question: "다음 중 '음운 변동의 원인에 따른 분류'에 해당하는 것은?",
+            options: ["교체", "탈락", "첨가", "동화"],
+            answer: "동화"
+        },
+        {
+            question: "끝소리 규칙의 다른 이름으로 옳지 않은 것은?",
+            options: ["평음화", "평파열 현상", "경음화"],
+            answer: "경음화"
+        },
+        {
+            question: "'옷'이라는 단어가 끝소리 규칙에 따라 발음될 때, 대표음으로 바뀌는 자음은?",
+            options: ["ㅅ → ㄱ", "ㅅ → ㄷ", "ㅅ → ㅂ", "ㅅ → ㄹ"],
+            answer: "ㅅ → ㄷ"
+        }
+    ];
+
+    function buildQuiz() {
+        quizContainer.innerHTML = quizQuestions.map((q, index) => `
+            <div>
+                <p class="font-bold mb-2">${index + 1}. ${q.question}</p>
+                <div class="flex flex-col space-y-2">
+                    ${q.options.map(opt => `
+                        <label class="p-3 bg-gray-100 rounded-lg hover:bg-gray-200 cursor-pointer transition-colors">
+                            <input type="radio" name="question${index}" value="${opt}" class="mr-2">
+                            ${opt}
+                        </label>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    submitQuizBtn.addEventListener('click', () => {
+        let score = 0;
+        quizQuestions.forEach((q, index) => {
+            const selected = quizContainer.querySelector(`input[name="question${index}"]:checked`);
+            // Reset background for all labels in this question
+            document.querySelectorAll(`input[name="question${index}"]`).forEach(input => {
+                input.parentElement.style.backgroundColor = '';
+            });
+
+            if (selected && selected.value === q.answer) {
+                score++;
+                selected.parentElement.style.backgroundColor = '#d4edda'; // Correct: light green
+            } else if (selected) {
+                selected.parentElement.style.backgroundColor = '#f8d7da'; // Incorrect: light red
+                // Highlight correct answer
+                document.querySelectorAll(`input[name="question${index}"]`).forEach(input => {
+                    if (input.value === q.answer) {
+                        input.parentElement.style.backgroundColor = '#ffe0b2'; // Correct answer highlight: light orange
+                    }
+                });
+            } else {
+                 // If no answer selected, just highlight the correct one
+                 document.querySelectorAll(`input[name="question${index}"]`).forEach(input => {
+                    if (input.value === q.answer) {
+                        input.parentElement.style.backgroundColor = '#ffe0b2'; // Correct answer highlight: light orange
+                    }
+                });
+            }
+        });
+        quizResult.textContent = `결과: ${quizQuestions.length}문제 중 ${score}개를 맞혔습니다!`;
+    });
+
+
+    // Initial renders
+    renderExamples();
+    buildQuiz();
+</script>
+</body>
+</html>

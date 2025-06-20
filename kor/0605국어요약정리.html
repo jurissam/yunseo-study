@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>국어 기말고사 & 수행평가 완벽 대비</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Scholarly Neutrals (Background: #FDFBF6, Primary Text: #3C3633, Accent: #7A9D96, Secondary Accent: #E0A75E) -->
+    <!-- Application Structure Plan: A task-oriented dashboard SPA with two main switchable sections: "Writing Assessment" and "Grammar Prep". This structure separates the two main preparation tasks, allowing the student to focus on one at a time. The Writing section uses a visual process flow and interactive checklist to guide preparation steps. The Grammar section uses a chart to visually emphasize its importance, as noted in the report. This interactive, component-based design is more engaging and memory-friendly for a student than a simple text document. -->
+    <!-- Visualization & Content Choices: 
+        1. Report Info: Writing Process -> Goal: Organize/Inform -> Viz: HTML/CSS styled process flow diagram -> Interaction: Hover effects to highlight steps -> Justification: Clearly visualizes the required sequence, more intuitive than a simple list. -> Method: HTML/Tailwind.
+        2. Report Info: Writing Structure & Rules -> Goal: Inform -> Viz: Styled content cards -> Interaction: None, clear presentation is key -> Justification: Segments key rules into digestible, easy-to-read cards. -> Method: HTML/Tailwind.
+        3. Report Info: Grammar Importance -> Goal: Emphasize -> Viz: Doughnut Chart -> Interaction: Hover tooltip -> Justification: Visually represents the teacher's emphasis on grammar's high weight in the exam, which is more impactful than text alone. -> Library: Chart.js (Canvas).
+        4. Report Info: Performance Assessment Prep -> Goal: Action/Check -> Viz: Interactive Checklist -> Interaction: User can click to toggle check-marks -> Justification: Encourages active self-assessment and tracking of preparation progress. -> Method: HTML/JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #FDFBF6;
+            color: #3C3633;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+            border-bottom: 4px solid transparent;
+        }
+        .nav-button.active {
+            color: #7A9D96;
+            border-bottom-color: #7A9D96;
+        }
+        .nav-button:not(.active):hover {
+            color: #3C3633;
+            border-bottom-color: #E0A75E;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .process-step {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .process-step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .checklist-item {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .checklist-item.checked {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+        .checklist-item.checked .check-icon {
+            opacity: 1;
+        }
+        .check-icon {
+            opacity: 0.2;
+            transition: opacity 0.2s;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 300px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="container mx-auto px-4 py-8 md:py-12">
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800" style="color: #3C3633;">국어 기말고사 & 수행평가 완벽 대비</h1>
+            <p class="mt-2 text-lg text-gray-600" style="color: #7A9D96;">선생님 강조 포인트를 중심으로 한 핵심 전략</p>
+        </header>
+
+        <nav class="flex justify-center border-b border-gray-200 mb-8">
+            <button id="nav-writing" class="nav-button active text-lg font-bold py-3 px-6">📝 글쓰기 수행평가</button>
+            <button id="nav-grammar" class="nav-button text-lg font-bold py-3 px-6">📚 문법 시험 대비</button>
+        </nav>
+
+        <main>
+            <section id="content-writing" class="content-section active">
+                <div class="bg-white/50 rounded-xl p-6 md:p-8 shadow-sm mb-8">
+                    <h2 class="text-2xl font-bold mb-4">수행평가 개요</h2>
+                    <p class="text-base md:text-lg">
+                        이 섹션에서는 사회적 쟁점에 대한 글쓰기 수행평가를 완벽하게 준비하기 위한 핵심 사항들을 단계별로 안내합니다. 글쓰기 과정, 필수 구조, 그리고 선생님이 강조한 유의사항들을 인터랙티브하게 확인하며 자신의 준비 상태를 점검해 보세요.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-xl p-6 md:p-8 shadow-lg">
+                        <h3 class="text-xl font-bold mb-6 text-center">⭐ 글쓰기 과정 5단계</h3>
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-center gap-2 text-center">
+                            <div class="process-step bg-amber-50 rounded-lg p-3 flex-1">계획하기</div>
+                            <div class="text-2xl font-bold text-amber-400 self-center">→</div>
+                            <div class="process-step bg-amber-50 rounded-lg p-3 flex-1">내용 생성</div>
+                            <div class="text-2xl font-bold text-amber-400 self-center">→</div>
+                            <div class="process-step bg-amber-50 rounded-lg p-3 flex-1">조직하기</div>
+                            <div class="text-2xl font-bold text-amber-400 self-center">→</div>
+                            <div class="process-step bg-amber-50 rounded-lg p-3 flex-1">표현하기</div>
+                            <div class="text-2xl font-bold text-amber-400 self-center">→</div>
+                            <div class="process-step bg-amber-50 rounded-lg p-3 flex-1">고쳐쓰기</div>
+                        </div>
+                        <p class="text-sm text-center mt-4 text-gray-500">각 단계를 충실히 따르면 논리적인 글을 완성할 수 있습니다.</p>
+                    </div>
+
+                    <div class="bg-white rounded-xl p-6 md:p-8 shadow-lg">
+                        <h3 class="text-xl font-bold mb-6">⭐ 글쓰기 핵심 구조</h3>
+                        <div class="space-y-4">
+                            <div class="border-l-4 border-teal-500 pl-4 py-2 bg-teal-50/50 rounded-r-lg">
+                                <h4 class="font-bold">서론</h4>
+                                <p>문제 상황 제시, 쟁점 소개</p>
+                            </div>
+                            <div class="border-l-4 border-teal-500 pl-4 py-2 bg-teal-50/50 rounded-r-lg">
+                                <h4 class="font-bold">본론</h4>
+                                <p>문제 원인 분석 및 해결 방안 제시 (자신의 입장 + 근거)</p>
+                            </div>
+                            <div class="border-l-4 border-teal-500 pl-4 py-2 bg-teal-50/50 rounded-r-lg">
+                                <h4 class="font-bold">결론</h4>
+                                <p>내용 요약 및 입장 강조, 전망 제시</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                     <div class="bg-white rounded-xl p-6 md:p-8 shadow-lg">
+                        <h3 class="text-xl font-bold mb-6">⭐ 자료 활용 원칙</h3>
+                         <ul class="space-y-3 text-lg">
+                            <li class="flex items-start">
+                                <span class="text-teal-600 mr-3 mt-1">✔️</span>
+                                <div><strong class="font-bold text-teal-700">타당성, 신뢰성, 공정성</strong>을 갖춘 자료 사용하기</div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-teal-600 mr-3 mt-1">✔️</span>
+                                <div><strong class="font-bold text-teal-700">출처는 명확히</strong> 밝히기</div>
+                            </li>
+                             <li class="flex items-start">
+                                <span class="text-teal-600 mr-3 mt-1">✔️</span>
+                                 <div>내용을 <strong class="font-bold text-teal-700">과장·왜곡·축소</strong>하지 않기</div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 md:p-8 shadow-lg">
+                        <h3 class="text-xl font-bold mb-6">🚀 수행평가 준비 체크리스트</h3>
+                        <div id="checklist" class="space-y-4">
+                            <div class="checklist-item flex items-center text-lg p-2 rounded-md hover:bg-gray-50">
+                                <span class="check-icon mr-3 text-2xl text-green-500">✓</span>
+                                <span><strong class="text-amber-700">[주제]</strong> 정책 문제 관련 사회적 쟁점 정하기</span>
+                            </div>
+                            <div class="checklist-item flex items-center text-lg p-2 rounded-md hover:bg-gray-50">
+                                <span class="check-icon mr-3 text-2xl text-green-500">✓</span>
+                                <span><strong class="text-amber-700">[입장]</strong> 토론을 통해 자신의 입장 명확히 하기</span>
+                            </div>
+                            <div class="checklist-item flex items-center text-lg p-2 rounded-md hover:bg-gray-50">
+                                <span class="check-icon mr-3 text-2xl text-green-500">✓</span>
+                                <span><strong class="text-amber-700">[근거]</strong> 입장을 뒷받침할 신뢰성 있는 자료 수집</span>
+                            </div>
+                            <div class="checklist-item flex items-center text-lg p-2 rounded-md hover:bg-gray-50">
+                                <span class="check-icon mr-3 text-2xl text-green-500">✓</span>
+                                <span><strong class="text-amber-700">[구조]</strong> 서론-본론-결론 구조에 맞춰 개요 작성</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="content-grammar" class="content-section">
+                <div class="bg-white/50 rounded-xl p-6 md:p-8 shadow-sm mb-8">
+                    <h2 class="text-2xl font-bold mb-4">문법 시험 대비</h2>
+                    <p class="text-base md:text-lg">
+                        기말고사에서 높은 비중을 차지하는 문법 파트를 대비하기 위한 핵심 전략입니다. 선생님이 강조하신 학습 자료의 중요성을 시각적으로 확인하고, 무엇에 집중해야 할지 명확히 파악하여 시험을 준비하세요.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div class="bg-white rounded-xl p-6 md:p-8 shadow-lg text-center">
+                        <h3 class="text-xl font-bold mb-4">🚨 시험 내 문법 비중</h3>
+                        <div class="chart-container">
+                            <canvas id="grammarChart"></canvas>
+                        </div>
+                         <p class="mt-4 font-bold text-red-600 text-lg">선생님께서 '매우 중요'하다고 직접 강조하셨습니다!</p>
+                    </div>
+
+                    <div class="bg-white rounded-xl p-6 md:p-8 shadow-lg">
+                        <h3 class="text-xl font-bold mb-6">⭐ 필수 학습 전략</h3>
+                        <div class="text-center bg-amber-100 border-2 border-amber-300 rounded-lg p-6">
+                            <p class="text-5xl mb-4">📹</p>
+                            <h4 class="text-2xl font-bold text-amber-800">QR코드 영상 학습 필수</h4>
+                            <p class="mt-2 text-gray-700">배부된 프린트의 QR코드 영상을 반드시 시청하세요.</p>
+                            <div class="mt-4 bg-white rounded-lg p-3">
+                                <p class="font-bold">영상 핵심 내용:</p>
+                                <p class="text-gray-600">1~3학년 중학교 문법 총정리</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center mt-12 text-gray-500">
+            <p>&copy; 2025 기말고사 대비 자료. 이 앱으로 좋은 결과를 얻길 바랍니다!</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navWriting = document.getElementById('nav-writing');
+            const navGrammar = document.getElementById('nav-grammar');
+            const contentWriting = document.getElementById('content-writing');
+            const contentGrammar = document.getElementById('content-grammar');
+            let grammarChartInstance = null;
+
+            function switchTab(activeNav, activeContent) {
+                [navWriting, navGrammar].forEach(nav => nav.classList.remove('active'));
+                [contentWriting, contentGrammar].forEach(content => content.classList.remove('active'));
+
+                activeNav.classList.add('active');
+                activeContent.classList.add('active');
+                
+                if (activeNav === navGrammar) {
+                    renderGrammarChart();
+                }
+            }
+
+            navWriting.addEventListener('click', () => switchTab(navWriting, contentWriting));
+            navGrammar.addEventListener('click', () => switchTab(navGrammar, contentGrammar));
+
+            const checklistItems = document.querySelectorAll('.checklist-item');
+            checklistItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    item.classList.toggle('checked');
+                });
+            });
+
+            function renderGrammarChart() {
+                if (grammarChartInstance) {
+                    return;
+                }
+                const ctx = document.getElementById('grammarChart').getContext('2d');
+                grammarChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['문법 비중', '기타'],
+                        datasets: [{
+                            label: '시험 비중',
+                            data: [80, 20],
+                            backgroundColor: [
+                                '#E0A75E',
+                                '#f3f4f6'
+                            ],
+                            borderColor: [
+                                '#FDFBF6'
+                            ],
+                            borderWidth: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: true,
+                                callbacks: {
+                                    label: function(context) {
+                                        if (context.label === '문법 비중') {
+                                            return '매우 중요! 절대 놓치지 마세요.';
+                                        }
+                                        return '';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

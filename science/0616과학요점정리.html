@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>효소 완전 정복: 인터랙티브 복습</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony Neutrals -->
+    <!-- Application Structure Plan: A single-page application with a top navigation bar for quick access to key learning modules: 1. Introduction with an interactive activation energy chart. 2. A card-based section for enzyme characteristics, including a temperature-activity graph. 3. A toggle-based comparison of metabolism types. 4. An interactive table comparing respiration and combustion. 5. A visual grid of real-world applications. 6. A new interactive quiz section. This thematic, non-linear structure allows users to review topics in any order, focusing on interactive elements like charts, clickable cards, and now the quiz to enhance engagement and knowledge retention over passive reading. -->
+    <!-- Visualization & Content Choices: 1. Activation Energy (Info) -> Goal: Change -> Viz: Line Chart (Chart.js) -> Interaction: Visual demonstration of energy reduction -> Justification: Best way to visualize the core function of an enzyme. 2. Enzyme Characteristics (Info) -> Goal: Organize -> Viz: Clickable Cards + Line Chart (HTML/JS/Chart.js) -> Interaction: Click to reveal details -> Justification: Breaks down complex info into manageable chunks. 3. Metabolism (Info) -> Goal: Compare -> Viz: Side-by-side layout with toggles (HTML/JS) -> Interaction: Toggle between summary and detail -> Justification: Clear, direct comparison enhanced with interactivity. 4. Respiration vs. Combustion (Info) -> Goal: Compare -> Viz: Interactive Table (HTML/JS) -> Interaction: Highlight rows on click -> Justification: Makes data comparison more focused and engaging. 5. Applications (Info) -> Goal: Inform -> Viz: Icon Grid (HTML/Tailwind) -> Interaction: Hover to see details (via tooltips) -> Justification: Visually appealing and quick way to scan examples. 6. Quiz (Assess/Reinforce) -> Goal: Assess -> Viz: Multiple Choice Q&A (HTML/JS) -> Interaction: Click options, immediate feedback, score tracking -> Justification: Direct assessment of understanding, encourages active recall. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+        .nav-link { transition: color 0.3s, border-color 0.3s; }
+        .nav-link:hover, .nav-link.active { color: #f59e0b; border-bottom-color: #f59e0b; }
+        .card { transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
+        .content-hidden { display: none; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin: auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+        .quiz-option-button {
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .quiz-option-button:hover:not(.correct):not(.incorrect) {
+            background-color: #fefce8;
+            border-color: #fde68a;
+        }
+        .quiz-option-button.correct {
+            background-color: #d1fae5;
+            border-color: #34d399;
+        }
+        .quiz-option-button.incorrect {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-xl md:text-2xl font-bold text-amber-600">효소 완전 정복 🧪</h1>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#intro" class="nav-link font-semibold pb-1 border-b-2 border-transparent">효소란?</a>
+                    <a href="#features" class="nav-link font-semibold pb-1 border-b-2 border-transparent">핵심 특징</a>
+                    <a href="#metabolism" class="nav-link font-semibold pb-1 border-b-2 border-transparent">물질 대사</a>
+                    <a href="#comparison" class="nav-link font-semibold pb-1 border-b-2 border-transparent">비교 탐구</a>
+                    <a href="#applications" class="nav-link font-semibold pb-1 border-b-2 border-transparent">실생활 활용</a>
+                    <a href="#quiz" class="nav-link font-semibold pb-1 border-b-2 border-transparent">복습 퀴즈</a>
+                </div>
+                <button id="mobile-menu-button" class="md:hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <span class="text-2xl">☰</span>
+                </button>
+            </div>
+            <div id="mobile-menu" class="hidden md:hidden py-2">
+                <a href="#intro" class="block py-2 px-4 text-sm hover:bg-amber-50 rounded-md">효소란?</a>
+                <a href="#features" class="block py-2 px-4 text-sm hover:bg-amber-50 rounded-md">핵심 특징</a>
+                <a href="#metabolism" class="block py-2 px-4 text-sm hover:bg-amber-50 rounded-md">물질 대사</a>
+                <a href="#comparison" class="block py-2 px-4 text-sm hover:bg-amber-50 rounded-md">비교 탐구</a>
+                <a href="#applications" class="block py-2 px-4 text-sm hover:bg-amber-50 rounded-md">실생활 활용</a>
+                <a href="#quiz" class="block py-2 px-4 text-sm hover:bg-amber-50 rounded-md">복습 퀴즈</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        
+        <section id="intro" class="text-center py-12 md:py-20 scroll-mt-16">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">효소, 우리 몸의 슈퍼 조력자!</h2>
+            <p class="max-w-3xl mx-auto text-slate-600 mb-8">
+                얘들아! 오늘 이거... <strong class="text-amber-600">★시험★에 무조건 나옵니다!</strong> 선생님이 몇 번을 말하니~ <br>
+                효소는 우리 몸에서 일어나는 모든 화학 반응(물질 대사)을 돕는 '생체 촉매'입니다. 효소가 없으면 반응이 너무 느려서 생명을 유지할 수 없어요. 효소는 반응이 넘어야 할 <strong class="text-amber-600">'활성화 에너지'</strong>라는 언덕을 낮춰 반응 속도를 극적으로 높여줍니다. 아래 그래프에서 효소가 어떻게 에너지 언덕을 낮추는지 직접 확인해보세요! <strong class="text-amber-600">이 그래프! 언덕! 효소가 줄여주는 거! 이거 틀리면 안 돼요~</strong>
+            </p>
+            <div class="chart-container bg-white rounded-xl shadow-lg p-4">
+                <canvas id="activationEnergyChart"></canvas>
+            </div>
+        </section>
+
+        <section id="features" class="py-12 md:py-20 scroll-mt-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">효소의 3가지 핵심 특징 (⭐시험 단골⭐)</h2>
+            <p class="text-center max-w-3xl mx-auto text-slate-600 mb-8">
+                <strong class="text-amber-600">이 세 가지 특징! 꼭 외우세요. 시험!</strong> 효소 문제는 항상 이 특징들이 나옵니다. 각각의 의미를 정확히 알아두세요! <br>아래 카드를 **클릭**하면 더 자세한 설명을 볼 수 있어요!
+            </p>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="card bg-white p-6 rounded-xl shadow-lg text-center" onclick="toggleContent('feature1')">
+                    <div class="text-4xl mb-4">🔑</div>
+                    <h3 class="text-xl font-bold mb-2">기질 특이성</h3>
+                    <p class="text-slate-600">"효소는 아무 기질이랑 안 놀아요~ 딱 자기한테 맞는 애랑만 놀아요~"</p>
+                    <p class="text-xs text-amber-500 font-semibold mt-2">👆 클릭해서 자세히 보기</p>
+                    <div id="feature1" class="content-hidden mt-4 text-left text-sm bg-amber-50 p-3 rounded-lg">
+                        효소는 자신에게 딱 맞는 모양의 '기질'하고만 결합하여 반응을 촉진해요. 마치 특정 자물쇠에 맞는 열쇠처럼, 우리 몸에서 정확하고 필요한 반응만 일어나게 합니다. <br><strong>예:</strong> 아밀레이스는 녹말만 분해함!
+                        <p class="mt-2 font-bold text-amber-700">★시험 포인트★ 효소와 기질의 관계 (자물쇠-열쇠 모형)를 이해해야 합니다!</p>
+                    </div>
+                </div>
+                <div class="card bg-white p-6 rounded-xl shadow-lg text-center" onclick="toggleContent('feature2')">
+                    <div class="text-4xl mb-4">♻️</div>
+                    <h3 class="text-xl font-bold mb-2">재사용 가능</h3>
+                    <p class="text-slate-600">"일하고 나서도 멀쩡~ 또 일할 수 있어요!"</p>
+                    <p class="text-xs text-amber-500 font-semibold mt-2">👆 클릭해서 자세히 보기</p>
+                    <div id="feature2" class="content-hidden mt-4 text-left text-sm bg-amber-50 p-3 rounded-lg">
+                        효소는 반응 전후에 자신의 구조가 변하지 않아요. 그래서 하나의 반응이 끝나면 곧바로 다른 반응에 재사용될 수 있어 우리 몸의 물질 대사를 효율적으로 진행시킵니다.
+                        <p class="mt-2 font-bold text-amber-700">★시험 포인트★ 적은 양의 효소로도 많은 반응을 일으킬 수 있다는 것을 기억하세요!</p>
+                    </div>
+                </div>
+                <div class="card bg-white p-6 rounded-xl shadow-lg text-center" onclick="toggleContent('feature3')">
+                    <div class="text-4xl mb-4">🌡️</div>
+                    <h3 class="text-xl font-bold mb-2">온도와 pH 민감성</h3>
+                    <p class="text-slate-600">"단백질이라서~ 너무 뜨거우면 변형돼요! 그래서 체온에서만 잘 작동해요."</p>
+                    <p class="text-xs text-amber-500 font-semibold mt-2">👆 클릭해서 자세히 보기</p>
+                    <div id="feature3" class="content-hidden mt-4 text-left text-sm bg-amber-50 p-3 rounded-lg">
+                        대부분 단백질로 이루어져 있어 특정 온도(체온 약 37℃)와 pH(산성도) 범위에서만 활발하게 활동해요. 이 범위를 벗어나면 효소의 입체 구조가 변형(변성)되어 기능을 잃게 됩니다.
+                        <p class="mt-2 font-bold text-amber-700">★시험 포인트★ 최적 온도/pH 그래프 해석 능력과 변성의 의미를 반드시 알아야 합니다!</p>
+                    </div>
+                </div>
+            </div>
+             <div class="mt-12">
+                <p class="text-center text-slate-600 mb-8">
+                    특히 온도는 효소의 활성에 지대한 영향을 미칩니다. 이 그래프 모양! <strong class="text-amber-600">37℃에서 가장 활발하다는 거 꼭 눈으로 익혀두세요!</strong>
+                </p>
+                <div class="chart-container bg-white rounded-xl shadow-lg p-4">
+                    <canvas id="temperatureChart"></canvas>
+                </div>
+            </div>
+        </section>
+        
+        <section id="metabolism" class="py-12 md:py-20 bg-slate-100 rounded-2xl scroll-mt-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">물질 대사: 합성하고 분해하기</h2>
+            <p class="text-center max-w-3xl mx-auto text-slate-600 mb-8">
+                물질 대사는 생명체 내에서 일어나는 모든 화학 반응을 의미하며, 크게 동화 작용과 이화 작용으로 나뉩니다. <strong class="text-amber-600">이 두 가지를 구분하는 건 시험 단골이에요!!</strong> 아래 표를 보며 에너지 흡수/방출, 고분자/저분자 방향, 그리고 예시를 정확히 파악하세요.
+            </p>
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center text-blue-600 mb-4">동화 작용 (합성)</h3>
+                    <p class="text-center text-slate-500 mb-4">저분자 → 고분자 <br> 작은 것을 모아 큰 것을 만들어요.</p>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-start"><span class="text-blue-500 mr-2 font-bold">✓</span> <strong>에너지:</strong> 에너지를 <strong class="text-amber-600">★흡수★</strong>해요 (흡열 반응이라고도 부름)</li>
+                        <li class="flex items-start"><span class="text-blue-500 mr-2 font-bold">✓</span> <strong>예시:</strong> 아미노산 → 단백질 합성, 광합성, 포도당 합성</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-center text-red-600 mb-4">이화 작용 (분해)</h3>
+                    <p class="text-center text-slate-500 mb-4">고분자 → 저분자 <br> 큰 것을 잘게 쪼개요.</p>
+                    <ul class="space-y-2 text-sm">
+                        <li class="flex items-start"><span class="text-red-500 mr-2 font-bold">✓</span> <strong>에너지:</strong> 에너지를 <strong class="text-amber-600">★방출★</strong>해요 (발열 반응이라고도 부름)</li>
+                        <li class="flex items-start"><span class="text-red-500 mr-2 font-bold">✓</span> <strong>예시:</strong> 음식 소화, 세포 호흡</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="text-center max-w-3xl mx-auto text-slate-600 mt-8 font-bold text-amber-700">
+                ★시험 포인트★ 동화/이화 작용은 '방향', '에너지 흡수/방출', '예시'를 중심으로 반드시 비교해서 알아두세요!
+            </p>
+        </section>
+
+        <section id="comparison" class="py-12 md:py-20 scroll-mt-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">세포 호흡 vs 연소 (🔥이것도 시험 단골🔥)</h2>
+            <p class="text-center max-w-3xl mx-auto text-slate-600 mb-8">
+                <strong class="text-amber-600">세포 호흡 vs 연소 비교도 꼭 나와요!</strong> 둘 다 에너지를 얻는 과정이지만, 조건과 방식이 너무나 다릅니다. 아래 표의 각 항목을 클릭하여 차이점을 자세히 살펴보고 머릿속에 꼭 넣어두세요!
+            </p>
+            <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+                <table class="w-full text-left" id="comparisonTable">
+                    <thead>
+                        <tr class="bg-slate-100">
+                            <th class="p-4 font-bold text-slate-700">구분</th>
+                            <th class="p-4 font-bold text-slate-700">세포 호흡</th>
+                            <th class="p-4 font-bold text-slate-700">연소</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-t hover:bg-amber-50 cursor-pointer">
+                            <td class="p-4 font-semibold">장소</td>
+                            <td class="p-4">살아있는 세포 (미토콘드리아)</td>
+                            <td class="p-4">세포 밖 (실험실 등)</td>
+                        </tr>
+                        <tr class="border-t hover:bg-amber-50 cursor-pointer">
+                            <td class="p-4 font-semibold">온도</td>
+                            <td class="p-4">체온 범위 (약 37℃)</td>
+                            <td class="p-4">고온 (400℃ 이상)</td>
+                        </tr>
+                        <tr class="border-t hover:bg-amber-50 cursor-pointer">
+                            <td class="p-4 font-semibold">효소 (촉매)</td>
+                            <td class="p-4"><strong class="text-amber-600">⭐반드시 필요⭐</strong></td>
+                            <td class="p-4">필요 없음</td>
+                        </tr>
+                        <tr class="border-t hover:bg-amber-50 cursor-pointer">
+                            <td class="p-4 font-semibold">에너지 방출</td>
+                            <td class="p-4">단계적으로 <strong class="text-amber-600">천천히</strong> (ATP로 저장)</td>
+                            <td class="p-4">한꺼번에 <strong class="text-amber-600">대량으로</strong> (빛, 열)</td>
+                        </tr>
+                        <tr class="border-t hover:bg-amber-50 cursor-pointer">
+                            <td class="p-4 font-semibold">에너지 형태</td>
+                            <td class="p-4">ATP, 열에너지</td>
+                            <td class="p-4">빛과 열에너지</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-center max-w-3xl mx-auto text-slate-600 mt-8 font-bold text-amber-700">
+                ★시험 포인트★ 효소의 필요 유무, 에너지 방출 방식, 온도 차이가 가장 중요합니다! 표 전체를 완벽하게 숙지하세요!
+            </p>
+        </section>
+
+        <section id="applications" class="py-12 md:py-20 bg-slate-100 rounded-2xl scroll-mt-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">우리 생활 속 효소</h2>
+            <p class="text-center max-w-3xl mx-auto text-slate-600 mb-8">
+                효소는 실험실에만 있는 따분한 존재가 아니에요! 우리 생활 곳곳에서 효소의 활약을 찾아볼 수 있어요. 아래 항목들을 살펴보며 <strong class="text-amber-600">이런 실생활 사례들이 효소의 어떤 특징과 관련되어 있는지 함께 생각해보세요!</strong>
+            </p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-5xl mx-auto text-center">
+                <div class="bg-white p-4 rounded-xl shadow-lg">
+                    <div class="text-4xl mb-3">🧼</div>
+                    <h4 class="font-bold">세제</h4>
+                    <p class="text-xs text-slate-500">단백질, 지방 분해 효소가 때를 쏙! (기질 특이성)</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-lg">
+                    <div class="text-4xl mb-3">💊</div>
+                    <h4 class="font-bold">소화제</h4>
+                    <p class="text-xs text-slate-500">탄수화물, 단백질 분해를 도와 속을 편안하게 (기질 특이성)</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-lg">
+                    <div class="text-4xl mb-3">🥬</div>
+                    <h4 class="font-bold">발효 식품</h4>
+                    <p class="text-xs text-slate-500">김치, 된장 등이 효소 작용으로 깊은 맛을 내요 (재사용 가능)</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-lg">
+                     <div class="text-4xl mb-3">🥩</div>
+                    <h4 class="font-bold">연육제</h4>
+                    <p class="text-xs text-slate-500">과일의 효소가 고기를 부드럽게 만들어요 (기질 특이성, 온도 민감성)</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="quiz" class="py-12 md:py-20 bg-amber-50 rounded-2xl scroll-mt-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-amber-700">🌙 밤에 자기 전, 효소 복습 퀴즈! 🌙</h2>
+            <p class="text-center max-w-3xl mx-auto text-slate-700 mb-8">
+                오늘 배운 효소 내용을 제대로 이해했는지 확인해 볼 시간이에요! 총 <span id="totalQuestions"></span>문제입니다. 정답을 맞히면 점수가 올라가요! 편안한 마음으로 풀어보세요!
+            </p>
+
+            <div id="quiz-container" class="max-w-xl mx-auto bg-white rounded-xl shadow-lg p-6 md:p-8">
+                <div id="question-area">
+                    <p class="text-xl font-semibold mb-6" id="quiz-question">문제 로딩 중...</p>
+                    <div id="quiz-options" class="grid grid-cols-1 gap-4">
+                        <!-- Options will be dynamically loaded here -->
+                    </div>
+                </div>
+                <div id="quiz-feedback" class="mt-6 p-4 rounded-lg hidden">
+                    <p id="feedback-text" class="font-semibold"></p>
+                    <p id="feedback-explanation" class="text-sm mt-2 text-slate-600"></p>
+                </div>
+                <div class="mt-8 flex justify-between items-center">
+                    <p class="text-lg font-bold text-slate-700">점수: <span id="quiz-score">0</span> / <span id="quiz-max-score">0</span></p>
+                    <button id="next-question-button" class="bg-amber-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-amber-700 transition-colors hidden">
+                        다음 문제
+                    </button>
+                    <button id="restart-quiz-button" class="bg-slate-600 text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-slate-700 transition-colors hidden">
+                        퀴즈 다시 시작
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center p-8 text-slate-500">
+        <p>복습 완료! 효소의 모든 것을 마스터했습니다. 👍 <br>얘들아, 지금 이거 안 외우면 후회해요~</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            document.querySelectorAll('#mobile-menu a, nav a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    if(!mobileMenu.classList.contains('hidden')){
+                        mobileMenu.classList.add('hidden');
+                    }
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            const actEnergyCtx = document.getElementById('activationEnergyChart').getContext('2d');
+            new Chart(actEnergyCtx, {
+                type: 'line',
+                data: {
+                    labels: ['반응 시작', '전이 상태', '반응 끝'],
+                    datasets: [{
+                        label: '효소 없을 때',
+                        data: [10, 80, 20],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        fill: false,
+                        tension: 0.4
+                    }, {
+                        label: '효소 있을 때',
+                        data: [10, 40, 20],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: false,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: { display: true, text: '활성화 에너지 변화', font: { size: 16 } },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: '에너지 수준' } }
+                    }
+                }
+            });
+
+            const tempCtx = document.getElementById('temperatureChart').getContext('2d');
+            new Chart(tempCtx, {
+                type: 'line',
+                data: {
+                    labels: ['0°C', '10°C', '20°C', '37°C', '50°C', '60°C'],
+                    datasets: [{
+                        label: '효소 활성도',
+                        data: [5, 20, 60, 100, 40, 5],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: { display: true, text: '온도에 따른 효소 활성도 변화', font: { size: 16 } },
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, max: 110, title: { display: true, text: '상대적 활성도 (%)' } }
+                    }
+                }
+            });
+
+            const comparisonTable = document.getElementById('comparisonTable');
+            comparisonTable.querySelectorAll('tbody tr').forEach(row => {
+                row.addEventListener('click', () => {
+                    row.classList.toggle('bg-amber-100');
+                    row.classList.toggle('font-bold');
+                });
+            });
+        
+        // Quiz Logic
+        const quizData = [
+            {
+                question: "다음 중 효소의 역할로 옳은 것은?",
+                options: [
+                    "화학 반응의 활성화 에너지를 높인다.",
+                    "화학 반응 속도를 느리게 한다.",
+                    "화학 반응의 활성화 에너지를 낮춘다.",
+                    "반응 후 효소의 구조가 변한다."
+                ],
+                correctAnswerIndex: 2,
+                explanation: "효소는 화학 반응이 더 쉽고 빠르게 일어나도록 활성화 에너지를 낮추는 역할을 합니다. 반응 후에도 효소의 구조는 변하지 않아 재사용될 수 있습니다."
+            },
+            {
+                question: "효소의 특징이 아닌 것은?",
+                options: [
+                    "기질 특이성",
+                    "재사용 가능성",
+                    "온도 민감성",
+                    "무기 촉매"
+                ],
+                correctAnswerIndex: 3,
+                explanation: "효소는 '생체 촉매'이며, 무기 촉매와는 다릅니다. 기질 특이성, 재사용 가능성, 온도/pH 민감성은 효소의 중요한 특징입니다."
+            },
+            {
+                question: "고분자를 저분자로 분해하며 에너지를 방출하는 물질 대사 작용은?",
+                options: [
+                    "동화 작용",
+                    "이화 작용",
+                    "광합성",
+                    "단백질 합성"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "고분자를 저분자로 분해하며 에너지를 방출하는 것은 이화 작용(발열 반응)입니다. 동화 작용은 에너지를 흡수하여 저분자를 고분자로 합성하는 과정입니다."
+            },
+            {
+                question: "세포 호흡과 연소의 공통점이 아닌 것은?",
+                options: [
+                    "산소를 이용한다.",
+                    "유기물을 분해한다.",
+                    "에너지를 방출한다.",
+                    "모두 효소가 필요하다."
+                ],
+                correctAnswerIndex: 3,
+                explanation: "세포 호흡은 효소가 반드시 필요하지만, 연소는 효소 없이 고온에서 일어납니다. 나머지 보기는 세포 호흡과 연소의 공통점입니다."
+            },
+            {
+                question: "우리 몸의 효소가 가장 활발하게 작용하는 대략적인 온도는?",
+                options: [
+                    "0°C",
+                    "10°C",
+                    "37°C",
+                    "100°C"
+                ],
+                correctAnswerIndex: 2,
+                explanation: "효소는 단백질로 이루어져 있어 특정 온도에 민감합니다. 우리 몸의 효소는 체온인 약 37°C에서 가장 활발하게 작용합니다."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let quizAttempted = false; // 퀴즈 시작 여부 확인용
+
+        const quizQuestion = document.getElementById('quiz-question');
+        const quizOptions = document.getElementById('quiz-options');
+        const quizFeedback = document.getElementById('quiz-feedback');
+        const feedbackText = document.getElementById('feedback-text');
+        const feedbackExplanation = document.getElementById('feedback-explanation');
+        const quizScore = document.getElementById('quiz-score');
+        const quizMaxScore = document.getElementById('quiz-max-score');
+        const totalQuestionsSpan = document.getElementById('totalQuestions');
+        const nextQuestionButton = document.getElementById('next-question-button');
+        const restartQuizButton = document.getElementById('restart-quiz-button');
+
+        function loadQuestion() {
+            if (currentQuestionIndex < quizData.length) {
+                const question = quizData[currentQuestionIndex];
+                quizQuestion.textContent = `${currentQuestionIndex + 1}. ${question.question}`;
+                quizOptions.innerHTML = ''; // Clear previous options
+                quizFeedback.classList.add('hidden');
+                nextQuestionButton.classList.add('hidden');
+                restartQuizButton.classList.add('hidden');
+
+                question.options.forEach((option, index) => {
+                    const button = document.createElement('button');
+                    button.textContent = option;
+                    button.className = 'quiz-option-button bg-white text-slate-700 py-3 px-4 rounded-lg shadow-sm border border-slate-200 text-left';
+                    button.onclick = () => checkAnswer(index);
+                    quizOptions.appendChild(button);
+                });
+                updateScoreDisplay();
+            } else {
+                showResult();
+            }
+        }
+
+        function checkAnswer(selectedIndex) {
+            if (quizAttempted) return; // Prevent multiple clicks on options for the same question
+            quizAttempted = true;
+
+            const question = quizData[currentQuestionIndex];
+            const optionButtons = quizOptions.querySelectorAll('.quiz-option-button');
+
+            if (selectedIndex === question.correctAnswerIndex) {
+                score++;
+                feedbackText.textContent = "정답! 🎉";
+                feedbackText.className = "font-semibold text-green-700";
+                optionButtons[selectedIndex].classList.add('correct');
+            } else {
+                feedbackText.textContent = "오답! 😅";
+                feedbackText.className = "font-semibold text-red-700";
+                optionButtons[selectedIndex].classList.add('incorrect');
+                optionButtons[question.correctAnswerIndex].classList.add('correct'); // Show correct answer
+            }
+            feedbackExplanation.textContent = `설명: ${question.explanation}`;
+            quizFeedback.classList.remove('hidden');
+            nextQuestionButton.classList.remove('hidden');
+            updateScoreDisplay();
+
+            // Disable all options after selection
+            optionButtons.forEach(button => button.onclick = null);
+        }
+
+        function showResult() {
+            quizQuestion.textContent = "퀴즈가 끝났습니다! 수고했어요! 👍";
+            quizOptions.innerHTML = '';
+            quizFeedback.classList.remove('hidden');
+            feedbackText.textContent = `최종 점수: ${score} / ${quizData.length} 점`;
+            feedbackText.className = "font-semibold text-xl text-blue-700";
+            feedbackExplanation.textContent = "틀린 문제는 다시 복습해보세요. 정말 중요한 내용들이에요!";
+            nextQuestionButton.classList.add('hidden');
+            restartQuizButton.classList.remove('hidden');
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            quizAttempted = false;
+            loadQuestion();
+        }
+
+        function updateScoreDisplay() {
+            quizScore.textContent = score;
+            quizMaxScore.textContent = currentQuestionIndex < quizData.length ? currentQuestionIndex + 1 : quizData.length;
+            totalQuestionsSpan.textContent = quizData.length;
+        }
+
+        nextQuestionButton.addEventListener('click', () => {
+            currentQuestionIndex++;
+            quizAttempted = false;
+            loadQuestion();
+        });
+
+        restartQuizButton.addEventListener('click', restartQuiz);
+
+        // Initial quiz load
+        loadQuestion();
+        }); // 이 닫는 괄호가 누락되어 있었습니다.
+    </script>
+</body>
+</html>

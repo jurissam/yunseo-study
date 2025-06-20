@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>세포 탐험: 시험에 꼭 나오는 핵심 정리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: A thematic, single-page application designed for interactive learning. The structure includes a sticky navigation bar for quick access to key sections: '세포 소기관' (Cell Organelles), '동물 vs 식물 비교' (Animal vs. Plant Comparison), '생명 시스템의 구성 단계' (Levels of Life), '핵심 과정' (Key Processes), and '퀴즈' (Quiz). This non-linear structure allows students to freely explore topics based on their curiosity or study needs, rather than following the rigid order of a report. The core interaction is a card-based system for organelles, where clicking reveals detailed information, fostering active engagement. The addition of a quiz section provides an interactive assessment tool. This design was chosen to transform passive reading into an exploratory experience, making complex biological concepts more digestible and memorable for students preparing for an exam. -->
+    <!-- Visualization & Content Choices: 
+    1. Report Info: Cell organelle names, functions, and teacher's notes. -> Goal: Inform & Memorize. -> Viz/Method: Interactive HTML/CSS flip-cards. -> Interaction: Click to reveal details. -> Justification: Encourages active recall and focuses on one concept at a time. Highlights exam tips (⭐) directly. -> Library: Vanilla JS.
+    2. Report Info: Differences between animal and plant cells. -> Goal: Compare. -> Viz/Method: A Venn-like diagram using a doughnut chart from Chart.js. -> Interaction: Visual representation of shared and unique organelles. -> Justification: A diagram is more intuitive and faster to understand for comparison than text lists. -> Library: Chart.js.
+    3. Report Info: The hierarchical structure of life. -> Goal: Organize & Show Flow. -> Viz/Method: An interactive, horizontal flowchart built with HTML/CSS Flexbox. -> Interaction: Hovering over a stage reveals its definition in a tooltip. -> Justification: Visually represents the process and hierarchy more effectively than a simple list, and interactivity provides on-demand information without cluttering the UI. -> Library: Vanilla JS.
+    4. Report Info: Photosynthesis and Cellular Respiration processes. -> Goal: Explain Processes. -> Viz/Method: Styled HTML/CSS cards with clear visual flows (arrows, icons). -> Interaction: Static, clear visual summary. -> Justification: Simplifies complex chemical processes into an easy-to-read, infographic-style format. -> Library: N/A.
+    5. Report Info: Key concepts from all sections. -> Goal: Assess understanding. -> Viz/Method: Interactive multiple-choice quiz using HTML forms. -> Interaction: Select answer, submit, receive feedback, view score, restart. -> Justification: Provides immediate reinforcement of learning and helps identify areas for further study. -> Library: Vanilla JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #FDFBF8; }
+        .nav-btn { transition: all 0.3s ease; }
+        .nav-btn.active, .nav-btn:hover { background-color: #E4D5C7; color: #6D5D51; }
+        .card { perspective: 1000px; }
+        .card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
+        .card.is-flipped .card-inner { transform: rotateY(180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 1.5rem; border-radius: 0.75rem; }
+        .card-front { background-color: #fff; border: 1px solid #E4D5C7; }
+        .card-back { background-color: #F8F1E9; border: 1px solid #E4D5C7; transform: rotateY(180deg); }
+        .flow-item { transition: all 0.2s ease-in-out; }
+        .flow-item:hover { transform: translateY(-5px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .chart-container { position: relative; width: 100%; max-width: 500px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 400px; } }
+        .section-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #6D5D51;
+            text-align: center;
+            margin-bottom: 2.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: #E4D5C7;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <header class="bg-[#F8F1E9]/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-3">
+                <h1 class="text-xl md:text-2xl font-bold text-[#6D5D51]">세포 탐험 🧪</h1>
+                <div class="hidden md:flex space-x-2">
+                    <button onclick="scrollToSection('organelles')" class="nav-btn px-4 py-2 rounded-lg font-semibold text-gray-700">세포 소기관</button>
+                    <button onclick="scrollToSection('comparison')" class="nav-btn px-4 py-2 rounded-lg font-semibold text-gray-700">동물 vs 식물</button>
+                    <button onclick="scrollToSection('levels')" class="nav-btn px-4 py-2 rounded-lg font-semibold text-gray-700">생명 시스템</button>
+                    <button onclick="scrollToSection('processes')" class="nav-btn px-4 py-2 rounded-lg font-semibold text-gray-700">핵심 과정</button>
+                    <button onclick="scrollToSection('quiz')" class="nav-btn px-4 py-2 rounded-lg font-semibold text-gray-700">퀴즈</button>
+                </div>
+                 <div class="md:hidden">
+                    <select onchange="scrollToSection(this.value)" class="bg-white border border-gray-300 rounded-md py-2 px-3 text-gray-700">
+                        <option value="organelles">소기관</option>
+                        <option value="comparison">비교</option>
+                        <option value="levels">시스템</option>
+                        <option value="processes">핵심 과정</option>
+                        <option value="quiz">퀴즈</option>
+                    </select>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-16">
+        <section id="intro" class="text-center mb-16 md:mb-24">
+            <h2 class="text-3xl md:text-5xl font-bold text-[#6D5D51] mb-4">선생님의 시험에 꼭 나오는 핵심 정리</h2>
+            <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+                어려운 생명 과학, 더 이상 외우지 마세요! 선생님의 설명을 따라가며 세포의 신비로운 세계를 탐험하고, 시험 핵심 포인트를 콕콕 짚어봅시다.
+            </p>
+        </section>
+
+        <section id="organelles" class="mb-16 md:mb-24 scroll-mt-20">
+            <h3 class="section-title">세포 소기관 탐험</h3>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">세포 안에는 어떤 기관들이 살고 있을까요? 카드를 클릭해서 각 소기관의 이름과 역할을 확인해보세요. 선생님이 ⭐ 표시로 시험 꿀팁을 알려줄 거예요!</p>
+            <div id="organelle-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            </div>
+        </section>
+
+        <section id="comparison" class="mb-16 md:mb-24 scroll-mt-20">
+            <h3 class="section-title">동물세포 vs 식물세포</h3>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">동물세포와 식물세포는 어떻게 다를까요? 아래 차트와 목록을 통해 공통점과 차이점을 한눈에 파악해봅시다. ✅ 표시가 있는 소기관이 식물세포에만 있는 특별한 친구들이에요!</p>
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <div class="chart-container">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
+                    <div>
+                        <h4 class="font-bold text-xl mb-3 text-[#5A8D6E]">✅ 식물세포에만 있어요</h4>
+                        <ul class="space-y-2 text-gray-700">
+                            <li><strong>세포벽:</strong> 세포 형태 유지 및 보호</li>
+                            <li><strong>엽록체:</strong> 광합성으로 양분 생산</li>
+                            <li><strong>액포:</strong> 크게 발달하여 물, 양분, 노폐물 저장</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xl mb-3 text-[#D98B7E]">🐾 공통으로 있어요</h4>
+                        <ul class="space-y-2 text-gray-700">
+                             <li>핵, 미토콘드리아, 리보솜, 소포체, 골지체, 세포막 등</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="levels" class="mb-16 md:mb-24 scroll-mt-20">
+            <h3 class="section-title">생명 시스템의 구성 단계</h3>
+             <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">세포 하나에서 시작해서 어떻게 하나의 완전한 생명체가 될까요? 동물과 식물의 구성 단계를 따라가며 생명 시스템의 놀라운 체계를 이해해봅시다.</p>
+            <div class="space-y-10">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h4 class="font-bold text-xl mb-5 text-center">🐾 동물의 구성 단계</h4>
+                    <div id="animal-levels" class="flex flex-wrap items-center justify-center gap-4"></div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h4 class="font-bold text-xl mb-5 text-center">🌱 식물의 구성 단계</h4>
+                    <div id="plant-levels" class="flex flex-wrap items-center justify-center gap-4"></div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="processes" class="mb-16 md:mb-24 scroll-mt-20">
+            <h3 class="section-title">핵심 생명 과정</h3>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">생명 활동의 핵심! 에너지를 만들고 사용하는 두 가지 중요한 과정을 살펴봅시다. 세포 호흡과 광합성은 서로 반대되는 과정이라는 점도 기억해주세요!</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-lg border-l-4 border-[#5A8D6E]">
+                    <h4 class="font-bold text-2xl mb-4">🌱 광합성 (식물)</h4>
+                    <p class="mb-4 text-gray-600">엽록체에서 빛 에너지를 이용해 양분을 만드는 과정이에요.</p>
+                    <div class="space-y-3 text-lg">
+                        <div class="flex items-center"><span>물 + 이산화탄소</span><span class="mx-4 font-bold text-[#5A8D6E]"> --(빛 에너지)--> </span><span>포도당 + 산소</span></div>
+                    </div>
+                </div>
+                 <div class="bg-white p-8 rounded-xl shadow-lg border-l-4 border-[#D98B7E]">
+                    <h4 class="font-bold text-2xl mb-4">🐾 세포 호흡 (동물+식물)</h4>
+                    <p class="mb-4 text-gray-600">미토콘드리아에서 양분을 분해해 생명 활동에 필요한 에너지를 얻는 과정이에요.</p>
+                     <div class="space-y-3 text-lg">
+                        <div class="flex items-center"><span>포도당 + 산소</span><span class="mx-4 font-bold text-[#D98B7E]"> ----> </span><span>물 + 이산화탄소 + <strong class="text-red-500">에너지</strong></span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="quiz" class="scroll-mt-20">
+            <h3 class="section-title">실력 점검 퀴즈!</h3>
+            <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">지금까지 배운 내용을 바탕으로 퀴즈를 풀어보세요! 총 5문제로 구성되어 있으며, 각 문제의 답을 선택 후 '정답 확인' 버튼을 눌러주세요.</p>
+            <div class="bg-white p-6 rounded-xl shadow-lg max-w-2xl mx-auto">
+                <div id="quiz-container">
+                    <h4 id="question-text" class="text-xl font-bold mb-6">문제 1. 세포 호흡을 통해 에너지를 생산하는 세포 소기관은?</h4>
+                    <div id="options-container" class="space-y-4 mb-6">
+                        <label class="block cursor-pointer bg-gray-50 hover:bg-gray-100 p-3 rounded-lg border border-gray-200">
+                            <input type="radio" name="answer" value="0" class="mr-3">
+                            <span class="text-gray-800">핵</span>
+                        </label>
+                        <label class="block cursor-pointer bg-gray-50 hover:bg-gray-100 p-3 rounded-lg border border-gray-200">
+                            <input type="radio" name="answer" value="1" class="mr-3">
+                            <span class="text-gray-800">미토콘드리아</span>
+                        </label>
+                        <label class="block cursor-pointer bg-gray-50 hover:bg-gray-100 p-3 rounded-lg border border-gray-200">
+                            <input type="radio" name="answer" value="2" class="mr-3">
+                            <span class="text-gray-800">엽록체</span>
+                        </label>
+                        <label class="block cursor-pointer bg-gray-50 hover:bg-gray-100 p-3 rounded-lg border border-gray-200">
+                            <input type="radio" name="answer" value="3" class="mr-3">
+                            <span class="text-gray-800">리보솜</span>
+                        </label>
+                    </div>
+                    <button id="submit-quiz" class="w-full bg-[#E4D5C7] text-[#6D5D51] font-bold py-3 rounded-lg hover:bg-[#D4C5B7] transition-colors">정답 확인</button>
+                    <div id="feedback" class="mt-4 text-center font-bold text-lg"></div>
+                    <button id="restart-quiz" class="w-full bg-gray-200 text-gray-700 font-bold py-3 rounded-lg hover:bg-gray-300 transition-colors mt-3 hidden">퀴즈 다시 풀기</button>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="bg-[#F8F1E9] mt-16 py-6">
+        <div class="container mx-auto text-center text-gray-600">
+            <p>&copy; 2025 생명 과학 핵심 정리. All rights reserved.</p>
+        </div>
+    </footer>
+
+<script>
+    const organelleData = [
+        { name: '핵', icon: '🧬', details: '유전 물질인 **DNA**(핵산)가 들어있어 생명 활동을 조절하는 중심! 제일 중요하다고 했지?' },
+        { name: '미토콘드리아', icon: '⚡️', details: '⭐**세포 호흡**으로 **에너지(ATP)를 생산**하는 발전소! 에너지가 많이 필요한 근육 세포에 많아. <br>✅ 올해부터 **마이토콘드리아**라고 불러야 해!' },
+        { name: '리보솜', icon: '⚪', details: '⭐**단백질을 합성**하는 아주 작은 알갱이야. 소포체에 붙어있거나 세포질에 흩어져 있어. <br>✅ 얘도 **라이보솜**으로 이름 바뀌었고, **막이 없어!**' },
+        { name: '소포체', icon: '🚚', details: '리보솜에서 만든 단백질을 운반하는 **통로**! 옛날 택배(소포) 생각하면 쉽지?' },
+        { name: '골지체', icon: '📦', details: '단백질을 저장하고 포장해서 세포 밖으로 내보내는 **마지막 관문**! 골판지처럼 생겼어.' },
+        { name: '세포막', icon: '🛡️', details: '세포를 둘러싸고 물질의 출입을 조절하는 **문지기**! "넌 들어와, 넌 나가!"' },
+        { name: '세포벽', icon: '🧱', details: '✅ **식물 세포에만 있어!** 세포막 바깥의 단단한 벽으로 세포의 형태를 유지하고 보호해.' },
+        { name: '엽록체', icon: '🌿', details: '✅ **식물 세포에만 있어!** ⭐**광합성**으로 빛 에너지를 이용해 양분(포도당)을 만드는 공장이야.' },
+        { name: '액포', icon: '💧', details: '✅ **식물 세포에서 크게 발달!** 물, 양분, 노폐물을 저장하는 창고. 동물 세포엔 거의 없거나 작아.' },
+    ];
+
+    const animalLevels = [
+        { name: '세포', desc: '가장 작은 기본 단위' },
+        { name: '조직', desc: '비슷한 세포의 모임' },
+        { name: '기관', desc: '여러 조직이 모여 고유 기능 수행 (예: 위, 심장)' },
+        { name: '기관계', desc: '⭐동물만 가짐! 특정 기능을 함께하는 기관들의 모임 (예: 소화계)' },
+        { name: '개체', desc: '완전한 하나의 생명체' },
+    ];
+
+    const plantLevels = [
+        { name: '세포', desc: '가장 작은 기본 단위' },
+        { name: '조직', desc: '비슷한 세포의 모임' },
+        { name: '조직계', desc: '⭐식물만 가짐! 특정 기능을 함께하는 조직들의 모임 (예: 관다발조직계)' },
+        { name: '기관', desc: '여러 조직계가 모여 고유 기능 수행 (예: 뿌리, 잎)' },
+        { name: '개체', desc: '완전한 하나의 생명체' },
+    ];
+
+    const quizData = [
+        {
+            question: '세포 호흡을 통해 에너지를 생산하는 세포 소기관은?',
+            options: ['핵', '미토콘드리아', '엽록체', '리보솜'],
+            correct: 1
+        },
+        {
+            question: '단백질을 합성하는 세포 소기관으로, 막이 없는 특징을 가진 것은?',
+            options: ['소포체', '골지체', '리보솜 (라이보솜)', '세포막'],
+            correct: 2
+        },
+        {
+            question: '다음 중 식물 세포에만 존재하는 세포 소기관을 모두 고르시오.',
+            options: ['핵, 미토콘드리아', '세포벽, 엽록체, 액포', '리보솜, 소포체', '세포막, 골지체'],
+            correct: 1
+        },
+        {
+            question: '동물의 생명 시스템 구성 단계로 올바른 것은?',
+            options: ['세포 → 조직 → 기관 → 개체', '세포 → 조직 → 기관계 → 기관 → 개체', '세포 → 조직 → 기관 → 기관계 → 개체', '세포 → 조직계 → 기관 → 개체'],
+            correct: 2
+        },
+        {
+            question: '광합성 과정의 결과물로 옳은 것은?',
+            options: ['포도당과 이산화탄소', '물과 산소', '포도당과 산소', '물과 이산화탄소'],
+            correct: 2
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const submitQuizBtn = document.getElementById('submit-quiz');
+    const feedbackDiv = document.getElementById('feedback');
+    const restartQuizBtn = document.getElementById('restart-quiz');
+
+    function createOrganelleCards() {
+        const grid = document.getElementById('organelle-grid');
+        organelleData.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card h-48';
+            card.innerHTML = `
+                <div class="card-inner rounded-xl shadow-md">
+                    <div class="card-face card-front">
+                        <span class="text-5xl mb-2">${item.icon}</span>
+                        <h4 class="text-xl font-bold text-gray-800">${item.name}</h4>
+                    </div>
+                    <div class="card-face card-back">
+                        <p class="text-center text-gray-700">${item.details}</p>
+                    </div>
+                </div>
+            `;
+            card.addEventListener('click', () => {
+                card.classList.toggle('is-flipped');
+            });
+            grid.appendChild(card);
+        });
+    }
+    
+    function createLevelFlow(containerId, data) {
+        const container = document.getElementById(containerId);
+        data.forEach((item, index) => {
+            const itemEl = document.createElement('div');
+            itemEl.className = 'flow-item bg-gray-100 p-4 rounded-lg text-center relative group cursor-pointer';
+            itemEl.innerHTML = `<h5 class="font-bold">${item.name}</h5><div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">${item.desc}</div>`;
+            container.appendChild(itemEl);
+
+            if (index < data.length - 1) {
+                const arrow = document.createElement('div');
+                arrow.className = 'text-2xl font-bold text-gray-300 hidden sm:block';
+                arrow.innerText = '→';
+                container.appendChild(arrow);
+            }
+        });
+    }
+
+    function createComparisonChart() {
+        const ctx = document.getElementById('comparisonChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['공통 소기관', '식물 고유 소기관'],
+                datasets: [{
+                    label: '세포 소기관',
+                    data: [6, 3], 
+                    backgroundColor: [
+                        '#D98B7E',
+                        '#5A8D6E',
+                    ],
+                    borderColor: '#FFFFFF',
+                    borderWidth: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { size: 14 }
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: '동물세포와 식물세포 소기관 비교',
+                        font: { size: 18, weight: 'bold' }
+                    }
+                },
+                cutout: '50%'
+            }
+        });
+    }
+
+    function renderQuestion() {
+        if (currentQuestionIndex < quizData.length) {
+            const question = quizData[currentQuestionIndex];
+            questionText.textContent = `문제 ${currentQuestionIndex + 1}. ${question.question}`;
+            optionsContainer.innerHTML = '';
+            question.options.forEach((option, index) => {
+                const label = document.createElement('label');
+                label.className = 'block cursor-pointer bg-gray-50 hover:bg-gray-100 p-3 rounded-lg border border-gray-200';
+                label.innerHTML = `
+                    <input type="radio" name="answer" value="${index}" class="mr-3">
+                    <span class="text-gray-800">${option}</span>
+                `;
+                optionsContainer.appendChild(label);
+            });
+            submitQuizBtn.classList.remove('hidden');
+            feedbackDiv.textContent = '';
+            restartQuizBtn.classList.add('hidden');
+        } else {
+            showResult();
+        }
+    }
+
+    function checkAnswer() {
+        const selectedOption = document.querySelector('input[name="answer"]:checked');
+        if (!selectedOption) {
+            feedbackDiv.textContent = '답을 선택해주세요!';
+            feedbackDiv.className = 'mt-4 text-center font-bold text-lg text-yellow-600';
+            return;
+        }
+
+        const userAnswer = parseInt(selectedOption.value);
+        const correctAnswer = quizData[currentQuestionIndex].correct;
+
+        if (userAnswer === correctAnswer) {
+            score++;
+            feedbackDiv.textContent = '정답입니다! 🎉';
+            feedbackDiv.className = 'mt-4 text-center font-bold text-lg text-green-600';
+        } else {
+            feedbackDiv.textContent = `오답입니다. 정답은 "${quizData[currentQuestionIndex].options[correctAnswer]}" 입니다. 🙁`;
+            feedbackDiv.className = 'mt-4 text-center font-bold text-lg text-red-600';
+        }
+
+        submitQuizBtn.classList.add('hidden');
+        setTimeout(() => {
+            currentQuestionIndex++;
+            renderQuestion();
+            if (currentQuestionIndex >= quizData.length) {
+                showResult();
+            } else {
+                 feedbackDiv.textContent = '';
+            }
+        }, 1500);
+    }
+
+    function showResult() {
+        questionText.textContent = '퀴즈가 종료되었습니다!';
+        optionsContainer.innerHTML = `<p class="text-center text-xl font-bold">총 ${quizData.length}문제 중 ${score}문제 맞히셨습니다! ✨</p>`;
+        feedbackDiv.textContent = '';
+        submitQuizBtn.classList.add('hidden');
+        restartQuizBtn.classList.remove('hidden');
+    }
+
+    function resetQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        renderQuestion();
+    }
+
+    function scrollToSection(sectionId) {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        createOrganelleCards();
+        createLevelFlow('animal-levels', animalLevels);
+        createLevelFlow('plant-levels', plantLevels);
+        createComparisonChart();
+        renderQuestion(); 
+
+        submitQuizBtn.addEventListener('click', checkAnswer);
+        restartQuizBtn.addEventListener('click', resetQuiz);
+        
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const sections = document.querySelectorAll('section[id]');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if(pageYOffset >= sectionTop - 80){
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navButtons.forEach(button => {
+                button.classList.remove('active');
+                if(button.getAttribute('onclick').includes(current)){
+                    button.classList.add('active');
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

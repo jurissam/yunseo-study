@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대화형 물리 핵심 정리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: 이 애플리케이션은 두 개의 핵심 주제(충격량과 힘, 운동과 중력)를 중심으로 한 탭 기반의 단일 페이지 구조를 채택했습니다. 이 구조는 사용자가 복잡한 물리 개념들을 명확하게 구분된 섹션 내에서 집중적으로 학습할 수 있도록 돕습니다. '달걀 떨어뜨리기' 시뮬레이션과 '낙하 경주' 시뮬레이션 같은 대화형 요소를 각 섹션의 중심에 배치하여, 사용자가 직접 조작하며 원리를 탐구하는 능동적인 학습 경험을 제공합니다. 시뮬레이션 결과는 즉각적인 시각적 피드백(애니메이션, 동적 차트, 비교표)으로 이어져 개념 이해를 심화시킵니다. 여기에 '퀴즈' 섹션을 추가하여 학습한 내용을 스스로 점검하고 복습할 수 있는 기회를 제공합니다. 이 접근 방식은 정적인 정보 나열보다 훨씬 효과적으로 사용자의 참여를 유도하고 학습 효과를 높이기 때문에 선택되었습니다. -->
+    <!-- Visualization & Content Choices: 1. 달걀 실험 (목표: 충격량-충격력 관계 비교) -> 방법: JS 애니메이션 + Chart.js 막대그래프. 상호작용: 버튼 클릭 시 애니메이션과 함께 동적 그래프 생성. 정당성: 충돌 시간의 차이가 힘의 크기에 미치는 영향을 시각적으로 명확하게 보여줌. 2. 안전장치 (목표: 다른 원리 비교) -> 방법: HTML/CSS 탭. 상호작용: 탭 클릭 시 설명 전환. 정당성: 두 장치의 작동 원리가 다름을 명확히 분리하여 설명. 3. 낙하 운동 (목표: 자유낙하와 수평투사 비교) -> 방법: JS 애니메이션 + HTML 비교표. 상호작용: 버튼 클릭 시 동시 낙하 애니메이션 실행 후 비교표 표시. 정당성: 연직/수평 운동의 독립성을 가장 직관적인 애니메이션으로 증명하고, 표로 핵심 차이를 요약 정리. 4. 퀴즈 (목표: 학습 내용 점검) -> 방법: HTML 폼 + JS 채점 로직. 상호작용: 라디오 버튼 선택 후 '정답 확인' 버튼 클릭 시 결과 표시. 정당성: 사용자의 자기 평가를 돕고, 학습 성과를 즉시 확인할 수 있도록 함. NO SVG, NO Mermaid 사용 확인. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #FDFBF8; }
+        .tab-active { border-color: #A5825A; color: #A5825A; background-color: #F5F1EB; }
+        .tab-inactive { border-color: #D1C7BC; color: #6B5E51; }
+        .btn-primary { background-color: #A5825A; color: white; transition: background-color 0.3s; }
+        .btn-primary:hover { background-color: #8A6C4A; }
+        .egg { width: 40px; height: 50px; background-color: #FDE9CC; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; position: absolute; bottom: 200px; left: 50%; transform: translateX(-50%); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .crack { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url("data:image/svg+xml,%3Csvg width='40' height='50' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 20 L 15 25 L 12 30 M20 15 L 25 20 L 28 15 M 30 25 L 25 30 L 30 35' stroke='rgba(0,0,0,0.5)' stroke-width='1' fill='none'/%3E%3C/svg%3E"); opacity: 0;}
+        .cushion { width: 100%; height: 20px; background-color: #D1C7BC; border-radius: 5px; position: absolute; bottom: 0; }
+        .floor { width: 100%; height: 5px; background-color: #8A6C4A; position: absolute; bottom: 0; }
+        .object { width: 30px; height: 30px; background-color: #BF9B7A; border-radius: 50%; position: absolute; top: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 40vh; }
+        @keyframes fall {
+            from { bottom: 200px; }
+            to { bottom: 5px; }
+        }
+        @keyframes fall-cushion {
+            from { bottom: 200px; }
+            to { bottom: 20px; }
+        }
+        @keyframes break {
+            to { opacity: 1; }
+        }
+        @keyframes compress {
+            50% { transform: scaleY(0.5); }
+            100% { transform: scaleY(1); }
+        }
+        .animate-fall { animation: fall 0.5s ease-in forwards; }
+        .animate-fall-cushion { animation: fall-cushion 0.5s ease-in forwards; }
+        .animate-break { animation: break 0.1s 0.5s forwards; }
+        .animate-compress { animation: compress 0.3s 0.5s ease-out forwards; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-[#8A6C4A]">대화형 물리 핵심 정리</h1>
+            <p class="text-lg text-gray-600 mt-2">시뮬레이션으로 체험하는 물리 핵심 원리</p>
+        </header>
+
+        <div class="flex justify-center border-b-2 border-gray-200 mb-8">
+            <button id="tab1-btn" class="py-3 px-6 text-lg font-semibold border-b-4 tab-active" onclick="switchTab('tab1')">1. 충격량과 힘</button>
+            <button id="tab2-btn" class="py-3 px-6 text-lg font-semibold border-b-4 tab-inactive" onclick="switchTab('tab2')">2. 운동과 중력</button>
+            <button id="tab3-btn" class="py-3 px-6 text-lg font-semibold border-b-4 tab-inactive" onclick="switchTab('tab3')">3. 퀴즈</button>
+        </div>
+
+        <main>
+            <section id="tab1">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold mb-4 text-[#A5825A]">달걀 떨어뜨리기 실험</h2>
+                    <p class="mb-6 text-gray-700">충격량이 같을 때, 충돌 시간이 길어지면 물체가 받는 힘(충격력)은 어떻게 변할까요? 아래 '실험 시작' 버튼을 눌러 직접 확인해 보세요. 같은 높이에서 떨어진 두 달걀의 운명이 어떻게 달라지는지 관찰하고, 아래 생성되는 힘-시간 그래프를 통해 그 원리를 이해할 수 있습니다.</p>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-6 h-64 relative">
+                        <div class="border p-4 rounded-lg bg-[#FDFBF8] relative h-full">
+                            <h3 class="text-center font-bold mb-2">단단한 바닥</h3>
+                            <div id="hard-surface-area" class="relative w-full h-full">
+                                <div id="egg1" class="egg"><div class="crack"></div></div>
+                                <div class="floor"></div>
+                            </div>
+                        </div>
+                        <div class="border p-4 rounded-lg bg-[#FDFBF8] relative h-full">
+                             <h3 class="text-center font-bold mb-2">푹신한 방석</h3>
+                            <div id="soft-surface-area" class="relative w-full h-full">
+                                <div id="egg2" class="egg"></div>
+                                <div id="cushion" class="cushion"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mb-8">
+                        <button id="egg-drop-btn" class="btn-primary font-bold py-2 px-6 rounded-full text-lg" onclick="dropEggs()">실험 시작</button>
+                    </div>
+
+                    <div id="chart-container-wrapper" class="hidden">
+                         <div class="chart-container">
+                            <canvas id="impactChart"></canvas>
+                        </div>
+                        <p id="chart-desc" class="text-center mt-4 text-gray-700 font-medium"></p>
+                    </div>
+
+                    <hr class="my-12">
+
+                    <h2 class="text-2xl font-bold mb-4 text-[#A5825A]">안전장치의 원리</h2>
+                     <p class="mb-6 text-gray-700">우리의 안전을 지켜주는 장치들은 다양한 물리 원리를 이용합니다. 에어백과 안전벨트는 모두 중요하지만, 서로 다른 원리로 우리를 보호합니다. 아래 탭을 눌러 각 장치의 핵심 원리를 비교해 보세요.</p>
+                    <div class="flex border-b border-gray-300">
+                        <button id="safety-tab1-btn" class="py-2 px-4 font-semibold text-[#A5825A] border-b-2 border-[#A5825A]" onclick="switchSafetyTab(1)">에어백</button>
+                        <button id="safety-tab2-btn" class="py-2 px-4 font-semibold text-gray-500" onclick="switchSafetyTab(2)">안전벨트</button>
+                    </div>
+                    <div id="safety-content1" class="mt-4 p-4 bg-amber-50 rounded-lg">
+                        <h3 class="font-bold text-lg mb-2">에어백: 충돌 시간 늘리기</h3>
+                        <p>에어백은 충돌 시 탑승자와 핸들 또는 대시보드 사이에서 부풀어 오릅니다. 이 푹신한 에어백이 **충돌 시간을 길게** 만들어, 탑승자가 받는 **최대 충격력의 크기를 줄여줍니다.** 이는 '달걀 떨어뜨리기' 실험에서 푹신한 방석과 같은 원리입니다.</p>
+                        <p class="mt-2 font-semibold text-[#8A6C4A]">핵심 원리: 충격량($I=F \Delta t$) 조절</p>
+                    </div>
+                    <div id="safety-content2" class="mt-4 p-4 bg-gray-100 rounded-lg hidden">
+                        <h3 class="font-bold text-lg mb-2">안전벨트: 관성 제어하기</h3>
+                        <p>안전벨트는 급정거나 충돌 시, 몸이 앞으로 쏠리려는 **관성**을 제어하여 탑승자를 좌석에 고정시키는 역할을 합니다. 몸이 튕겨 나가 2차 충돌로 인한 더 큰 부상을 입는 것을 막아줍니다. 이는 힘을 분산시키는 원리와는 다른, **관성의 법칙**을 이용한 것입니다.</p>
+                        <p class="mt-2 font-semibold text-gray-600">핵심 원리: 관성(Inertia)</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab2" class="hidden">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold mb-4 text-[#A5825A]">낙하 운동 경주</h2>
+                    <p class="mb-6 text-gray-700">같은 높이에서 한 물체는 그대로 떨어뜨리고(자유 낙하), 다른 물체는 수평 방향으로 던지면(수평 투사 운동) 어느 쪽이 먼저 바닥에 닿을까요? '경주 시작' 버튼을 눌러 결과를 직접 확인하고, 두 운동의 차이점을 아래 비교표에서 학습해 보세요.</p>
+                    
+                    <div class="relative w-full h-80 bg-[#FDFBF8] border rounded-lg p-4 overflow-hidden">
+                        <div id="object-freefall" class="object" style="left: 30%;"></div>
+                        <div id="object-projectile" class="object" style="left: 0;"></div>
+                        <div class="absolute bottom-0 left-0 w-full h-1 bg-[#8A6C4A]"></div>
+                        <p class="absolute top-2 left-[30%] -translate-x-1/2 font-semibold">자유 낙하</p>
+                        <p class="absolute top-2 left-2 font-semibold">수평 투사</p>
+                    </div>
+                    
+                    <div class="text-center mt-6 mb-8">
+                        <button id="race-btn" class="btn-primary font-bold py-2 px-6 rounded-full text-lg" onclick="startRace()">경주 시작</button>
+                    </div>
+
+                    <div id="comparison-table" class="hidden">
+                        <h3 class="text-xl font-bold mb-4 text-center">운동 방식 비교</h3>
+                        <div class="grid md:grid-cols-2 gap-6 text-center">
+                            <div class="bg-amber-50 p-4 rounded-lg">
+                                <h4 class="font-bold text-lg mb-2">자유 낙하</h4>
+                                <ul class="text-left space-y-2">
+                                    <li><span class="font-semibold">수평 운동:</span> 없음</li>
+                                    <li><span class="font-semibold">수직 운동:</span> 속도 일정하게 증가 (등가속도)</li>
+                                    <li><span class="font-semibold">힘의 방향:</span> 항상 연직 아래 (중력)</li>
+                                    <li><span class="font-semibold">운동 방향:</span> 항상 연직 아래</li>
+                                </ul>
+                            </div>
+                             <div class="bg-gray-100 p-4 rounded-lg">
+                                <h4 class="font-bold text-lg mb-2">수평 투사 운동</h4>
+                                 <ul class="text-left space-y-2">
+                                    <li><span class="font-semibold">수평 운동:</span> 속도 일정 (등속도)</li>
+                                    <li><span class="font-semibold">수직 운동:</span> 속도 일정하게 증가 (등가속도)</li>
+                                    <li><span class="font-semibold">힘의 방향:</span> 항상 연직 아래 (중력)</li>
+                                    <li><span class="font-semibold">운동 방향:</span> 매 순간 변함 (포물선 접선 방향)</li>
+                                </ul>
+                            </div>
+                        </div>
+                         <p class="text-center mt-6 text-lg font-bold text-[#A5825A]">결론: 두 물체는 동시에 바닥에 도달합니다!</p>
+                         <p class="text-center mt-2 text-gray-700">수평 방향의 운동은 연직 방향의 낙하 운동에 영향을 주지 않기 때문입니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab3" class="hidden">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-bold mb-4 text-[#A5825A]">물리 핵심 퀴즈</h2>
+                    <p class="mb-6 text-gray-700">지금까지 학습한 내용을 퀴즈를 통해 점검해 보세요. 각 문제의 정답을 선택하고 '정답 확인' 버튼을 누르면 결과를 확인할 수 있습니다.</p>
+                    
+                    <form id="quiz-form">
+                        <div class="mb-8">
+                            <p class="font-semibold text-lg mb-3">1. 충격량이 일정할 때, 충돌 시간이 길어지면 물체가 받는 힘(충격력)의 크기는 어떻게 될까요?</p>
+                            <div class="flex flex-col space-y-2">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" class="form-radio text-[#A5825A]" name="q1" value="A">
+                                    <span class="ml-2">A) 커진다</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" class="form-radio text-[#A5825A]" name="q1" value="B">
+                                    <span class="ml-2">B) 작아진다</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" class="form-radio text-[#A5825A]" name="q1" value="C">
+                                    <span class="ml-2">C) 변하지 않는다</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" class="form-radio text-[#A5825A]" name="q1" value="D">
+                                    <span class="ml-2">D) 0이 된다</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-8">
+                            <p class="font-semibold text-lg mb-3">2. 자동차의 에어백과 안전벨트 중, '충돌 시간을 길게 하여 충격력을 줄이는' 원리를 이용하는 것은 무엇일까요?</p>
+                            <div class="flex flex-col space-y-2">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" class="form-radio text-[#A5825A]" name="q2" value="A">
+                                    <span class="ml-2">A) 에어백만</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" class="form-radio text-[#A5825A]" name="q2" value="B">
+                                    <span class="ml-2">B) 안전벨트만</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" class="form-radio text-[#A5825A]" name="q2" value="C">
+                                    <span class="ml-2">C) 둘 다</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" class="form-radio text-[#A5825A]" name="q2" value="D">
+                                    <span class="ml-2">D) 둘 다 아님</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-8">
+                            <p class="font-semibold text-lg mb-3">3. 같은 높이에서 자유 낙하하는 물체와 수평 방향으로 던져진 물체는 언제 바닥에 도달할까요?</p>
+                            <div class="flex flex-col space-y-2">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" class="form-radio text-[#A5825A]" name="q3" value="A">
+                                    <span class="ml-2">A) 자유 낙하하는 물체가 먼저</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" class="form-radio text-[#A5825A]" name="q3" value="B">
+                                    <span class="ml-2">B) 수평 방향으로 던져진 물체가 먼저</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" class="form-radio text-[#A5825A]" name="q3" value="C">
+                                    <span class="ml-2">C) 동시에</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" class="form-radio text-[#A5825A]" name="q3" value="D">
+                                    <span class="ml-2">D) 질량에 따라 다름</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-8">
+                            <p class="font-semibold text-lg mb-3">4. 자유 낙하 운동 시 물체에 작용하는 가속도 값은 얼마일까요?</p>
+                            <div class="flex flex-col space-y-2">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" class="form-radio text-[#A5825A]" name="q4" value="A">
+                                    <span class="ml-2">A) 물체의 질량에 따라 변한다</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" class="form-radio text-[#A5825A]" name="q4" value="B">
+                                    <span class="ml-2">B) 0</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" class="form-radio text-[#A5825A]" name="q4" value="C">
+                                    <span class="ml-2">C) 9.8 m/s² (일정)</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" class="form-radio text-[#A5825A]" name="q4" value="D">
+                                    <span class="ml-2">D) 속도에 비례하여 증가한다</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-6">
+                            <button type="button" class="btn-primary font-bold py-2 px-6 rounded-full text-lg" onclick="submitQuiz()">정답 확인</button>
+                            <button type="button" class="bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-full text-lg ml-4 hidden" id="reset-quiz-btn" onclick="resetQuiz()">다시 풀기</button>
+                        </div>
+                    </form>
+
+                    <div id="quiz-results" class="mt-8 p-6 bg-gray-50 rounded-lg hidden">
+                        <h3 class="text-xl font-bold mb-4 text-center">퀴즈 결과</h3>
+                        <p id="quiz-score" class="text-center text-2xl font-bold mb-4"></p>
+                        <ul id="quiz-feedback" class="space-y-3"></ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        let impactChart = null;
+        const correctAnswers = {
+            q1: 'B',
+            q2: 'A',
+            q3: 'C',
+            q4: 'C'
+        };
+
+        function switchTab(tabId) {
+            document.getElementById('tab1').classList.add('hidden');
+            document.getElementById('tab2').classList.add('hidden');
+            document.getElementById('tab3').classList.add('hidden'); // New tab
+            
+            document.getElementById('tab1-btn').classList.remove('tab-active');
+            document.getElementById('tab1-btn').classList.add('tab-inactive');
+            document.getElementById('tab2-btn').classList.remove('tab-active');
+            document.getElementById('tab2-btn').classList.add('tab-inactive');
+            document.getElementById('tab3-btn').classList.remove('tab-active'); // New tab button
+            document.getElementById('tab3-btn').classList.add('tab-inactive'); // New tab button
+            
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById(tabId + '-btn').classList.add('tab-active');
+            document.getElementById(tabId + '-btn').classList.remove('tab-inactive');
+        }
+        
+        function switchSafetyTab(tabNum) {
+            if (tabNum === 1) {
+                document.getElementById('safety-content1').classList.remove('hidden');
+                document.getElementById('safety-content2').classList.add('hidden');
+                document.getElementById('safety-tab1-btn').classList.add('border-[#A5825A]', 'text-[#A5825A]');
+                document.getElementById('safety-tab1-btn').classList.remove('text-gray-500', 'border-transparent');
+                document.getElementById('safety-tab2-btn').classList.add('text-gray-500', 'border-transparent');
+                document.getElementById('safety-tab2-btn').classList.remove('border-[#A5825A]', 'text-[#A5825A]');
+            } else {
+                document.getElementById('safety-content1').classList.add('hidden');
+                document.getElementById('safety-content2').classList.remove('hidden');
+                document.getElementById('safety-tab1-btn').classList.remove('border-[#A5825A]', 'text-[#A5825A]');
+                document.getElementById('safety-tab1-btn').classList.add('text-gray-500', 'border-transparent');
+                document.getElementById('safety-tab2-btn').classList.remove('text-gray-500', 'border-transparent');
+                document.getElementById('safety-tab2-btn').classList.add('border-[#A5825A]', 'text-[#A5825A]');
+            }
+        }
+
+        function resetAnimation(el) {
+            el.style.animation = 'none';
+            el.offsetHeight; 
+            el.style.animation = null; 
+        }
+
+        function dropEggs() {
+            const egg1 = document.getElementById('egg1');
+            const crack = egg1.querySelector('.crack');
+            const egg2 = document.getElementById('egg2');
+            const cushion = document.getElementById('cushion');
+            const btn = document.getElementById('egg-drop-btn');
+
+            btn.disabled = true;
+            btn.textContent = '실험 중...';
+
+            resetAnimation(egg1);
+            resetAnimation(crack);
+            resetAnimation(egg2);
+            resetAnimation(cushion);
+            
+            egg1.classList.add('animate-fall');
+            crack.classList.add('animate-break');
+            egg2.classList.add('animate-fall-cushion');
+            cushion.classList.add('animate-compress');
+
+            document.getElementById('chart-container-wrapper').classList.add('hidden');
+
+            setTimeout(() => {
+                createImpactChart();
+                document.getElementById('chart-container-wrapper').classList.remove('hidden');
+                btn.disabled = false;
+                btn.textContent = '다시 실험하기';
+            }, 800);
+        }
+
+        function createImpactChart() {
+            const ctx = document.getElementById('impactChart').getContext('2d');
+            if (impactChart) {
+                impactChart.destroy();
+            }
+            impactChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['단단한 바닥', '푹신한 방석'],
+                    datasets: [{
+                        label: '최대 힘 (충격력)',
+                        data: [100, 25],
+                        backgroundColor: ['#BF9B7A', '#D1C7BC'],
+                        borderColor: ['#8A6C4A', '#A89E93'],
+                        borderWidth: 2
+                    }, {
+                        label: '충돌 시간',
+                        data: [10, 40],
+                        backgroundColor: 'rgba(165, 130, 90, 0.2)',
+                        borderColor: 'rgba(165, 130, 90, 0.5)',
+                        borderWidth: 1,
+                        type: 'line',
+                        yAxisID: 'y1',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: '힘의 크기 (상대값)', font: { size: 14 } },
+                            position: 'left',
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            title: { display: true, text: '시간 (상대값)', font: { size: 14 } },
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false, 
+                            },
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y;
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        legend: {
+                           position: 'top',
+                        }
+                    }
+                }
+            });
+            document.getElementById('chart-desc').textContent = '두 경우의 충격량(힘×시간, 그래프 넓이에 비례)은 같지만, 충돌 시간이 길어진 방석에서 최대 힘(충격력)이 현저히 줄어든 것을 볼 수 있습니다.';
+        }
+
+        function startRace() {
+            const freefallObj = document.getElementById('object-freefall');
+            const projectileObj = document.getElementById('object-projectile');
+            const container = freefallObj.parentElement;
+            const btn = document.getElementById('race-btn');
+
+            btn.disabled = true;
+            btn.textContent = '경주 중...';
+            document.getElementById('comparison-table').classList.add('hidden');
+
+            const g = 9.8 * 20; 
+            const horizontal_v = 150; 
+            let start = null;
+            const containerHeight = container.clientHeight - freefallObj.clientHeight;
+
+            freefallObj.style.top = '0px';
+            freefallObj.style.left = '30%';
+            projectileObj.style.top = '0px';
+            projectileObj.style.left = '0px';
+            
+            function step(timestamp) {
+                if (!start) start = timestamp;
+                const progress = (timestamp - start) / 1000; 
+
+                let y_pos = 0.5 * g * Math.pow(progress, 2);
+                let x_pos = horizontal_v * progress;
+
+                if (y_pos >= containerHeight) {
+                    y_pos = containerHeight;
+                    freefallObj.style.top = y_pos + 'px';
+                    projectileObj.style.top = y_pos + 'px';
+                    document.getElementById('comparison-table').classList.remove('hidden');
+                     btn.disabled = false;
+                    btn.textContent = '다시 경주하기';
+                    return;
+                }
+
+                freefallObj.style.top = y_pos + 'px';
+                projectileObj.style.top = y_pos + 'px';
+                projectileObj.style.left = x_pos + 'px';
+
+                requestAnimationFrame(step);
+            }
+
+            requestAnimationFrame(step);
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            const quizForm = document.getElementById('quiz-form');
+            const quizResults = document.getElementById('quiz-results');
+            const quizScore = document.getElementById('quiz-score');
+            const quizFeedback = document.getElementById('quiz-feedback');
+            const resetButton = document.getElementById('reset-quiz-btn');
+
+            quizFeedback.innerHTML = ''; // Clear previous feedback
+
+            for (const qKey in correctAnswers) {
+                const selectedOption = quizForm.elements[qKey].value;
+                const correctAnswer = correctAnswers[qKey];
+                const questionNumber = qKey.replace('q', '');
+                const questionText = quizForm.querySelector(`p[name=${qKey}]`) || quizForm.querySelector(`p:has(input[name=${qKey}])`).textContent;
+                
+                const listItem = document.createElement('li');
+                if (selectedOption === correctAnswer) {
+                    score++;
+                    listItem.className = 'text-green-700';
+                    listItem.innerHTML = `✅ ${questionNumber}. 정답입니다!`;
+                } else {
+                    listItem.className = 'text-red-700';
+                    listItem.innerHTML = `❌ ${questionNumber}. 오답입니다. (정답: ${correctAnswer})`;
+                }
+                quizFeedback.appendChild(listItem);
+
+                // Disable radio buttons after submission
+                quizForm.elements[qKey].forEach(radio => radio.disabled = true);
+            }
+
+            quizScore.textContent = `총점: ${score} / ${Object.keys(correctAnswers).length}점`;
+            quizResults.classList.remove('hidden');
+            resetButton.classList.remove('hidden');
+            quizForm.querySelector('button[type="button"]').classList.add('hidden'); // Hide submit button
+        }
+
+        function resetQuiz() {
+            const quizForm = document.getElementById('quiz-form');
+            const quizResults = document.getElementById('quiz-results');
+            const resetButton = document.getElementById('reset-quiz-btn');
+
+            quizForm.reset(); // Reset all radio selections
+            quizResults.classList.add('hidden'); // Hide results
+
+            for (const qKey in correctAnswers) {
+                // Enable radio buttons
+                quizForm.elements[qKey].forEach(radio => radio.disabled = false);
+            }
+            resetButton.classList.add('hidden'); // Hide reset button
+            quizForm.querySelector('button[type="button"]').classList.remove('hidden'); // Show submit button
+        }
+    </script>
+</body>
+</html>

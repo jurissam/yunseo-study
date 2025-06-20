@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인터랙티브 역학 교실</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Neutrals with Teal Accent -->
+    <!-- Application Structure Plan: A single-page application with a sticky top navigation for quick access to four core thematic sections: Gravity, Kinematics, Newton's Second Law, and Uniform Motion. This structure logically follows the learning progression of the source report. Each section combines explanatory text with interactive calculators or visualizations (like dynamic charts and simple animations) to allow users to actively engage with the concepts rather than passively reading. This hands-on approach is chosen to deepen understanding and make the abstract physics principles more tangible and memorable. -->
+    <!-- Visualization & Content Choices:
+        1. Gravity Calculator: Report Info -> F=mg formula. Goal -> Inform/Interact. Method -> HTML inputs for mass and a toggle for 'g' (9.8/10), with real-time calculation via JS. Justification -> Actively demonstrates the relationship between mass and gravitational force. Library -> Vanilla JS.
+        2. Kinematics Explainer: Report Info -> Concepts of displacement, velocity, acceleration. Goal -> Compare/Inform. Method -> A tabbed interface. 'Distance vs. Displacement' uses a CSS diagram. 'Acceleration' uses an interactive calculator. 'Gravitational Acceleration' uses a JS-driven animation showing a falling object's velocity change. Justification -> Breaks down complex concepts into manageable, interactive parts. A visual diagram and animation are more intuitive than text alone. Library -> Vanilla JS.
+        3. Newton's Law (F=ma) Calculator: Report Info -> F=ma formula. Goal -> Explore Relationships. Method -> Interactive calculator where users input two variables to find the third. Justification -> Allows users to explore the direct and inverse relationships between force, mass, and acceleration. Library -> Vanilla JS.
+        4. Uniform Motion Graphs: Report Info -> Graphs for uniform motion. Goal -> Change/Visualize. Method -> Three dynamic Chart.js charts. A slider allows users to change the constant velocity, which instantly updates the time-distance and time-speed graphs. Justification -> Makes the abstract concept of graphical representation interactive and demonstrates cause-and-effect. Library -> Chart.js.
+        5. Quiz: Report Info -> All core concepts. Goal -> Assess/Memorize. Method -> Interactive multiple-choice quiz with immediate feedback and score tracking. Justification -> Provides an active learning component to reinforce memorization and understanding. Library -> Vanilla JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            margin: auto;
+        }
+        @media (max-width: 640px) {
+            .chart-container {
+                height: 250px;
+            }
+        }
+        .tab-btn.active {
+            border-color: #0d9488;
+            color: #0d9488;
+            font-weight: 700;
+        }
+        .quiz-option-btn {
+            @apply w-full text-left p-3 border-2 border-stone-300 rounded-md hover:bg-stone-200 transition-colors duration-200;
+        }
+        .quiz-option-btn.correct {
+            @apply bg-green-200 border-green-500;
+        }
+        .quiz-option-btn.incorrect {
+            @apply bg-red-200 border-red-500;
+        }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <h1 class="text-2xl font-bold text-teal-700">인터랙티브 역학 교실</h1>
+            <nav class="mt-2">
+                <ul class="flex space-x-4 text-sm md:text-base">
+                    <li><a href="#gravity" class="text-stone-600 hover:text-teal-600 font-medium">1. 중력</a></li>
+                    <li><a href="#kinematics" class="text-stone-600 hover:text-teal-600 font-medium">2. 운동의 기술</a></li>
+                    <li><a href="#newton" class="text-stone-600 hover:text-teal-600 font-medium">3. 뉴턴의 제2법칙</a></li>
+                    <li><a href="#uniform-motion" class="text-stone-600 hover:text-teal-600 font-medium">4. 등속 직선 운동</a></li>
+                    <li><a href="#quiz" class="text-stone-600 hover:text-teal-600 font-medium">5. 퀴즈</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8 space-y-12">
+
+        <!-- 1. 중력 섹션 -->
+        <section id="gravity" class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4 text-teal-700">1. 중력 (Gravity)</h2>
+            <p class="mb-6 text-stone-700">질량을 가진 모든 물체는 서로를 끌어당깁니다. 이 힘이 바로 중력입니다. 여기서는 지구 표면 근처의 물체에 작용하는 중력을 계산해 볼 수 있습니다. 질량을 입력하고, 중력 가속도(g) 값을 선택하여 물체의 무게(중력의 크기)가 어떻게 변하는지 확인해보세요.</p>
+            
+            <div class="grid md:grid-cols-2 gap-6 items-center bg-stone-50 p-6 rounded-md">
+                <div class="space-y-4">
+                    <div>
+                        <label for="mass-gravity" class="block text-sm font-medium text-stone-700">물체의 질량 (m)</label>
+                        <div class="flex items-center mt-1">
+                            <input type="number" id="mass-gravity" value="10" class="w-full p-2 border border-stone-300 rounded-md focus:ring-teal-500 focus:border-teal-500">
+                            <span class="ml-2 font-semibold">kg</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700">중력 가속도 (g)</label>
+                        <div class="mt-2 flex space-x-2">
+                             <button id="g-9.8" class="g-btn flex-1 p-2 rounded-md border-2 border-teal-600 bg-teal-600 text-white font-bold">9.8 m/s²</button>
+                             <button id="g-10" class="g-btn flex-1 p-2 rounded-md border-2 border-teal-600 text-teal-600 font-bold bg-white">10 m/s²</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center bg-teal-600 p-6 rounded-lg text-white">
+                    <p class="text-lg font-semibold">계산된 중력 (F = mg)</p>
+                    <p id="gravity-result" class="text-4xl font-bold mt-2">98.0 N</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. 운동의 기술 섹션 -->
+        <section id="kinematics" class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4 text-teal-700">2. 운동의 기술 (Kinematics)</h2>
+            <p class="mb-6 text-stone-700">운동을 어떻게 과학적으로 표현하고 분석할 수 있을까요? 이동 거리와 변위, 속력과 속도, 그리고 속도의 변화를 나타내는 가속도의 개념을 알아봅니다. 각 탭을 클릭하여 핵심 개념들을 시각 자료와 함께 학습하고 직접 계산해보세요.</p>
+            
+            <div id="kinematics-tabs" class="mb-4 border-b border-stone-200">
+                <nav class="flex space-x-4">
+                    <button class="tab-btn py-2 px-4 border-b-2 text-stone-500 active" data-tab="kinematics-1">이동 거리 vs 변위</button>
+                    <button class="tab-btn py-2 px-4 border-b-2 text-stone-500" data-tab="kinematics-2">가속도 계산</button>
+                    <button class="tab-btn py-2 px-4 border-b-2 text-stone-500" data-tab="kinematics-3">자유 낙하 시뮬레이션</button>
+                </nav>
+            </div>
+
+            <div id="kinematics-content" class="p-4 bg-stone-50 rounded-md">
+                <div id="kinematics-1" class="tab-content space-y-4">
+                    <h3 class="text-lg font-semibold">이동 거리와 변위의 차이</h3>
+                    <p><strong>이동 거리</strong>는 물체가 실제로 움직인 경로의 총 길이이며, <strong>변위</strong>는 출발점에서 도착점까지의 직선 거리와 방향을 나타냅니다. 아래 그림에서 파란색 점선이 이동 거리, 붉은색 화살표가 변위를 의미합니다.</p>
+                    <div class="w-full bg-white p-4 rounded-md border flex justify-center items-center h-48 relative">
+                        <div class="absolute top-8 left-8 text-sm font-bold">출발</div>
+                         <div class="absolute bottom-8 right-8 text-sm font-bold">도착</div>
+                        <div style="width: 10px; height: 10px; background: #3b82f6; border-radius: 50%; position: absolute; top: 2rem; left: 2rem;"></div>
+                        <div style="width: 10px; height: 10px; background: #ef4444; border-radius: 50%; position: absolute; bottom: 2rem; right: 2rem;"></div>
+                        <!-- Winding Path (Distance) -->
+                        <div class="absolute top-0 left-0 w-full h-full">
+                            <div class="absolute border-2 border-dashed border-blue-500 rounded-full" style="width: 150px; height: 80px; top: 1rem; left: 3rem; transform: rotate(20deg);"></div>
+                            <div class="absolute border-2 border-dashed border-blue-500 rounded-full" style="width: 120px; height: 60px; top: 4rem; left: 8rem; transform: rotate(-30deg);"></div>
+                        </div>
+                        <!-- Straight Arrow (Displacement) -->
+                         <div class="absolute" style="top: 2.2rem; left: 2.2rem; right: 2.2rem; bottom: 2.2rem;">
+                            <div class="w-full h-full relative">
+                               <div class="absolute top-0 left-0 w-full h-full" style="clip-path: polygon(0 0, 100% 100%, calc(100% - 15px) 100%, 0 calc(0% + 15px)); background: #ef4444;"></div>
+                                <div class="absolute w-0 h-0" style="right: -4px; bottom: -12px; border-top: 15px solid transparent; border-bottom: 15px solid transparent; border-left: 20px solid #ef4444; transform: rotate(45deg);"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="kinematics-2" class="tab-content hidden space-y-4">
+                     <h3 class="text-lg font-semibold">가속도 (Acceleration) 계산기</h3>
+                     <p>가속도는 단위 시간당 속도의 변화량입니다. $a = (v - v_0) / \Delta t$ 공식을 사용하여 가속도를 직접 계산해 보세요. 값들을 입력하면 결과가 자동으로 계산됩니다.</p>
+                    <div class="grid md:grid-cols-2 gap-6 items-center">
+                        <div class="space-y-3">
+                            <div>
+                                <label for="v0" class="block text-sm font-medium">처음 속도 (v₀)</label>
+                                <input type="number" id="v0" value="0" class="w-full p-2 border border-stone-300 rounded-md">
+                            </div>
+                            <div>
+                                <label for="v" class="block text-sm font-medium">나중 속도 (v)</label>
+                                <input type="number" id="v" value="20" class="w-full p-2 border border-stone-300 rounded-md">
+                            </div>
+                            <div>
+                                <label for="delta-t" class="block text-sm font-medium">걸린 시간 (Δt)</label>
+                                <input type="number" id="delta-t" value="10" class="w-full p-2 border border-stone-300 rounded-md">
+                            </div>
+                        </div>
+                        <div class="text-center bg-teal-600 p-6 rounded-lg text-white">
+                            <p class="text-lg font-semibold">계산된 가속도 (a)</p>
+                            <p id="acceleration-result" class="text-4xl font-bold mt-2">2.0 m/s²</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="kinematics-3" class="tab-content hidden space-y-4">
+                    <h3 class="text-lg font-semibold">중력 가속도: 자유 낙하 시뮬레이션</h3>
+                    <p>공기 저항이 없을 때, 모든 물체는 중력의 영향만 받아 $9.8 \, \text{m/s}^2$의 일정한 가속도로 떨어집니다. '시작' 버튼을 누르면 시간이 지남에 따라 물체의 속도가 어떻게 변하는지 확인 할 수 있습니다.</p>
+                    <div class="flex items-start gap-6">
+                        <div class="relative w-24 h-80 bg-gray-200 rounded-md overflow-hidden border-2 border-gray-300">
+                             <div id="falling-object" class="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-10 bg-red-500 rounded-full transition-all duration-500 ease-linear"></div>
+                        </div>
+                        <div class="flex-1">
+                            <button id="start-fall" class="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700">시작</button>
+                            <div id="fall-log" class="mt-4 space-y-1 text-sm"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 뉴턴의 제2법칙 섹션 -->
+        <section id="newton" class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4 text-teal-700">3. 뉴턴의 제2법칙 (F=ma)</h2>
+            <p class="mb-6 text-stone-700">힘(F), 질량(m), 가속도(a) 사이의 관계를 나타내는 가장 중요한 물리 법칙 중 하나입니다. 물체에 가해진 힘은 그 물체의 질량과 가속도의 곱과 같습니다. 아래 계산기에서 두 개의 값을 입력하면 나머지 하나의 값이 자동으로 계산됩니다. 이를 통해 세 변수 간의 관계를 탐구해보세요.</p>
+            <div class="bg-stone-50 p-6 rounded-md space-y-4">
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="force" class="block text-sm font-medium">힘 (F)</label>
+                        <div class="flex items-center mt-1">
+                            <input type="number" id="force" value="100" class="w-full p-2 border border-stone-300 rounded-md">
+                            <span class="ml-2 font-semibold">N</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="mass-newton" class="block text-sm font-medium">질량 (m)</label>
+                        <div class="flex items-center mt-1">
+                            <input type="number" id="mass-newton" value="20" class="w-full p-2 border border-stone-300 rounded-md">
+                            <span class="ml-2 font-semibold">kg</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="acceleration-newton" class="block text-sm font-medium">가속도 (a)</label>
+                         <div class="flex items-center mt-1">
+                            <input type="number" id="acceleration-newton" value="5" class="w-full p-2 border border-stone-300 rounded-md">
+                            <span class="ml-2 font-semibold">m/s²</span>
+                        </div>
+                    </div>
+                </div>
+                 <p class="text-sm text-center text-stone-500">두 값을 수정하면 나머지 값이 계산됩니다.</p>
+            </div>
+        </section>
+
+        <!-- 4. 등속 직선 운동 섹션 -->
+        <section id="uniform-motion" class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4 text-teal-700">4. 등속 직선 운동</h2>
+            <p class="mb-6 text-stone-700">속력과 방향이 변하지 않는 운동을 등속 직선 운동이라고 합니다. 슬라이더를 조절하여 속력을 바꾸면, 시간에 따른 이동 거리와 속력 그래프가 어떻게 변하는지 실시간으로 확인할 수 있습니다. 가속도는 속도 변화가 없으므로 항상 0입니다.</p>
+            <div class="space-y-4">
+                <div class="px-2">
+                    <label for="velocity-slider" class="block font-medium mb-2">속력 조절: <span id="velocity-value" class="font-bold text-teal-600">5</span> m/s</label>
+                    <input type="range" id="velocity-slider" min="1" max="20" value="5" class="w-full">
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-stone-50 p-4 rounded-md">
+                        <h3 class="font-semibold text-center mb-2">시간 - 이동 거리</h3>
+                        <div class="chart-container">
+                            <canvas id="distance-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-stone-50 p-4 rounded-md">
+                         <h3 class="font-semibold text-center mb-2">시간 - 속력</h3>
+                        <div class="chart-container">
+                            <canvas id="speed-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-stone-50 p-4 rounded-md md:col-span-2 lg:col-span-1">
+                        <h3 class="font-semibold text-center mb-2">시간 - 가속도</h3>
+                        <div class="chart-container">
+                            <canvas id="acceleration-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. 퀴즈 섹션 -->
+        <section id="quiz" class="bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4 text-teal-700">5. 역학 퀴즈</h2>
+            <p class="mb-6 text-stone-700">앞서 학습한 역학 개념들을 얼마나 잘 이해하고 있는지 퀴즈를 통해 확인해 보세요. 각 문제의 정답을 맞히면 최종 점수를 확인할 수 있습니다. 모든 문제를 풀고 학습 내용을 완벽하게 암기해봅시다!</p>
+            
+            <div class="bg-stone-50 p-6 rounded-md space-y-6">
+                <div id="quiz-question-container">
+                    <p id="quiz-question" class="text-lg font-semibold mb-4"></p>
+                    <div id="quiz-options" class="space-y-2">
+                        <!-- Quiz options will be loaded here by JavaScript -->
+                    </div>
+                    <div id="quiz-feedback" class="mt-4 text-center font-bold"></div>
+                </div>
+                <div class="flex justify-between items-center mt-6">
+                    <button id="quiz-check-btn" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50" disabled>정답 확인</button>
+                    <button id="quiz-next-btn" class="bg-teal-600 text-white px-6 py-2 rounded-md hover:bg-teal-700 disabled:opacity-50" disabled>다음 문제</button>
+                </div>
+                <div id="quiz-score" class="text-xl font-bold text-center mt-6 hidden"></div>
+                <button id="quiz-restart-btn" class="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600 w-full mt-4 hidden">퀴즈 다시 시작</button>
+            </div>
+        </section>
+
+    </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // 1. 중력 계산기
+    const massGravityInput = document.getElementById('mass-gravity');
+    const gravityResult = document.getElementById('gravity-result');
+    const gBtns = document.querySelectorAll('.g-btn');
+    let gValue = 9.8;
+
+    function calculateGravity() {
+        const mass = parseFloat(massGravityInput.value) || 0;
+        const force = mass * gValue;
+        gravityResult.textContent = `${force.toFixed(1)} N`;
+    }
+
+    massGravityInput.addEventListener('input', calculateGravity);
+    gBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            gValue = parseFloat(btn.id.split('-')[1]);
+            gBtns.forEach(b => b.classList.remove('bg-teal-600', 'text-white'));
+            gBtns.forEach(b => b.classList.add('bg-white', 'text-teal-600'));
+            btn.classList.add('bg-teal-600', 'text-white');
+            btn.classList.remove('bg-white', 'text-teal-600');
+            calculateGravity();
+        });
+    });
+
+    // 2. 운동의 기술 탭
+    const kinematicsTabs = document.getElementById('kinematics-tabs');
+    const kinematicsContents = document.getElementById('kinematics-content').children;
+    
+    kinematicsTabs.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') {
+            const tabId = e.target.dataset.tab;
+            
+            // 탭 버튼 활성화 상태 변경
+            kinematicsTabs.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            e.target.classList.add('active');
+            
+            // 컨텐츠 표시 변경
+            Array.from(kinematicsContents).forEach(content => {
+                if (content.id === tabId) {
+                    content.classList.remove('hidden');
+                } else {
+                    content.classList.add('hidden');
+                }
+            });
+        }
+    });
+
+    // 가속도 계산기
+    const v0Input = document.getElementById('v0');
+    const vInput = document.getElementById('v');
+    const deltaTInput = document.getElementById('delta-t');
+    const accelerationResult = document.getElementById('acceleration-result');
+
+    function calculateAcceleration() {
+        const v0 = parseFloat(v0Input.value) || 0;
+        const v = parseFloat(vInput.value) || 0;
+        const deltaT = parseFloat(deltaTInput.value) || 1;
+        if (deltaT === 0) {
+            accelerationResult.textContent = "∞";
+            return;
+        }
+        const acceleration = (v - v0) / deltaT;
+        accelerationResult.textContent = `${acceleration.toFixed(1)} m/s²`;
+    }
+    [v0Input, vInput, deltaTInput].forEach(input => input.addEventListener('input', calculateAcceleration));
+    
+    // 자유 낙하 시뮬레이션
+    const startFallBtn = document.getElementById('start-fall');
+    const fallingObject = document.getElementById('falling-object');
+    const fallLog = document.getElementById('fall-log');
+    let fallInterval;
+    let fallTime = 0;
+
+    startFallBtn.addEventListener('click', () => {
+        clearInterval(fallInterval);
+        fallTime = 0;
+        fallingObject.style.top = '8px'; // 2rem
+        fallLog.innerHTML = '';
+        startFallBtn.disabled = true;
+
+        fallInterval = setInterval(() => {
+            fallTime++;
+            const velocity = 9.8 * fallTime;
+            // s = 1/2 * g * t^2
+            const distance = 0.5 * 9.8 * (fallTime * fallTime);
+            // h_max is 320px, so calculate percentage
+            const fallPercentage = (distance / 40) * 100; // Scaled for visual effect
+            
+            fallingObject.style.top = `${Math.min(fallPercentage, 90)}%`; // stop at bottom
+
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `${fallTime}초 후: 속도 ${velocity.toFixed(1)} m/s`;
+            fallLog.appendChild(logEntry);
+            
+            if (fallTime >= 4) {
+                clearInterval(fallInterval);
+                startFallBtn.disabled = false;
+            }
+        }, 1000);
+    });
+
+    // 3. 뉴턴의 제2법칙 계산기
+    const forceInput = document.getElementById('force');
+    const massNewtonInput = document.getElementById('mass-newton');
+    const accNewtonInput = document.getElementById('acceleration-newton');
+    let lastEdited = 'force';
+
+    [forceInput, massNewtonInput, accNewtonInput].forEach(input => {
+        input.addEventListener('focus', () => {
+            lastEdited = input.id.split('-')[0];
+        });
+        input.addEventListener('input', calculateFma);
+    });
+
+    function calculateFma() {
+        let f = parseFloat(forceInput.value);
+        let m = parseFloat(massNewtonInput.value);
+        let a = parseFloat(accNewtonInput.value);
+
+        if (lastEdited === 'mass' || lastEdited === 'acceleration') {
+            if (!isNaN(m) && !isNaN(a)) {
+                forceInput.value = (m * a).toFixed(2);
+            }
+        } else if (lastEdited === 'force' || lastEdited === 'acceleration') {
+             if (!isNaN(f) && !isNaN(a) && a !== 0) {
+                massNewtonInput.value = (f / a).toFixed(2);
+            }
+        } else if (lastEdited === 'force' || lastEdited === 'mass') {
+             if (!isNaN(f) && !isNaN(m) && m !== 0) {
+                accNewtonInput.value = (f / m).toFixed(2);
+            }
+        }
+    }
+
+
+    // 4. 등속 직선 운동 그래프
+    const velocitySlider = document.getElementById('velocity-slider');
+    const velocityValue = document.getElementById('velocity-value');
+    
+    const timeLabels = [0, 1, 2, 3, 4, 5];
+    
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: { title: { display: true, text: '시간 (s)' } },
+            y: { beginAtZero: true }
+        },
+        plugins: { legend: { display: false } }
+    };
+
+    const createChart = (ctx, options) => new Chart(ctx, { type: 'line', data: { labels: timeLabels }, options: options });
+
+    const distanceCtx = document.getElementById('distance-chart').getContext('2d');
+    const distanceChart = createChart(distanceCtx, { ...commonOptions, scales: { ...commonOptions.scales, y: { ...commonOptions.scales.y, title: { display: true, text: '이동 거리 (m)' } } } });
+
+    const speedCtx = document.getElementById('speed-chart').getContext('2d');
+    const speedChart = createChart(speedCtx, { ...commonOptions, scales: { ...commonOptions.scales, y: { ...commonOptions.scales.y, title: { display: true, text: '속력 (m/s)' }, min: 0, max: 25 } } });
+    
+    const accelerationCtx = document.getElementById('acceleration-chart').getContext('2d');
+    const accelerationChart = createChart(accelerationCtx, { ...commonOptions, scales: { ...commonOptions.scales, y: { ...commonOptions.scales.y, title: { display: true, text: '가속도 (m/s²)' }, min: -1, max: 1 } } });
+
+    function updateUniformMotionCharts() {
+        const velocity = parseFloat(velocitySlider.value);
+        velocityValue.textContent = velocity;
+
+        distanceChart.data.datasets = [{ data: timeLabels.map(t => t * velocity), borderColor: '#0d9488', tension: 0.1, fill: false }];
+        distanceChart.update();
+
+        speedChart.data.datasets = [{ data: timeLabels.map(() => velocity), borderColor: '#0d9488', tension: 0.1, fill: false, stepped: true }];
+        speedChart.update();
+        
+        accelerationChart.data.datasets = [{ data: timeLabels.map(() => 0), borderColor: '#0d9488', tension: 0.1, fill: false }];
+        accelerationChart.update();
+    }
+
+    velocitySlider.addEventListener('input', updateUniformMotionCharts);
+
+    // 5. 퀴즈 섹션
+    const quizQuestions = [
+        {
+            question: "질량을 가진 모든 물체 사이에 작용하는 힘을 무엇이라고 하나요?",
+            options: ["마찰력", "중력", "장력", "수직항력"],
+            answer: 1 // Index of correct option
+        },
+        {
+            question: "출발점에서 도착점까지의 직선 거리와 방향을 나타내는 물리량은 무엇인가요?",
+            options: ["이동 거리", "속력", "변위", "가속도"],
+            answer: 2
+        },
+        {
+            question: "단위 시간당 속도의 변화량을 나타내는 물리량은 무엇인가요?",
+            options: ["속도", "속력", "변위", "가속도"],
+            answer: 3
+        },
+        {
+            question: "$F=ma$ 공식에서 $F$가 의미하는 것은 무엇인가요?",
+            options: ["질량", "가속도", "알짜힘", "시간"],
+            answer: 2
+        },
+        {
+            question: "속력과 방향이 변하지 않는 운동을 무엇이라고 하나요?",
+            options: ["자유 낙하 운동", "등가속도 운동", "등속 직선 운동", "원운동"],
+            answer: 2
+        },
+        {
+            question: "지구 표면 근처에서 물체에 작용하는 중력 가속도($g$)의 표준 값은 얼마인가요? (계산 편의를 위한 10 m/s² 제외)",
+            options: ["0 m/s²", "9.8 m/s²", "10 m/s²", "100 m/s²"],
+            answer: 1
+        },
+        {
+            question: "가속도의 단위는 무엇인가요?",
+            options: ["m/s", "N", "kg", "m/s²"],
+            answer: 3
+        },
+        {
+            question: "같은 힘이 작용할 때, 질량이 두 배가 되면 가속도는 어떻게 되나요?",
+            options: ["두 배가 된다", "절반으로 줄어든다", "변함 없다", "네 배가 된다"],
+            answer: 1
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let selectedOption = null;
+
+    const quizQuestion = document.getElementById('quiz-question');
+    const quizOptions = document.getElementById('quiz-options');
+    const quizFeedback = document.getElementById('quiz-feedback');
+    const quizCheckBtn = document.getElementById('quiz-check-btn');
+    const quizNextBtn = document.getElementById('quiz-next-btn');
+    const quizScore = document.getElementById('quiz-score');
+    const quizRestartBtn = document.getElementById('quiz-restart-btn');
+
+    function loadQuestion() {
+        if (currentQuestionIndex < quizQuestions.length) {
+            const q = quizQuestions[currentQuestionIndex];
+            quizQuestion.textContent = `${currentQuestionIndex + 1}. ${q.question}`;
+            quizOptions.innerHTML = '';
+            quizFeedback.textContent = '';
+            selectedOption = null;
+            quizCheckBtn.disabled = true;
+            quizNextBtn.disabled = true;
+            quizScore.classList.add('hidden');
+            quizRestartBtn.classList.add('hidden');
+
+            q.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('quiz-option-btn');
+                button.dataset.index = index;
+                button.addEventListener('click', () => selectOption(button, index));
+                quizOptions.appendChild(button);
+            });
+        } else {
+            displayFinalScore();
+        }
+    }
+
+    function selectOption(button, index) {
+        selectedOption = index;
+        quizOptions.querySelectorAll('.quiz-option-btn').forEach(btn => {
+            btn.classList.remove('bg-blue-100', 'border-blue-500');
+        });
+        button.classList.add('bg-blue-100', 'border-blue-500');
+        quizCheckBtn.disabled = false;
+    }
+
+    function checkAnswer() {
+        if (selectedOption === null) return;
+
+        const q = quizQuestions[currentQuestionIndex];
+        const optionButtons = quizOptions.querySelectorAll('.quiz-option-btn');
+
+        if (selectedOption === q.answer) {
+            score++;
+            quizFeedback.textContent = "정답입니다!";
+            quizFeedback.classList.remove('text-red-600');
+            quizFeedback.classList.add('text-green-600');
+            optionButtons[selectedOption].classList.add('correct');
+        } else {
+            quizFeedback.textContent = "오답입니다. 다시 시도해 보세요.";
+            quizFeedback.classList.remove('text-green-600');
+            quizFeedback.classList.add('text-red-600');
+            optionButtons[selectedOption].classList.add('incorrect');
+            optionButtons[q.answer].classList.add('correct'); // Show correct answer
+        }
+
+        quizCheckBtn.disabled = true;
+        quizNextBtn.disabled = false;
+        optionButtons.forEach(btn => btn.disabled = true); // Disable all options after checking
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        loadQuestion();
+    }
+
+    function displayFinalScore() {
+        quizQuestion.textContent = "";
+        quizOptions.innerHTML = "";
+        quizFeedback.textContent = "";
+        quizCheckBtn.classList.add('hidden');
+        quizNextBtn.classList.add('hidden');
+        
+        quizScore.textContent = `최종 점수: ${score} / ${quizQuestions.length}`;
+        quizScore.classList.remove('hidden');
+        quizRestartBtn.classList.remove('hidden');
+    }
+
+    function restartQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        quizCheckBtn.classList.remove('hidden');
+        quizNextBtn.classList.remove('hidden');
+        loadQuestion();
+    }
+
+    quizCheckBtn.addEventListener('click', checkAnswer);
+    quizNextBtn.addEventListener('click', nextQuestion);
+    quizRestartBtn.addEventListener('click', restartQuiz);
+
+    // 초기화
+    calculateGravity();
+    calculateAcceleration();
+    calculateFma();
+    updateUniformMotionCharts();
+    loadQuestion(); // Load the first quiz question
+});
+</script>
+
+</body>
+</html>

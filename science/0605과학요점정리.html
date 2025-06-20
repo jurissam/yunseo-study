@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>물리 개념 탐구 실험실</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Cosmic Blue and Light Gray -->
+    <!-- Application Structure Plan: The application is structured as a virtual laboratory with four main sections, accessible via a top navigation bar: 1) A Projectile Motion Lab to compare free-fall and horizontally thrown objects. 2) An Inertia Lab with simple, relatable animations. 3) A Momentum & Impulse Calculator to engage with the core formulas. 4) A Circular Motion Explorer to visualize vector changes. This thematic, lab-based approach encourages active exploration and direct interaction with physics principles, which is more effective for learning than a static summary of the report. -->
+    <!-- Visualization & Content Choices: 
+        1. Projectile Motion: Report Info -> Concepts of vertical/horizontal motion. Goal -> Compare/Visualize. Method -> An interactive Chart.js canvas animation. A slider controls initial horizontal velocity for two objects, while a third is dropped. A launch button starts the simulation, plotting their parabolic/linear paths and showing they land simultaneously. Justification -> This directly visualizes the key report concepts: independent vertical/horizontal motions and simultaneous impact times.
+        2. Inertia: Report Info -> Definition, mass relationship, and examples (bus, tripping). Goal -> Inform/Visualize. Method -> Simple HTML/CSS animations. "Bus Start/Stop" buttons trigger a person inside to lurch. Another button shows a coin dropping into a cup when the card is flicked. Justification -> These are classic, intuitive examples that make the abstract concept of inertia tangible and memorable.
+        3. Momentum & Impulse: Report Info -> Formulas p=mv and I=FΔt. Goal -> Explore Relationships/Inform. Method -> Two interactive calculators. Users can input any two values in each formula, and the third is calculated in real-time. Justification -> This allows for hands-on exploration of the core formulas, solidifying the user's understanding of the relationship between the variables.
+        4. Circular Motion: Report Info -> Constant speed but changing velocity and central force. Goal -> Visualize. Method -> A simple HTML/CSS animation of an orbiting body. Vector arrows (as styled divs) dynamically show the changing tangential velocity and the constant central acceleration. Justification -> This dynamic diagram clearly illustrates why circular motion is a form of acceleration, a common point of confusion.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f1f5f9; /* slate-100 */
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .nav-link {
+            @apply px-4 py-2 text-gray-700 font-medium rounded-md hover:bg-slate-200 hover:text-slate-900 transition-colors;
+        }
+        .card {
+            @apply bg-white p-6 rounded-xl shadow-lg;
+        }
+        .section-title {
+            @apply text-3xl font-bold mb-4 text-slate-800;
+        }
+        .section-intro {
+            @apply mb-6 text-slate-600 max-w-3xl;
+        }
+        /* Inertia Lab Styles */
+        #bus { transition: transform 0.3s ease-in-out; }
+        #person { transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
+        .lurch-forward { transform: translateX(20px) rotate(5deg); }
+        .lurch-backward { transform: translateX(-20px) rotate(-5deg); }
+
+        #coin { transition: transform 0.3s ease-out, top 0.4s ease-in 0.1s; }
+        #paper { transition: transform 0.2s ease-out; }
+        
+        /* Circular Motion Styles */
+        .orbit-container {
+            position: relative; /* Changed to relative to position inner elements */
+            width: 250px; /* Increased size for better visualization */
+            height: 250px;
+            border: 2px dashed #94a3b8;
+            border-radius: 50%; /* Make it a perfect circle */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        #moon {
+            position: absolute;
+            top: 0; /* Initial position at the top of the orbit */
+            left: calc(50% - 16px); /* Centered horizontally */
+            transform-origin: 16px 125px; /* Center of the orbit (half of orbit-container size) */
+            transition: none; /* No CSS transition, JS will handle movement */
+        }
+
+        .vector {
+            position: absolute;
+            height: 3px; /* Thickness of the vector line */
+            transform-origin: left center; /* For rotation from the base of the arrow */
+            border-radius: 2px;
+        }
+        .vector::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            right: -8px; /* Position arrow head at the end of the line */
+            top: -3px; /* Adjust to center vertically with the line */
+        }
+        #velocity-vector {
+            background-color: #22c55e; /* Green */
+        }
+        #velocity-vector::after {
+            border-width: 5px 0 5px 8px; /* Arrowhead pointing right */
+            border-color: transparent transparent transparent #22c55e;
+        }
+        #acceleration-vector {
+            background-color: #ef4444; /* Red */
+        }
+        #acceleration-vector::after {
+            border-width: 5px 0 5px 8px; /* Arrowhead pointing right */
+            border-color: transparent transparent transparent #ef4444;
+        }
+        /* Quiz specific styles */
+        .quiz-option {
+            @apply block bg-gray-100 p-3 rounded-md cursor-pointer hover:bg-gray-200 transition-colors mb-2;
+        }
+        .quiz-option.selected {
+            @apply bg-blue-200 border-blue-500 border-2;
+        }
+        .quiz-option.correct {
+            @apply bg-green-200 border-green-500 border-2;
+        }
+        .quiz-option.incorrect {
+            @apply bg-red-200 border-red-500 border-2;
+        }
+
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <header class="bg-white/90 backdrop-blur-sm shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-blue-700">물리 개념 탐구 실험실</h1>
+            <nav class="hidden md:flex space-x-1">
+                <a href="#projectile" class="nav-link">포물선 운동</a>
+                <a href="#inertia" class="nav-link">관성</a>
+                <a href="#momentum" class="nav-link">운동량 & 충격량</a>
+                <a href="#circular" class="nav-link">원운동</a>
+                <a href="#quiz" class="nav-link">물리 퀴즈</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8 space-y-16">
+
+        <!-- 1. 포물선 운동 실험 -->
+        <section id="projectile" class="card">
+            <h2 class="section-title">실험 1: 포물선 운동 비교</h2>
+            <p class="section-intro">같은 높이에서 한 물체는 가만히 떨어뜨리고(자유 낙하), 다른 물체는 수평으로 던졌을 때 어떻게 운동할까요? 이 실험은 수직 운동과 수평 운동이 서로 독립적임을 보여줍니다. 아래 슬라이더로 수평 속도를 조절하고 '발사!' 버튼을 눌러 물체들의 궤적을 관찰하며 어떤 물리가 숨어있는지 확인해보세요.</p>
+            <div class="flex flex-col md:flex-row gap-8">
+                <div class="w-full md:w-1/3">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="h-velocity" class="font-medium">물체 B의 수평 속도: <span id="h-velocity-value" class="font-bold text-blue-600">10</span> m/s</label>
+                            <input type="range" id="h-velocity" min="5" max="25" value="10" step="1" class="w-full mt-1">
+                        </div>
+                        <button id="launch-btn" class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-transform hover:scale-105 shadow-md">발사!</button>
+                        <div id="status" class="text-center font-medium h-12 pt-2"></div>
+                    </div>
+                </div>
+                <div class="w-full md:w-2/3 h-96 bg-slate-50 rounded-lg p-2 flex items-center justify-center">
+                    <canvas id="projectile-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. 관성 실험 -->
+        <section id="inertia" class="card">
+            <h2 class="section-title">실험 2: 관성의 법칙</h2>
+            <p class="section-intro">관성이란 물체가 자신의 운동 상태를 계속 유지하려는 성질입니다. 질량이 클수록 관성도 크죠. 우리 주변의 간단한 현상들을 통해 정지 관성과 운동 관성을 직접 눈으로 확인해 보세요.</p>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="text-center p-4 border rounded-lg">
+                    <h3 class="text-xl font-semibold mb-4">버스 관성 체험</h3>
+                    <div class="relative w-48 h-24 bg-yellow-300 rounded-t-lg mx-auto flex items-end justify-center" id="bus">
+                        <div class="w-4 h-12 bg-slate-600 rounded-sm" id="person"></div>
+                    </div>
+                    <div class="w-48 h-4 bg-gray-400 rounded-b-lg mx-auto"></div>
+                    <div class="mt-4 space-x-4">
+                        <button id="bus-start" class="bg-green-500 text-white px-4 py-2 rounded-md">급출발</button>
+                        <button id="bus-stop" class="bg-red-500 text-white px-4 py-2 rounded-md">급정거</button>
+                    </div>
+                </div>
+                <div class="text-center p-4 border rounded-lg">
+                    <h3 class="text-xl font-semibold mb-4">동전 떨어뜨리기</h3>
+                    <div class="relative w-24 h-40 mx-auto">
+                        <div class="absolute bottom-0 w-24 h-24 bg-blue-200 rounded-md flex items-center justify-center text-sm text-blue-800">컵</div>
+                        <div class="absolute bottom-24 w-32 h-1 bg-gray-300 left-1/2 -translate-x-1/2" id="paper"></div>
+                        <div class="absolute bottom-28 w-8 h-8 bg-yellow-500 rounded-full left-1/2 -translate-x-1/2" id="coin"></div>
+                    </div>
+                    <div class="mt-4">
+                        <button id="flick-btn" class="bg-indigo-500 text-white px-4 py-2 rounded-md">종이 쳐내기</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 운동량 & 충격량 -->
+        <section id="momentum" class="card">
+            <h2 class="section-title">탐구 3: 운동량과 충격량</h2>
+            <p class="section-intro">물체의 운동 상태를 나타내는 운동량($p=mv$)과 운동 상태의 변화를 일으키는 충격량($I=F\Delta t$)은 물리학의 핵심 공식입니다. 아래 계산기를 이용해 각 변수들이 결과에 어떻게 영향을 미치는지 직접 값을 바꿔보며 탐구해 보세요.</p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-slate-50 p-6 rounded-lg">
+                    <h3 class="text-xl font-semibold text-center mb-4">운동량 계산기 ($p = mv$)</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label for="mass-p" class="font-medium">질량 (m) [kg]</label>
+                            <input type="number" id="mass-p" value="10" min="0" step="0.1" class="p-input w-full p-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="velocity-p" class="font-medium">속도 (v) [m/s]</label>
+                            <input type="number" id="velocity-p" value="5" step="0.1" class="p-input w-full p-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div class="text-center pt-2">
+                            <p class="text-lg">운동량 (p): <span id="momentum-result" class="font-bold text-2xl text-blue-600">50</span> kg·m/s</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-50 p-6 rounded-lg">
+                    <h3 class="text-xl font-semibold text-center mb-4">충격량 계산기 ($I = F\Delta t$)</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label for="force-i" class="font-medium">힘 (F) [N]</label>
+                            <input type="number" id="force-i" value="100" min="0" step="0.1" class="i-input w-full p-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div>
+                            <label for="time-i" class="font-medium">시간 ($\Delta t$) [s]</label>
+                            <input type="number" id="time-i" value="0.5" min="0" step="0.01" class="i-input w-full p-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div class="text-center pt-2">
+                            <p class="text-lg">충격량 (I): <span id="impulse-result" class="font-bold text-2xl text-green-600">50</span> N·s</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. 원운동 -->
+        <section id="circular" class="card">
+            <h2 class="section-title">탐구 4: 원운동의 비밀</h2>
+            <p class="section-intro">달이나 인공위성은 일정한 빠르기로 움직이지만, 운동 방향이 계속 변하기 때문에 가속도 운동을 합니다. 이때 힘(중력)과 가속도의 방향은 항상 원의 중심을 향합니다. 아래 애니메이션을 통해 속도 벡터와 가속도 벡터의 변화를 관찰해 보세요. 
+                <br>
+                <br>
+                **관찰 가이드:**
+                <ul>
+                    <li><strong class="text-green-600">초록색 화살표 (속도 벡터):</strong> 달의 현재 운동 방향(궤도에 접선 방향)을 나타냅니다. 화살표의 길이는 변하지 않지만, 달이 움직이면서 그 방향이 계속 바뀌는 것을 주목하세요. 이는 빠르기는 일정해도 '속도'는 계속 변함을 보여줍니다.</li>
+                    <li><strong class="text-red-600">빨간색 화살표 (가속도 벡터):</strong> 항상 원운동의 중심(지구)을 향하고 있습니다. 이는 물체의 운동 방향을 끊임없이 변화시키는 힘(구심력)과 그에 따른 가속도(구심 가속도)가 항상 원의 중심 방향으로 작용한다는 것을 시각적으로 보여줍니다.</li>
+                </ul>
+            </p>
+            <div class="flex justify-center items-center py-8">
+                <div class="relative w-64 h-64 flex justify-center items-center">
+                    <div class="w-20 h-20 bg-blue-500 rounded-full text-white flex justify-center items-center font-bold text-lg shadow-md">지구</div>
+                    <div class="absolute orbit-container">
+                        <div id="moon" class="absolute w-8 h-8 bg-slate-400 rounded-full shadow-lg" style="transform: translate(-50%, -50%);"></div>
+                        <!-- Velocity Vector -->
+                        <div id="velocity-vector" class="vector" style="width: 50px;"></div>
+                        <!-- Acceleration Vector -->
+                        <div id="acceleration-vector" class="vector" style="width: 50px;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. 물리 퀴즈 -->
+        <section id="quiz" class="card">
+            <h2 class="section-title">물리 개념 확인 퀴즈</h2>
+            <p class="section-intro">원운동에 대한 이해를 돕기 위한 퀴즈입니다. 다음 질문들을 풀어보면서 얼마나 잘 이해했는지 확인해 보세요. 이 내용은 시험에도 자주 출제되는 중요한 개념입니다!</p>
+            <div id="quiz-container" class="space-y-6">
+                <!-- Quiz questions will be dynamically loaded here -->
+            </div>
+            <div class="mt-8 text-center">
+                <button id="submit-quiz-btn" class="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition-transform hover:scale-105 shadow-md mr-4">정답 확인</button>
+                <button id="reset-quiz-btn" class="bg-gray-400 text-white px-8 py-3 rounded-lg hover:bg-gray-500 transition-transform hover:scale-105 shadow-md">다시 풀기</button>
+                <p id="quiz-result" class="mt-4 text-xl font-bold"></p>
+            </div>
+        </section>
+    </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // 1. Projectile Motion
+    const hVelocitySlider = document.getElementById('h-velocity');
+    const hVelocityValue = document.getElementById('h-velocity-value');
+    const launchBtn = document.getElementById('launch-btn');
+    const statusDiv = document.getElementById('status');
+    const ctx = document.getElementById('projectile-chart').getContext('2d');
+    let projectileChart = null;
+    let animationFrameId;
+
+    hVelocitySlider.addEventListener('input', (e) => {
+        hVelocityValue.textContent = e.target.value;
+    });
+
+    /**
+     * Creates or recreates the Chart.js instance for projectile motion.
+     * Destroys any existing chart to prevent memory leaks and ensure fresh rendering.
+     */
+    function createProjectileChart() {
+        if (projectileChart) {
+            projectileChart.destroy();
+        }
+        projectileChart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    { label: '물체 A (자유낙하)', data: [], backgroundColor: 'rgb(239, 68, 68)', pointRadius: 5 },
+                    { label: '물체 B (수평투사)', data: [], backgroundColor: 'rgb(59, 130, 246)', pointRadius: 5 },
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { 
+                        type: 'linear', 
+                        position: 'bottom', 
+                        min: 0, 
+                        max: 100, 
+                        title: { display: true, text: '수평 거리 (m)' },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    y: { 
+                        min: 0, 
+                        max: 100, 
+                        title: { display: true, text: '높이 (m)' },
+                        reverse: false, // Ensure y-axis goes from bottom (0) to top (100)
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: { enabled: false } // Tooltips disabled for animation clarity
+                },
+                animation: {
+                    duration: 0 // No animation on chart updates for real-time plotting
+                }
+            }
+        });
+    }
+
+    launchBtn.addEventListener('click', () => {
+        // Cancel any ongoing animation frame to restart cleanly
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+        }
+        createProjectileChart(); // Initialize or reset the chart
+
+        const g = 9.8; // Acceleration due to gravity (m/s^2)
+        const startHeight = 100; // Initial height (m)
+        const v_h = parseFloat(hVelocitySlider.value); // Initial horizontal velocity (m/s)
+        let t = 0; // Time (s)
+        const dt = 0.05; // Time increment for simulation (s)
+
+        // Clear existing data for a new simulation run
+        const dataA = []; // Data for Object A (free fall)
+        const dataB = []; // Data for Object B (horizontal projectile)
+        projectileChart.data.datasets[0].data = dataA;
+        projectileChart.data.datasets[1].data = dataB;
+
+        /**
+         * Animates the projectile motion simulation.
+         * Calculates new positions for both objects based on time and updates the chart.
+         */
+        function animateProjectile() {
+            const y = startHeight - 0.5 * g * t * t; // Vertical position (y = y0 - 0.5*g*t^2)
+            
+            // Continue animation as long as the object is above ground
+            if (y >= 0) {
+                // Object A (Free fall: x remains 0)
+                dataA.push({ x: 0, y: Math.max(0, y) }); // Ensure y doesn't go below 0
+
+                // Object B (Horizontal projectile: x = v_h * t)
+                const x_b = v_h * t;
+                dataB.push({ x: x_b, y: Math.max(0, y) });
+
+                projectileChart.update('none'); // Update chart without animation
+                statusDiv.textContent = `시간: ${t.toFixed(2)}s, 높이: ${y.toFixed(1)}m`;
+                
+                t += dt; // Increment time
+                animationFrameId = requestAnimationFrame(animateProjectile); // Continue animation
+            } else {
+                // Simulation ends when objects hit the ground
+                // Add final point to ensure they land at y=0
+                dataA.push({ x: 0, y: 0 });
+                dataB.push({ x: v_h * t, y: 0 });
+                projectileChart.update('none');
+                statusDiv.textContent = `두 물체 모두 ${t.toFixed(2)}초 만에 바닥에 동시 도착!`;
+            }
+        }
+        animateProjectile(); // Start the animation
+    });
+    // Initialize the chart on page load
+    createProjectileChart();
+
+    // 2. Inertia
+    const person = document.getElementById('person');
+    document.getElementById('bus-start').addEventListener('click', () => {
+        person.classList.add('lurch-backward'); // Person lurches backward on sudden start
+        setTimeout(() => person.classList.remove('lurch-backward'), 500); // Reset after 0.5s
+    });
+    document.getElementById('bus-stop').addEventListener('click', () => {
+        person.classList.add('lurch-forward'); // Person lurches forward on sudden stop
+        setTimeout(() => person.classList.remove('lurch-forward'), 500); // Reset after 0.5s
+    });
+    
+    const paper = document.getElementById('paper');
+    const coin = document.getElementById('coin');
+    document.getElementById('flick-btn').addEventListener('click', () => {
+        // Animate paper being flicked away
+        paper.style.transform = 'translateX(150px) rotate(15deg)';
+        // Animate coin falling straight down
+        coin.style.top = '120px'; // New position for the coin to fall into the cup
+
+        // After a delay, reset the paper and coin to their original positions
+        setTimeout(() => {
+            // Temporarily remove transitions for instant reset
+            paper.style.transition = 'none';
+            coin.style.transition = 'none';
+            
+            // Reset positions
+            paper.style.transform = 'translateX(0) rotate(0)';
+            coin.style.top = 'calc(100% - 104px)'; // Original position relative to container
+
+            // Re-add transitions for future animations
+            setTimeout(() => {
+                paper.style.transition = 'transform 0.2s ease-out';
+                coin.style.transition = 'transform 0.3s ease-out, top 0.4s ease-in 0.1s';
+            }, 50); // Small delay to allow instant reset before transitions are re-applied
+        }, 500); // Time for the animation to play out before resetting
+    });
+
+    // 3. Momentum & Impulse
+    const massP = document.getElementById('mass-p');
+    const velocityP = document.getElementById('velocity-p');
+    const momentumResult = document.getElementById('momentum-result');
+
+    /**
+     * Calculates and displays the momentum (p = m * v).
+     * Ensures inputs are valid numbers.
+     */
+    function calculateMomentum() {
+        const m = parseFloat(massP.value);
+        const v = parseFloat(velocityP.value);
+        // Check for valid number inputs; if not, default to 0 for calculation
+        const momentum = (isNaN(m) ? 0 : m) * (isNaN(v) ? 0 : v);
+        momentumResult.textContent = momentum.toFixed(2);
+    }
+    // Attach event listeners to all input fields in the momentum calculator
+    document.querySelectorAll('.p-input').forEach(el => el.addEventListener('input', calculateMomentum));
+    // Initial calculation on load
+    calculateMomentum();
+    
+    const forceI = document.getElementById('force-i');
+    const timeI = document.getElementById('time-i');
+    const impulseResult = document.getElementById('impulse-result');
+
+    /**
+     * Calculates and displays the impulse (I = F * Δt).
+     * Ensures inputs are valid numbers.
+     */
+    function calculateImpulse() {
+        const F = parseFloat(forceI.value);
+        const t = parseFloat(timeI.value);
+        // Check for valid number inputs; if not, default to 0 for calculation
+        const impulse = (isNaN(F) ? 0 : F) * (isNaN(t) ? 0 : t);
+        impulseResult.textContent = impulse.toFixed(2);
+    }
+    // Attach event listeners to all input fields in the impulse calculator
+    document.querySelectorAll('.i-input').forEach(el => el.addEventListener('input', calculateImpulse));
+    // Initial calculation on load
+    calculateImpulse();
+
+    // 4. Circular Motion
+    const orbitContainer = document.querySelector('.orbit-container');
+    const moon = document.getElementById('moon');
+    const velocityVector = document.getElementById('velocity-vector');
+    const accelerationVector = document.getElementById('acceleration-vector');
+
+    const orbitRadius = orbitContainer.offsetWidth / 2; // Radius from center of container to edge of moon's path
+    const earthRadius = document.querySelector('.bg-blue-500').offsetWidth / 2; // Radius of the Earth element
+    const moonRadius = moon.offsetWidth / 2; // Radius of the moon element
+
+    let angle = 0; // Starting angle in radians
+    const angularSpeed = 0.02; // Speed of rotation (radians per frame)
+
+    /**
+     * Animates the circular motion of the moon and its vectors.
+     * Updates position and rotation of moon, velocity, and acceleration vectors.
+     */
+    function animateCircularMotion() {
+        // Calculate moon's position on the circle
+        const moonX = orbitRadius * Math.cos(angle);
+        const moonY = orbitRadius * Math.sin(angle);
+
+        // Position the moon (centered on its own dimensions)
+        // Its position is relative to the center of the orbit-container
+        moon.style.left = `${orbitRadius + moonX}px`;
+        moon.style.top = `${orbitRadius + moonY}px`;
+
+        // Velocity vector: always tangential (90 degrees to radius)
+        // Position it at the moon's center
+        velocityVector.style.left = `${orbitRadius + moonX}px`;
+        velocityVector.style.top = `${orbitRadius + moonY}px`;
+        // Rotate it tangential to the circle, offset by 90 degrees from radial direction
+        velocityVector.style.transform = `translateY(-50%) rotate(${angle * 180 / Math.PI + 90}deg)`;
+
+        // Acceleration vector: always points towards the center of the orbit (Earth)
+        // Position it at the moon's center
+        accelerationVector.style.left = `${orbitRadius + moonX}px`;
+        accelerationVector.style.top = `${orbitRadius + moonY}px`;
+        // Rotate it to point back towards the origin (Earth)
+        accelerationVector.style.transform = `translateY(-50%) rotate(${angle * 180 / Math.PI - 90}deg)`;
+
+        angle += angularSpeed; // Increment angle for next frame
+        if (angle >= 2 * Math.PI) { // Reset angle after a full circle
+            angle = 0;
+        }
+
+        requestAnimationFrame(animateCircularMotion); // Loop the animation
+    }
+
+    // Start the circular motion animation when the window loads
+    window.onload = function () {
+        animateCircularMotion();
+    }
+
+    // 5. Physics Quiz
+    const quizQuestions = [
+        {
+            question: "1. 등속 원운동에서 물체의 속도 벡터 방향은 어느 쪽입니까?",
+            options: ["원의 중심을 향한다.", "원의 접선 방향이다.", "원의 중심에서 멀어진다.", "일정하지 않다."],
+            answer: 1 // Index of the correct option
+        },
+        {
+            question: "2. 등속 원운동에서 물체의 가속도 벡터 방향은 어느 쪽입니까?",
+            options: ["원의 중심을 향한다.", "원의 접선 방향이다.", "원의 중심에서 멀어진다.", "가속도는 존재하지 않는다."],
+            answer: 0
+        },
+        {
+            question: "3. 등속 원운동하는 물체는 가속도 운동을 한다고 볼 수 있습니까?",
+            options: ["예, 속도의 방향이 계속 변하기 때문입니다.", "아니오, 빠르기가 일정하기 때문입니다.", "예, 힘이 작용하지 않기 때문입니다.", "아니오, 질량이 변하기 때문입니다."],
+            answer: 0
+        }
+    ];
+
+    const quizContainer = document.getElementById('quiz-container');
+    const submitQuizBtn = document.getElementById('submit-quiz-btn');
+    const resetQuizBtn = document.getElementById('reset-quiz-btn');
+    const quizResult = document.getElementById('quiz-result');
+    let userSelections = new Array(quizQuestions.length).fill(null); // To store user's selected option index for each question
+
+    /**
+     * Renders all quiz questions and their options.
+     */
+    function renderQuiz() {
+        quizContainer.innerHTML = ''; // Clear previous questions
+        quizQuestions.forEach((q, qIndex) => {
+            const questionDiv = document.createElement('div');
+            questionDiv.classList.add('mb-4');
+            questionDiv.innerHTML = `<p class="font-semibold text-lg mb-2">${q.question}</p>`;
+            
+            const optionsDiv = document.createElement('div');
+            q.options.forEach((optionText, oIndex) => {
+                const optionLabel = document.createElement('label');
+                optionLabel.classList.add('quiz-option');
+                optionLabel.innerHTML = `
+                    <input type="radio" name="question-${qIndex}" value="${oIndex}" class="mr-2 hidden">
+                    <span>${optionText}</span>
+                `;
+                // Add click listener to visually mark selection
+                optionLabel.addEventListener('click', () => {
+                    // Remove 'selected' from siblings
+                    optionsDiv.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('selected'));
+                    // Add 'selected' to current
+                    optionLabel.classList.add('selected');
+                    // Store user's selection
+                    userSelections[qIndex] = oIndex;
+                });
+                optionsDiv.appendChild(optionLabel);
+            });
+            questionDiv.appendChild(optionsDiv);
+            quizContainer.appendChild(questionDiv);
+        });
+    }
+
+    /**
+     * Checks the user's answers and displays the score and feedback.
+     */
+    function checkQuiz() {
+        let score = 0;
+        quizQuestions.forEach((q, qIndex) => {
+            const selectedOptionIndex = userSelections[qIndex];
+            const options = quizContainer.children[qIndex].querySelectorAll('.quiz-option');
+
+            // Disable all options after submission
+            options.forEach(option => {
+                option.style.pointerEvents = 'none'; // Disable clicking
+                option.querySelector('input').disabled = true; // Disable radio button
+            });
+
+            if (selectedOptionIndex !== null) {
+                if (selectedOptionIndex === q.answer) {
+                    score++;
+                    options[selectedOptionIndex].classList.add('correct');
+                } else {
+                    options[selectedOptionIndex].classList.add('incorrect');
+                    options[q.answer].classList.add('correct'); // Highlight the correct answer
+                }
+            } else {
+                 // If no option was selected, highlight the correct answer
+                options[q.answer].classList.add('correct');
+            }
+        });
+        quizResult.textContent = `총 ${quizQuestions.length}문제 중 ${score}문제 정답입니다!`;
+        submitQuizBtn.disabled = true; // Disable submit button after checking
+    }
+
+    /**
+     * Resets the quiz to its initial state.
+     */
+    function resetQuiz() {
+        userSelections.fill(null); // Clear selections
+        quizResult.textContent = ''; // Clear result text
+        renderQuiz(); // Re-render the quiz to remove all selection/feedback styles
+        submitQuizBtn.disabled = false; // Enable submit button
+    }
+
+    submitQuizBtn.addEventListener('click', checkQuiz);
+    resetQuizBtn.addEventListener('click', resetQuiz);
+
+    // Initial render of the quiz when the page loads
+    renderQuiz();
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인터랙티브 운동 실험실</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Scholarly Blue and Gray -->
+    <!-- Application Structure Plan: The SPA is designed as a virtual laboratory with three main experiments. A top navigation bar links to: 1) A core 'Motion Comparison' lab where users can simulate and compare 'Uniform Motion' and 'Uniformly Accelerated Motion' side-by-side. 2) A 'Free Fall Simulator' to visualize the mass-independent nature of gravity. 3) A 'Newton's Law Calculator' for exploring the F=ma relationship. This thematic, experiment-based structure was chosen over a linear report summary to promote active, inquiry-based learning and allow users to directly manipulate variables and observe outcomes, which is a more effective way to understand physics principles. -->
+    <!-- Visualization & Content Choices: 
+        1. Motion Comparison: Report Info -> Concepts & graphs of both motion types. Goal -> Compare/Visualize/Change. Method -> A side-by-side interactive dashboard. Sliders control velocity (for uniform motion) and acceleration (for accelerated motion). Three corresponding graphs for each motion type (time-distance, time-speed, time-acceleration) update in real-time. Justification -> This direct comparison with immediate visual feedback is the most powerful way to illustrate the fundamental differences between the two main motion types discussed in the report. Library -> Chart.js, Vanilla JS.
+        2. Free Fall Simulator: Report Info -> Free fall is a type of uniformly accelerated motion, independent of mass. Goal -> Visualize/Inform. Method -> A simple animation showing a heavy object (쇠구슬) and a light one (깃털) being dropped simultaneously in a vacuum. A button triggers the animation, and a log displays their identical velocity over time. Justification -> This animation directly visualizes the counter-intuitive concept that all objects fall at the same rate in a vacuum, a key takeaway from the report. Library -> Vanilla JS & CSS animations.
+        3. Newton's Law Calculator: Report Info -> F=ma formula. Goal -> Explore Relationships/Inform. Method -> An interactive calculator where inputting any two of the three variables (Force, Mass, Acceleration) automatically computes the third. Justification -> Allows for hands-on exploration of the foundational F=ma formula, solidifying the user's understanding of the relationship between the variables. Library -> Vanilla JS.
+        4. Quiz: Report Info -> All core concepts (uniform motion, accelerated motion, free fall, F=ma). Goal -> Assess/Memorize. Method -> Interactive multiple-choice quiz with immediate feedback and score tracking. Justification -> Provides an active learning component to reinforce memorization and understanding, especially for "test-worthy" concepts. Library -> Vanilla JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f1f5f9; /* slate-100 */
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            max-height: 250px;
+            margin-top: 1rem;
+        }
+        .nav-link {
+            @apply px-3 py-2 text-gray-600 font-medium rounded-md hover:bg-slate-200 hover:text-slate-900 transition-colors;
+        }
+        .card {
+            @apply bg-white p-6 rounded-lg shadow-md;
+        }
+        .section-title {
+            @apply text-2xl font-bold mb-4 text-slate-800;
+        }
+        .section-intro {
+            @apply mb-6 text-slate-600 max-w-3xl;
+        }
+        .quiz-option-btn {
+            @apply w-full text-left p-3 border-2 border-slate-300 rounded-md hover:bg-slate-200 transition-colors duration-200;
+        }
+        .quiz-option-btn.selected {
+            @apply bg-blue-100 border-blue-500;
+        }
+        .quiz-option-btn.correct {
+            @apply bg-green-100 border-green-500;
+        }
+        .quiz-option-btn.incorrect {
+            @apply bg-red-100 border-red-500;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <header class="bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-blue-700">인터랙티브 운동 실험실</h1>
+            <nav class="hidden md:flex space-x-2">
+                <a href="#comparison" class="nav-link">운동 비교 실험</a>
+                <a href="#freefall" class="nav-link">자유 낙하 실험</a>
+                <a href="#newton" class="nav-link">뉴턴의 법칙</a>
+                <a href="#quiz" class="nav-link">개념 확인 퀴즈</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8 space-y-12">
+
+        <!-- 1. 운동 비교 실험 섹션 -->
+        <section id="comparison" class="card">
+            <h2 class="section-title">실험 1: 등속 직선 운동 vs 등가속도 직선 운동</h2>
+            <p class="section-intro">두 가지 대표적인 운동, '등속 직선 운동'과 '등가속도 직선 운동'을 나란히 비교해봅니다. 아래 슬라이더를 조절하여 각 운동의 초기 조건을 변경하고, 시간에 따라 이동 거리, 속력, 가속도 그래프가 어떻게 실시간으로 변하는지 관찰하며 두 운동의 핵심적인 차이를 발견해보세요.</p>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- 등속 직선 운동 -->
+                <div class="border-t-4 border-blue-500 pt-4">
+                    <h3 class="text-xl font-semibold mb-3 text-blue-700">등속 직선 운동</h3>
+                    <p class="text-sm text-slate-600 mb-4">속력이 일정하게 유지되는 운동입니다.</p>
+                    <div>
+                        <label for="uniform-velocity" class="font-medium">속력 (v): <span id="uniform-velocity-value" class="font-bold">10</span> m/s</label>
+                        <input type="range" id="uniform-velocity" min="0" max="20" value="10" step="1" class="w-full mt-1">
+                    </div>
+                    <div class="mt-4 p-3 bg-slate-50 rounded-md">
+                        <p class="text-sm font-medium">알짜힘 (F): <span class="font-bold text-lg text-blue-700">0 N</span></p>
+                    </div>
+                    <div class="chart-container"><canvas id="uniform-distance-chart"></canvas></div>
+                    <div class="chart-container"><canvas id="uniform-speed-chart"></canvas></div>
+                    <div class="chart-container"><canvas id="uniform-acceleration-chart"></canvas></div>
+                </div>
+
+                <!-- 등가속도 직선 운동 -->
+                <div class="border-t-4 border-green-500 pt-4">
+                    <h3 class="text-xl font-semibold mb-3 text-green-700">등가속도 직선 운동</h3>
+                    <p class="text-sm text-slate-600 mb-4">속력이 일정하게 변하는(가속도가 일정한) 운동입니다.</p>
+                    <div>
+                        <label for="accelerated-acc" class="font-medium">가속도 (a): <span id="accelerated-acc-value" class="font-bold">2</span> m/s²</label>
+                        <input type="range" id="accelerated-acc" min="0" max="5" value="2" step="0.5" class="w-full mt-1">
+                    </div>
+                    <div class="mt-4 p-3 bg-slate-50 rounded-md">
+                         <p class="text-sm font-medium">알짜힘 (F): <span class="font-bold text-lg text-green-700">일정하게 작용</span></p>
+                    </div>
+                    <div class="chart-container"><canvas id="accelerated-distance-chart"></canvas></div>
+                    <div class="chart-container"><canvas id="accelerated-speed-chart"></canvas></div>
+                    <div class="chart-container"><canvas id="accelerated-acceleration-chart"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. 자유 낙하 실험 섹션 -->
+        <section id="freefall" class="card">
+            <h2 class="section-title">실험 2: 자유 낙하 시뮬레이션</h2>
+            <p class="section-intro">공기 저항이 없는 진공 상태에서 물체를 떨어뜨리면 어떻게 될까요? 자유 낙하 운동은 질량과 관계없이 모든 물체가 동일한 중력 가속도로 떨어진다는 중요한 원리를 보여줍니다. '실험 시작' 버튼을 눌러 질량이 다른 쇠구슬과 깃털이 실제로 동시에 떨어지는지 확인해보세요.</p>
+            <div class="flex flex-col md:flex-row gap-8 items-center justify-center bg-slate-50 p-6 rounded-lg">
+                <div class="w-full md:w-auto">
+                     <button id="start-fall-btn" class="w-full md:w-auto bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-transform hover:scale-105">실험 시작</button>
+                </div>
+                <div class="flex gap-8 justify-center items-end h-64 w-full md:w-64 relative bg-white border rounded-md p-4">
+                    <div id="fall-log" class="absolute top-2 left-2 text-sm text-slate-500">시간: 0.0s, 속도: 0.0m/s</div>
+                    <!-- 깃털 -->
+                    <div id="feather" class="absolute w-8 h-12" style="top: 20px; left: 30%; transition: top 2s linear;">
+                        <div class="w-full h-full bg-gray-300" style="clip-path: path('M10 0 C-10 30, 10 60, 10 90 L12 90 C12 60, 30 30, 12 0 Z');"></div>
+                    </div>
+                    <!-- 쇠구슬 -->
+                    <div id="ball" class="absolute w-8 h-8 bg-slate-700 rounded-full" style="top: 20px; right: 30%; transition: top 2s linear;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 뉴턴의 법칙 섹션 -->
+        <section id="newton" class="card">
+            <h2 class="section-title">개념 탐구: 뉴턴의 제2법칙 (F=ma)</h2>
+            <p class="section-intro">물체의 가속도는 알짜힘에 비례하고 질량에 반비례한다는 법칙($F=ma$)은 운동을 이해하는 핵심입니다. 아래 계산기에서 힘, 질량, 가속도 중 두 가지 값을 입력하여 나머지 값이 어떻게 결정되는지 직접 확인하며 세 변수 간의 관계를 탐구해 보세요.</p>
+             <div class="bg-slate-50 p-6 rounded-md space-y-4 max-w-2xl mx-auto">
+                <div class="text-center mb-4">
+                    <p class="text-2xl font-bold tracking-wider"><span id="f-val">100</span> N = <span id="m-val">10</span> kg × <span id="a-val">10</span> m/s²</p>
+                </div>
+                <div class="grid sm:grid-cols-3 gap-4">
+                    <div>
+                        <label for="force" class="block text-sm font-medium">힘 (F) [N]</label>
+                        <input type="number" id="force" value="100" class="fma-input w-full p-2 mt-1 border border-slate-300 rounded-md">
+                    </div>
+                    <div>
+                        <label for="mass-newton" class="block text-sm font-medium">질량 (m) [kg]</label>
+                        <input type="number" id="mass-newton" value="10" class="fma-input w-full p-2 mt-1 border border-slate-300 rounded-md">
+                    </div>
+                    <div>
+                        <label for="acceleration-newton" class="block text-sm font-medium">가속도 (a) [m/s²]</label>
+                        <input type="number" id="acceleration-newton" value="10" class="fma-input w-full p-2 mt-1 border border-slate-300 rounded-md">
+                    </div>
+                </div>
+                 <p class="text-xs text-center text-slate-500 pt-2">한 값을 수정하면 나머지 값이 자동으로 업데이트됩니다.</p>
+            </div>
+        </section>
+
+        <!-- 4. 개념 확인 퀴즈 섹션 -->
+        <section id="quiz" class="card">
+            <h2 class="section-title">개념 확인 퀴즈</h2>
+            <p class="section-intro">학습한 운동 개념들을 얼마나 잘 이해하고 있는지 퀴즈를 통해 확인해 보세요. 각 문제의 정답을 맞히면 최종 점수를 확인할 수 있습니다. 모든 문제를 풀고 학습 내용을 완벽하게 암기해봅시다!</p>
+            
+            <div class="bg-slate-50 p-6 rounded-md space-y-6 max-w-2xl mx-auto">
+                <div id="quiz-question-container">
+                    <p id="quiz-question" class="text-lg font-semibold mb-4"></p>
+                    <div id="quiz-options" class="space-y-2">
+                        <!-- Quiz options will be loaded here by JavaScript -->
+                    </div>
+                    <div id="quiz-feedback" class="mt-4 text-center font-bold"></div>
+                </div>
+                <div class="flex justify-between items-center mt-6">
+                    <button id="quiz-check-btn" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50" disabled>정답 확인</button>
+                    <button id="quiz-next-btn" class="bg-slate-600 text-white px-6 py-2 rounded-md hover:bg-slate-700 disabled:opacity-50" disabled>다음 문제</button>
+                </div>
+                <div id="quiz-score" class="text-xl font-bold text-center mt-6 hidden"></div>
+                <button id="quiz-restart-btn" class="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600 w-full mt-4 hidden">퀴즈 다시 시작</button>
+            </div>
+        </section>
+
+    </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const timeLabels = [0, 1, 2, 3, 4, 5];
+    let charts = {};
+
+    const createChart = (ctx, label, color) => {
+        return new Chart(ctx, {
+            type: 'line',
+            data: { labels: timeLabels, datasets: [{
+                label: label,
+                borderColor: color,
+                backgroundColor: color + '33',
+                tension: 0.1,
+                fill: false,
+                pointRadius: 3,
+                pointBackgroundColor: color
+            }]},
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { title: { display: true, text: '시간 (s)' } },
+                    y: { beginAtZero: true, title: { display: true, text: label } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    };
+
+    // 1. 운동 비교 실험 초기화
+    const uniformVelocitySlider = document.getElementById('uniform-velocity');
+    const uniformVelocityValue = document.getElementById('uniform-velocity-value');
+    const acceleratedAccSlider = document.getElementById('accelerated-acc');
+    const acceleratedAccValue = document.getElementById('accelerated-acc-value');
+
+    charts.uniformDistance = createChart(document.getElementById('uniform-distance-chart').getContext('2d'), '이동 거리 (m)', '#3b82f6');
+    charts.uniformSpeed = createChart(document.getElementById('uniform-speed-chart').getContext('2d'), '속력 (m/s)', '#3b82f6');
+    charts.uniformAcceleration = createChart(document.getElementById('uniform-acceleration-chart').getContext('2d'), '가속도 (m/s²)', '#3b82f6');
+    
+    charts.acceleratedDistance = createChart(document.getElementById('accelerated-distance-chart').getContext('2d'), '이동 거리 (m)', '#22c55e');
+    charts.acceleratedSpeed = createChart(document.getElementById('accelerated-speed-chart').getContext('2d'), '속력 (m/s)', '#22c55e');
+    charts.acceleratedAcceleration = createChart(document.getElementById('accelerated-acceleration-chart').getContext('2d'), '가속도 (m/s²)', '#22c55e');
+
+    function updateComparisonCharts() {
+        const v = parseFloat(uniformVelocitySlider.value);
+        uniformVelocityValue.textContent = v;
+        charts.uniformDistance.data.datasets[0].data = timeLabels.map(t => v * t);
+        charts.uniformSpeed.data.datasets[0].data = timeLabels.map(() => v);
+        charts.uniformAcceleration.data.datasets[0].data = timeLabels.map(() => 0);
+        charts.uniformDistance.update();
+        charts.uniformSpeed.update();
+        charts.uniformAcceleration.update();
+
+        const a = parseFloat(acceleratedAccSlider.value);
+        acceleratedAccValue.textContent = a;
+        charts.acceleratedDistance.data.datasets[0].data = timeLabels.map(t => 0.5 * a * t * t);
+        charts.acceleratedSpeed.data.datasets[0].data = timeLabels.map(t => a * t);
+        charts.acceleratedAcceleration.data.datasets[0].data = timeLabels.map(() => a);
+        charts.acceleratedDistance.update();
+        charts.acceleratedSpeed.update();
+        charts.acceleratedAcceleration.update();
+    }
+    
+    uniformVelocitySlider.addEventListener('input', updateComparisonCharts);
+    acceleratedAccSlider.addEventListener('input', updateComparisonCharts);
+    updateComparisonCharts();
+
+    // 2. 자유 낙하 실험
+    const startFallBtn = document.getElementById('start-fall-btn');
+    const feather = document.getElementById('feather');
+    const ball = document.getElementById('ball');
+    const fallLog = document.getElementById('fall-log');
+    let fallAnimation;
+
+    startFallBtn.addEventListener('click', () => {
+        startFallBtn.disabled = true;
+        feather.style.transition = 'none';
+        ball.style.transition = 'none';
+        feather.style.top = '20px';
+        ball.style.top = '20px';
+
+        // Force reflow
+        void feather.offsetWidth;
+
+        feather.style.transition = 'top 2s linear';
+        ball.style.transition = 'top 2s linear';
+        feather.style.top = 'calc(100% - 48px)';
+        ball.style.top = 'calc(100% - 32px)';
+
+        let startTime = Date.now();
+        clearInterval(fallAnimation);
+        fallAnimation = setInterval(() => {
+            let elapsedTime = (Date.now() - startTime) / 1000;
+            if (elapsedTime > 2) {
+                elapsedTime = 2;
+                clearInterval(fallAnimation);
+                startFallBtn.disabled = false;
+            }
+            let velocity = 9.8 * elapsedTime;
+            fallLog.textContent = `시간: ${elapsedTime.toFixed(1)}s, 속도: ${velocity.toFixed(1)}m/s`;
+        }, 50);
+    });
+
+    // 3. 뉴턴의 법칙 계산기
+    const forceInput = document.getElementById('force');
+    const massInput = document.getElementById('mass-newton');
+    const accInput = document.getElementById('acceleration-newton');
+    const fVal = document.getElementById('f-val');
+    const mVal = document.getElementById('m-val');
+    const aVal = document.getElementById('a-val');
+    let lastEditedFMA = 'f';
+
+    document.querySelectorAll('.fma-input').forEach(input => {
+        input.addEventListener('focus', () => { lastEditedFMA = input.id; });
+        input.addEventListener('input', calculateFMA);
+    });
+
+    function calculateFMA() {
+        let f = parseFloat(forceInput.value);
+        let m = parseFloat(massInput.value);
+        let a = parseFloat(accInput.value);
+
+        if (lastEditedFMA === 'mass-newton' || lastEditedFMA === 'acceleration-newton') {
+            if (!isNaN(m) && !isNaN(a)) forceInput.value = (m * a).toFixed(2);
+        } else if (lastEditedFMA === 'force' || lastEditedFMA === 'acceleration-newton') {
+            if (!isNaN(f) && !isNaN(a) && a !== 0) massInput.value = (f / a).toFixed(2);
+        } else if (lastEditedFMA === 'force' || lastEditedFMA === 'mass-newton') {
+            if (!isNaN(f) && !isNaN(m) && m !== 0) accInput.value = (f / m).toFixed(2);
+        }
+        
+        fVal.textContent = parseFloat(forceInput.value).toFixed(1);
+        mVal.textContent = parseFloat(massInput.value).toFixed(1);
+        aVal.textContent = parseFloat(accInput.value).toFixed(1);
+    }
+    calculateFMA();
+
+    // 4. 개념 확인 퀴즈 섹션
+    const quizQuestions = [
+        {
+            question: "시간-속력 그래프에서 그래프 아래 넓이가 나타내는 물리량은 무엇인가요?",
+            options: ["가속도", "이동 거리", "속력 변화량", "힘"],
+            answer: 1 // 이동 거리
+        },
+        {
+            question: "시간-속력 그래프에서 기울기가 나타내는 물리량은 무엇인가요?",
+            options: ["이동 거리", "속력", "가속도", "시간"],
+            answer: 2 // 가속도
+        },
+        {
+            question: "등속 직선 운동에 대한 설명으로 옳은 것은?",
+            options: ["가속도가 0이 아니다.", "알짜힘이 일정하게 작용한다.", "속력과 방향이 변하지 않는다.", "시간-이동 거리 그래프는 곡선이다."],
+            answer: 2 // 속력과 방향이 변하지 않는다.
+        },
+        {
+            question: "등가속도 직선 운동에 대한 설명으로 옳은 것은?",
+            options: ["속력이 항상 일정하다.", "알짜힘이 0이다.", "가속도 값이 일정하다.", "시간-속력 그래프는 수평선이다."],
+            answer: 2 // 가속도 값이 일정하다.
+        },
+        {
+            question: "공기 저항을 무시할 때, 질량이 다른 쇠구슬과 깃털을 동시에 떨어뜨리면 어떻게 될까요?",
+            options: ["쇠구슬이 먼저 떨어진다.", "깃털이 먼저 떨어진다.", "동시에 떨어진다.", "떨어지는 속도는 각각 다르다."],
+            answer: 2 // 동시에 떨어진다.
+        },
+        {
+            question: "뉴턴의 제2법칙 F=ma 에서 물체에 작용하는 알짜힘이 0일 때, 물체의 운동 상태는?",
+            options: ["반드시 정지한다.", "속력이 점점 감소한다.", "등속 직선 운동을 유지하거나 정지한다.", "속력이 점점 증가한다."],
+            answer: 2 // 등속 직선 운동을 유지하거나 정지한다.
+        },
+        {
+            question: "등가속도 운동을 하는 물체의 알짜힘에 대한 설명으로 옳은 것은?",
+            options: ["항상 0이다.", "점점 증가한다.", "점점 감소한다.", "일정한 크기로 작용한다."],
+            answer: 3 // 일정한 크기로 작용한다.
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let selectedOptionIndex = null;
+
+    const quizQuestion = document.getElementById('quiz-question');
+    const quizOptionsContainer = document.getElementById('quiz-options');
+    const quizFeedback = document.getElementById('quiz-feedback');
+    const quizCheckBtn = document.getElementById('quiz-check-btn');
+    const quizNextBtn = document.getElementById('quiz-next-btn');
+    const quizScoreDisplay = document.getElementById('quiz-score');
+    const quizRestartBtn = document.getElementById('quiz-restart-btn');
+
+    function loadQuestion() {
+        if (currentQuestionIndex < quizQuestions.length) {
+            const q = quizQuestions[currentQuestionIndex];
+            quizQuestion.textContent = `${currentQuestionIndex + 1}. ${q.question}`;
+            quizOptionsContainer.innerHTML = '';
+            quizFeedback.textContent = '';
+            selectedOptionIndex = null;
+            quizCheckBtn.disabled = true;
+            quizNextBtn.disabled = true;
+            quizScoreDisplay.classList.add('hidden');
+            quizRestartBtn.classList.add('hidden');
+
+            q.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('quiz-option-btn');
+                button.dataset.index = index;
+                button.addEventListener('click', () => selectOption(button, index));
+                quizOptionsContainer.appendChild(button);
+            });
+        } else {
+            displayFinalScore();
+        }
+    }
+
+    function selectOption(button, index) {
+        selectedOptionIndex = index;
+        quizOptionsContainer.querySelectorAll('.quiz-option-btn').forEach(btn => {
+            btn.classList.remove('selected');
+        });
+        button.classList.add('selected');
+        quizCheckBtn.disabled = false;
+    }
+
+    function checkAnswer() {
+        if (selectedOptionIndex === null) return;
+
+        const q = quizQuestions[currentQuestionIndex];
+        const optionButtons = quizOptionsContainer.querySelectorAll('.quiz-option-btn');
+
+        if (selectedOptionIndex === q.answer) {
+            score++;
+            quizFeedback.textContent = "정답입니다! 👏";
+            quizFeedback.classList.remove('text-red-600');
+            quizFeedback.classList.add('text-green-600');
+            optionButtons[selectedOptionIndex].classList.add('correct');
+        } else {
+            quizFeedback.textContent = "오답입니다. 다시 한번 내용을 확인해 보세요. 🧐";
+            quizFeedback.classList.remove('text-green-600');
+            quizFeedback.classList.add('text-red-600');
+            optionButtons[selectedOptionIndex].classList.add('incorrect');
+            optionButtons[q.answer].classList.add('correct'); // Show correct answer
+        }
+
+        quizCheckBtn.disabled = true;
+        quizNextBtn.disabled = false;
+        optionButtons.forEach(btn => btn.disabled = true); // Disable all options after checking
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        loadQuestion();
+    }
+
+    function displayFinalScore() {
+        quizQuestion.textContent = "퀴즈 완료!";
+        quizOptionsContainer.innerHTML = "";
+        quizFeedback.textContent = "";
+        quizCheckBtn.classList.add('hidden');
+        quizNextBtn.classList.add('hidden');
+        
+        quizScoreDisplay.textContent = `최종 점수: ${score} / ${quizQuestions.length} 문제`;
+        quizScoreDisplay.classList.remove('hidden');
+        quizRestartBtn.classList.remove('hidden');
+    }
+
+    function restartQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        quizCheckBtn.classList.remove('hidden');
+        quizNextBtn.classList.remove('hidden');
+        loadQuestion();
+    }
+
+    quizCheckBtn.addEventListener('click', checkAnswer);
+    quizNextBtn.addEventListener('click', nextQuestion);
+    quizRestartBtn.addEventListener('click', restartQuiz);
+
+    // Initial loads
+    loadQuestion(); 
+});
+</script>
+
+</body>
+</html>

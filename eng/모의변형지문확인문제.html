@@ -1,0 +1,624 @@
+import React, { useState, useEffect, useRef } from 'react';
+
+// Question data structure:
+// questionText: The full text of the question with (N) placeholders for blanks.
+// blanks: An array of objects, each containing:
+//   id: The blank number (e.g., 1, 2)
+//   correctAnswer: The correct word for the blank
+// koreanTranslation: Korean translation of the question text for context.
+
+const allQuestions = [
+  {
+    id: 1,
+    questionText: `To all Dog Owners, I am writing to you as Lily Paxton, the Pet Program Coordinator for our town. We have (1) opened a brand-new dog park, which is part of our objective to make our community (2) welcoming to dogs. For the purpose of providing an (3) time for pets and their owners alike, the park was specifically (4) with several features. You will find large, open fields of grass where your pets are free to run, jump, and play. To (5) everyone's safety, we have created areas for larger dogs and smaller ones. Additionally. plenty of benches are available, along with spots for (7) and for cool. It is our hope that you and your dogs have a (9) time at this newly (10) facility.`,
+    koreanTranslation: `모든 반려견 주인님분들에게. 저는 우리 마을의 반려동물 프로그램 코디네이터인 Lily Paxton입니다. 최근 저희는 새로운 개 공원을 개장했으며, 이는 우리 지역사회를 개들에게 더욱 친화적인 곳으로 만들고자 하는 목표의 일환입니다. 이 공원은 반려동물과 주인 모두가 즐거운 시간을 보낼 수 있도록 여러 특별한 시설들을 갖추어 설계되었습니다. 여러분의 반려견이 자유롭게 뛰고, 점프하고, 놀 수 있는 넓고 탁 트인 잔디밭이 마련되어 있습니다. 모두의 안전을 위해 대형견과 소형견을 위한 구역을 분리해 놓았습니다. 또한 충분한 벤치와 함께 휴식을 취하고 시원하게 지낼 수 있는 공간들도 준비되어 있습니다. 여러분과 여러분의 반려견이 이 새로 개장한 시설에서 멋진 시간을 보내시기를 바랍니다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'recently' },
+      { id: 2, correctAnswer: 'more' },
+      { id: 3, correctAnswer: 'enjoyable' },
+      { id: 4, correctAnswer: 'designed' },
+      { id: 5, correctAnswer: 'ensure' },
+      { id: 6, correctAnswer: 'separate' }, // This blank (6) is implied by the text 'areas for larger dogs and smaller ones.' and the '정답 및 해설'
+      { id: 7, correctAnswer: 'resting' },
+      { id: 8, correctAnswer: 'staying' }, // This blank (8) is implied by the text 'and for cool.' and the '정답 및 해설'
+      { id: 9, correctAnswer: 'wonderful' },
+      { id: 10, correctAnswer: 'opened' },
+    ],
+  },
+  {
+    id: 2,
+    questionText: `Maya stood in the check-in line for her flight, and her (1) for the European backpacking trip were extremely high. Because she had been looking (2) to the trip for a full year, she couldn't wait to visit the museums of Madrid and see the Eiffel Tower light up the Paris night. As she (3) there, the feeling that her adventures were at last so (4) grew stronger. An airline employee at the counter asked to see Maya's (5) just as she (6) the front of the line. After reaching into her pocket and feeling (7) Maya suddenly (8) the terrible truth: she had left her passport at home. Her plans were ruined, and she was completely (9) knowing that without a passport, she could not (10) the flight and would have to put off her dream trip.`,
+    koreanTranslation: `Maya는 비행기 탑승 수속 줄에 서 있었다. 유럽 배낭여행에 대한 기대는 매우 컸다. 1년 내내 이 여행을 고대해왔기 때문에, 그녀는 Madrid의 박물관들을 방문하고 Paris의 밤을 밝히는 에펠 탑을 보는 것을 무척이나 기다렸다. 그곳에 서 있자. 마침내 모험이 코앞으로 다가왔다는 느낌이 더욱 강해졌다. Maya가 줄맨 앞으로 다가갔을 때, 카운터의 항공사 직원이 그녀의 여권을 보여달라고 요청했다. 주머니에 손을 넣었으나 아무것도 잡히지 않자. Maya는 여권을 집에 두고 왔다는 끔찍한 사실을 문득 깨달았다. 그녀의 계획은 수포로 돌아갔고, 여권 없이는 비행기에 탑승할 수 없으며 꿈에 그리던 여행을 미뤄야 한다는 것을 알게 되자 그녀는 완전히 상심했다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'expectations' },
+      { id: 2, correctAnswer: 'forward' },
+      { id: 3, correctAnswer: 'stood' },
+      { id: 4, correctAnswer: 'close' },
+      { id: 5, correctAnswer: 'passport' },
+      { id: 6, correctAnswer: 'approached' },
+      { id: 7, correctAnswer: 'nothing' },
+      { id: 8, correctAnswer: 'realized' },
+      { id: 9, correctAnswer: 'heartbroken' },
+      { id: 10, correctAnswer: 'board' },
+    ],
+  },
+  {
+    id: 3,
+    questionText: `People often ask me. "What (1) you most about habits?" One thing that continually (2) me is the (3) to which we're influenced by sheer (4). The amount of effort, time, or decision making required by an action has a huge influence on habit (5). To a truly (6) extent, we're more likely to do something if it's convenient, and (7) likely if it's not. For this reason, we should pay close attention to the convenience of any activity we want to make into a habit. Putting a wastebasket next to our front door made mail sorting slightly more convenient, and I stopped procrastinating with this chore. Many people report that they do a (8) better job of staying close to (9) family members now that tools like group chats make it easy to stay in (10).`,
+    koreanTranslation: `사람들은 종종 나에게, "습관에 관한 무엇이 당신을 가장 놀라게 하나요?"라고 묻는다. 나를 계속해서 놀라게 하는 한 가지는 우리가 순전한 편리성에 의해 영향을 받는 정도이다. 행동에 의해 요구되는 노력, 시간, 또는 의사결정의 양이 습관 형성에 큰 영향을 미친다. 정말 놀라울 정도로, 우리는 어떤 일이 편리하다면 그것을 더 자주 할 것이고, 그렇지 않다면 덜 하게 될 것이다. 이런 이유로. 우리는 습관으로 만들고 싶은 행동의 편리성에 세심한 주의를 기울여야 한다. 현관문 옆에 쓰레기통을 두는 것이 우편물을 분류하는 일을 약간 더 편리하게 했고, 나는 이 일을 미루는 것을 멈추었다. 많은 사람들은 그룹 채팅 같은 도구들이 연락을 유지하는 것을 쉽게 만들어 주기 때문에 멀리 사는 가족들과 더 가까이 지내는 일을 훨씬 더 잘한다 고 말한다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'surprises' },
+      { id: 2, correctAnswer: 'astonishes' },
+      { id: 3, correctAnswer: 'degree' },
+      { id: 4, correctAnswer: 'convenience' },
+      { id: 5, correctAnswer: 'formation' },
+      { id: 6, correctAnswer: 'remarkable' },
+      { id: 7, correctAnswer: 'less' },
+      { id: 8, correctAnswer: 'much' },
+      { id: 9, correctAnswer: 'distant' },
+      { id: 10, correctAnswer: 'touch' },
+    ],
+  },
+  {
+    id: 4,
+    questionText: `It is (1) sense that people's inner (2) may drive their (3) behavior. If you're attracted to a certain person, you should be more likely to (4) with that person. If you favor a brand of toothpaste, you're more likely to buy it. Of course, our internal thoughts don't always (5) obviously (6) our public behavior, but, overall, what we do what we think. But beliefs and behaviors are also related in a more remarkable way. It turns out that the arrow is as likely to point in the (7) direction. As social psychologist David Myers observes, "If social psychology has taught us anything during the last 25 years, it is that we are (8) not only to think ourselves into a way of (9) but also to act ourselves into a way of (10).`,
+    koreanTranslation: `사람들의 내적 신념이 그들의 외적인 행동을 이끌 수 있다는 것은 상식이다. 만약 당신이 어떤 사람에게 끌린다면, 당신은 그 사람과 더 어울리려고 할 것이다. 만약 당신이 한 브랜드의 치약을 선호한다면, 당신이 그것을 구매할 가능성은 더 높다. 물론, 우리의 내적 사고가 항상 공개적인 행동을 예측하지는 않지만, 전반적으로, 우리가 하는 것은 분명히 우리가 생각하는 바를 반영한다. 그러나 신념과 행동은 이보다 더 놀라운 방식으로도 관련이 있다. 화살이 반대 방향을 가리킬 가능성이 그만큼 높다는 것이 드러난다. 사회 심리학자 David Myers가 말한 바에 따르면, "지난 25년간 사회 심리학이 우리에게 가르쳐준 것이 있다면, 그것은 우리가 생각하여 행동 방식에 이를 뿐만 아니라 우리가 행동하여 사고 방식에 이를 가능성도 있다는 것이다."`,
+    blanks: [
+      { id: 1, correctAnswer: 'common' },
+      { id: 2, correctAnswer: 'beliefs' },
+      { id: 3, correctAnswer: 'external' },
+      { id: 4, correctAnswer: 'socialize' },
+      { id: 5, correctAnswer: 'predict' },
+      { id: 6, correctAnswer: 'reflects' },
+      { id: 7, correctAnswer: 'reverse' },
+      { id: 8, correctAnswer: 'likely' },
+      { id: 9, correctAnswer: 'acting' },
+      { id: 10, correctAnswer: 'thinking' },
+    ],
+  },
+  {
+    id: 5,
+    questionText: `Imagine following the spirit of a (1) vow into daily life. (2) yourself to spend an entire day saying only what you must say. It's been widely observed by behavioral psychology experts and anyone who's ever been on a first date that we too often (4) "conversation" as a game of waiting for our own (5) to speak. We miss what's being said because we're mentally (6) our next utterance. What if you could (7) the idea that the next available mini-silence is your next opening to express (8) is in your head? What if you were (9) to, say, fifty spoken words tomorrow? I think you'd listen quite differently. You'd attend quite carefully to every word you heard. You'd be attuned to what you must respond to. You might discover that the less you say, the (10) you hear.`,
+    koreanTranslation: `일상생활에서 침묵 서약의 정신을 따르는 것을 상상해 보라. 반드시 말해야 할 것만 말하는 데 하루 온종일을 보내는 것에 스스로 도전해 보라. 우리가 너무나 자주 "대화"를 자신이 말할 차례를 기다리는 게임처럼 여기는 경향이 있다는 것이 행동 심리학 전문가들 - 그리고 첫 데이트를 해 본 적이 있는 누구든지에 의해 널리 관찰되어 왔다. 우리는 다음 발언을 머릿속으로 연습하느라 말해지고 있는 것을 놓친다. 만약 당신이 그 다음에 오는 작은 침묵이 당신의 머릿속에 있는 무엇이든지를 표현할 그 다음 시작이라는 생각을 없앨 수 있다면 어떨까? 내일 당신이 말을, 이를 테면, 50단어로 제한받는다면 어떨까? 나는 당신이 매우 다르게 듣게 될 것이라고 생각한다. 당신은 당신이 듣는 모든 단어에 매우 신중히 귀를 기울이게 될 것이다. 당신이 반드시 응답해야 할 것에 맞춰질 것이다. 당신은 말을 줄일수록. 더 많이 듣게 된다는 것을 발견할지도 모른다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'silence' },
+      { id: 2, correctAnswer: 'Challenge' },
+      { id: 3, correctAnswer: 'absolutely' }, // This blank (3) is implied by the '정답 및 해설' and context.
+      { id: 4, correctAnswer: 'treat' },
+      { id: 5, correctAnswer: 'turn' },
+      { id: 6, correctAnswer: 'rehearsing' },
+      { id: 7, correctAnswer: 'eliminate' },
+      { id: 8, correctAnswer: 'whatever' },
+      { id: 9, correctAnswer: 'limited' },
+      { id: 10, correctAnswer: 'more' },
+    ],
+  },
+  {
+    id: 6,
+    questionText: `Science is (1) with accumulating and understanding observations of the physical world. That understanding alone solves no problems. Individual people have to act on that understanding for it to help (2) problems. For instance, science has found that exercise can lower your risk of heart disease. Knowing this fact is interesting, but it will do (4) for your personal health (5) you act on it and actually exercise. And that's the hard part. Reading an article about exercise is easy. Getting into an (6) routine of regular exercise is harder. In this sense, science really solves no problems at all. Problems are only solved when people take the (7) provided by science and use it. In fact many of humanity's (8) problems are caused by (9) of action, and (10) lack of knowledge.`,
+    koreanTranslation: `과학은 물리적 세계에 대한 관찰을 축적하고 이해하는 것과 관련이 있다. 그 이해 단독으로는 어떠한 문제도 해결하지 않는다. 개개인은 그것이 문제를 해결하는 것을 돕기 위해 그 이해를 행동으로 옮겨야 한다. 예를 들어. 과학은 규칙적인 운동이 심장병의 위험을 낮출 수 있다는 것을 발견했다. 이러한 사실을 아는 것은 흥미롭지만, 당신이 이를 행동으로 옮겨 실제로 운동하지 않는다면 그것은 당신의 개인 건강에 아무런 도움이 되지 않는다. 그리고 바로 이 점이 어려운 부분이다. 운동에 대한 기사를 읽는 것은 쉽다. 규칙적인 운동의 실제적인 루틴을 형성하는 것은 더 어렵다. 이러한 점에서, 과학은 사실 어떤 문제도 해결하지 않는다. 문제는 사람들이 과학에 의해 제공된 지식을 취하고 그것을 사용할 때만 해결된다. 실제로, 인류의 가장 큰 문제들 중 다수는 지식의 부족이 아니라, 행동의 부족에 의해 야기된다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'concerned' },
+      { id: 2, correctAnswer: 'solve' },
+      { id: 3, correctAnswer: 'regular' }, // This blank (3) is implied from the korean translation '규칙적인 운동'
+      { id: 4, correctAnswer: 'nothing' },
+      { id: 5, correctAnswer: 'unless' },
+      { id: 6, correctAnswer: 'actual' },
+      { id: 7, correctAnswer: 'knowledge' },
+      { id: 8, correctAnswer: 'biggest' },
+      { id: 9, correctAnswer: 'lack' },
+      { id: 10, correctAnswer: 'not' },
+    ],
+  },
+  {
+    id: 7,
+    questionText: `We assume that we are logical, objective, and (1). believing our analysis, judgments, and decisions to be (2) as a result. Consequently, we expect that if others are similarly logical, they will naturally agree with our viewpoint. However, the exact (3) is true. Every person's brain is unique, their life experience is distinct, and their (4) and knowledge are also different. While you may feel you are being (5) -believing your ideas perfectly reflect reality this is actually (6). What you perceive is merely your own (7) of reality, and it will inevitably be different from anyone else's. Consider when two countries compete in the World Cup: supporters from each side (8) the officials for (9) every foul the opposing team makes. Invariably, supporters on both sides conclude that the referees are (10) against their own team.`,
+    koreanTranslation: `우리는 자신이 논리적이고, 객관적이며, 이성적이라고 가정하면서, 그 결과 우리의 분석, 판단, 결정이 정확하다고 믿는다. 따라서 우리는 다른 사람들도 마찬가지로 논리적이라면, 자연스럽게 우리의 관점에 동의할 것이라고 기대한다. 하지만 정반대가 사실이다. 모든 사람의 뇌는 고유하고, 그들의 삶의 경험은 독특하며, 그들의 욕구와 지식 또한 다르다. 당신은 자신이 현실적이라고 느낄 수 있지만 당신의 생각이 현실을 완벽하게 반영한다고 믿으면서-이것은 실제로 불가능하다. 당신이 인식하는 것은 단지 현실에 대한 당신 자신의 해석일 뿐이며, 그것은 필연적으로 다른 누구의 것과도 다를 것이다. 두 나라가 World Cup에서 경쟁할 때를 생각해 보라: 각 측의 지지자들은 심판들이 상대팀이 저지르는 모든 반칙을 놓친다고 비판한다. 변함없이, 양측의 지지자들은 심판들이 자기 팀에게 편파적이라고 결론을 내린다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'rational' },
+      { id: 2, correctAnswer: 'accurate' },
+      { id: 3, correctAnswer: 'opposite' },
+      { id: 4, correctAnswer: 'desires' },
+      { id: 5, correctAnswer: 'realistic' },
+      { id: 6, correctAnswer: 'impossible' },
+      { id: 7, correctAnswer: 'interpretation' },
+      { id: 8, correctAnswer: 'criticize' },
+      { id: 9, correctAnswer: 'missing' },
+      { id: 10, correctAnswer: 'biased' },
+    ],
+  },
+  {
+    id: 8,
+    questionText: `The provided graph illustrates the percentage of retail sales conducted online for a selection of European nations in 2018 and 2019. The United Kingdom posted the (1) online retail percentage in 2019, (2) a figure of 19.2 percent. Between 2018 and 2019, the Netherlands displayed the largest (3) in its online retail share, showing a (4) of more than 6 percentage points. Germany's online retail share was (5) than the Netherlands' in 2018: (6) by 2019, Germany (7) behind its neighbor. The online retail share for Germany in 2018 was more than three times (8) than that of Spain. Out of the five nations, Italy recorded the (9) percentage for online retail trade in (10) 2018 and 2019.`,
+    koreanTranslation: `제시된 그래프는 2018년과 2019년에 선정된 유럽 국가들의 온라인 소매 판매 비율을 보여준다. 영국은 2019년에 가장 높은 온라인 소매 비율을 기록하여 19.2%에 도달했다. 2018년과 2019년 사이에 네덜란드는 온라인 소매 점유율에서 가장 큰 증가를 보였으며, 6% 포인트 이상의 상승을 나타냈다. 독일의 온라인 소매 점유율은 2018년에 네덜란드보다 높았으나, 2019년에는 독일이 이웃 국가에 뒤처졌다. 2018년 독일의 온라인 소매 점유율은 스페인의 3배 이상이었다. 5개국 중에서 이탈리아는 2018년과 2019년 모두에서 가장 낮은 온라인 소매 거래 비율을 기록했다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'highest' },
+      { id: 2, correctAnswer: 'reaching' },
+      { id: 3, correctAnswer: 'increase' },
+      { id: 4, correctAnswer: 'jump' },
+      { id: 5, correctAnswer: 'higher' },
+      { id: 6, correctAnswer: 'whereas' },
+      { id: 7, correctAnswer: 'fell' },
+      { id: 8, correctAnswer: 'higher' },
+      { id: 9, correctAnswer: 'lowest' },
+      { id: 10, correctAnswer: 'both' },
+    ],
+    imageUrl: 'https://placehold.co/400x300/e0e0e0/333333?text=Online+Share+Graph', // Placeholder image for the graph
+  },
+  {
+    id: 9,
+    questionText: `Edward O. Wilson, who became (1) in nature in his early childhood, spent a lot of his time (2) He was (3) blinded in a fishing accident at the age of seven. His (4) sight is what led Wilson to the study of ants, as he couldn't see large animals well from a(n) (5) Instead, he (6) could study up close. After he studied evolutionary biology at the University of Alabama. Wilson (7) to Harvard University, where he became a professor in 1956. He never received a Nobel Prize because the field of evolutionary biology was (8) something the prize would (9). He was, however, (10) the Crafoord Prize in 1990. Wilson, who is known to some as the "modern-day Darwin, died in Massachusetts at 92.`,
+    koreanTranslation: `어린 시절 자연에 관심을 갖게 된 Edward O. Wilson은 많은 시간을 야외에서 보냈다. 그는 7살 때 낚시 사고로 한쪽 눈의 시력을 부분적으로 잃었다. 그의 나빠진 시력은 Wilson이 개미 연구로 나아가게 한 계기가 되었는데. 이는 그가 멀리 있는 큰 동물들을 잘 볼 수 없었기 때문이다. 대신 그는 가까이서 연구할 수 있는 더 작은 생물에 집중했다. University of Alabama에서 진화생물학을 공부한 후 Wilson은 Harvard University로 옮겼고, 그곳에서 1956년에 교수가 되었다. 진화생물학 분야는 Nobel Prize가 인정하는 분야가 아니었기 때문에 그는 상을 받지 못했다. 하지만 그는 1990년에 Crafoord Prize를 수상했다. 일부 사람들에게 "현대의 Darwin"으로 알려진 Wilson은 92세의 나이로 Massachusetts에서 사망했다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'interested' },
+      { id: 2, correctAnswer: 'outdoors' },
+      { id: 3, correctAnswer: 'partially' },
+      { id: 4, correctAnswer: 'reduced' },
+      { id: 5, correctAnswer: 'distance' },
+      { id: 6, correctAnswer: 'concentrated' },
+      { id: 7, correctAnswer: 'transferred' },
+      { id: 8, correctAnswer: 'not' },
+      { id: 9, correctAnswer: 'awarded' },
+      { id: 10, correctAnswer: 'awarded' }, // The original answer sheet has 'awarded' twice for 9 and 10, might be a typo in the sheet itself. I'll use it as is.
+    ],
+  },
+  {
+    id: 10,
+    questionText: `Investigations of experts offer (1) into what having a deep and (2) understanding involves. Rather than being just good thinkers or individuals who are (3) smart, experts are people with deep, closely (4) ideas about the world. Their knowledge is in a (5) domain-like chess, chemistry, or tennis as they are not generalists. However, experts know more than just a collection of facts. In reality, having expertise on a topic means their knowledge is (6) into consistent frameworks. This structure helps the expert understand the connection between facts and (7) which ideas are most (8). This type of deep yet organized understanding enables greater (9) in learning and (10) application in multiple contexts.`,
+    koreanTranslation: `전문가에 대한 연구는 깊고 유연한 이해를 갖춘다는 것이 무엇을 의미하는지에 대한 통찰을 제공한다. 전문가는 단순히 사고를 잘하는 사람이나 특별히 똑똑한 개인이기보다는, 세상에 대해 깊고 긴밀하게 상호 연결된 생각을 가진 사람이다. 그들은 다방면에 박식한 사람이 아니므로, 그들의 지식은 체스, 화학, 테니스와 같은 특정 영역에 국한된다. 그러나 전문가는 단순히 사실의 나열 그 이상을 알고 있다. 실제로 한 주제에 대한 전문성을 갖는다는 것은 그 지식이 일관된 틀 안에서 조직화되어 있음을 의미한다. 이러한 구조는 전문가가 사실 간의 연관성을 이해하고 어떤 개념이 가장 핵심적인지를 구별하는 데 도움을 준다. 이처럼 깊이 있으면서도 체계적인 이해는 학습의 유연성을 더 높여주며, 다양한 맥락에서의 응용을 수월하게 한다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'insight' },
+      { id: 2, correctAnswer: 'flexible' },
+      { id: 3, correctAnswer: 'exceptionally' },
+      { id: 4, correctAnswer: 'interconnected' },
+      { id: 5, correctAnswer: 'specific' },
+      { id: 6, correctAnswer: 'organized' },
+      { id: 7, correctAnswer: 'distinguish' },
+      { id: 8, correctAnswer: 'central' },
+      { id: 9, correctAnswer: 'flexibility' },
+      { id: 10, correctAnswer: 'facilitates' },
+    ],
+  },
+  {
+    id: 11,
+    questionText: `It is natural for people to observe happenings and then seek (1) for why those happenings occurred. But sometimes the (2) is wrong because of one or more (3). One of these is the ecological fallacy, where an argument claims that there is a (4) relationship between two things merely because they occur together. For example, in the 1950s it was found that crime rates were the (5) in neighborhoods where immigrants were most (6). Some people used this "co-occurrence" to argue that immigrants were a cause of crime. But a careful analysis of this situation revealed that immigrants were forced to live in neighborhoods where crime rates were (7) high: they could not (8) more expensive housing in safer neighborhoods. Immigrants themselves committed very (9) of the crimes. Unless you analyze the claim carefully, you would (10) the relationship and thereby construct a faulty belief.`,
+    koreanTranslation: `사람들이 사건들을 관찰하고 나서 왜 그런 사건들이 일어났는지에 대한 설명을 찾는 것은 당연하다. 그러나 때로는 하나 또는 그 이상의 오해로 인해 추론이 잘못된다. 그 중 하나는 생태학적 오류로, 여기서 논지는 두 가지가 함께 발생한다는 이유만으로 두 가지 사이에 인과 관계가 있다는 것이다. 예를 들어, 1950년대에 범죄율이 이민자가 가장 많은 지역에서 가장 높다는 것이 밝혀졌다. 일부 사람들은 이민자들이 범죄의 원인이라고 주장하기 위해서 이러한 "동시 발생"을 이용했다. 그러나 이 상황에 대한 면밀한 분석은 이민자들이 이미 범죄율이 높은 지역에 거주할 수밖에 없었다는 것을 밝혀냈다 그들은 보다 안전한 지역의 더 비싼 주택을 살 여력이 없었다. 이민자 자신들은 범죄를 거의 저지르지 않았다. 그 주장을 주의 깊게 분석하지 않으면, 당신은 그 관계를 잘못 해석하여 잘못된 믿음을 형성할 수 있다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'explanations' },
+      { id: 2, correctAnswer: 'reasoning' },
+      { id: 3, correctAnswer: 'misconceptions' },
+      { id: 4, correctAnswer: 'causal' },
+      { id: 5, correctAnswer: 'highest' },
+      { id: 6, correctAnswer: 'numerous' },
+      { id: 7, correctAnswer: 'already' },
+      { id: 8, correctAnswer: 'afford' },
+      { id: 9, correctAnswer: 'few' },
+      { id: 10, correctAnswer: 'misinterpret' },
+    ],
+  },
+  {
+    id: 12,
+    questionText: `In everyday life, we use (1) experience to predict where we should pay attention. Different environments create different (2). This was profoundly illustrated by the scientist Jared Diamond in his book Guns, Germs, and Steel. He describes an adventure (3) through the New Guinea jungle with native New Guineans. He relates that these natives tend to perform (4) at tasks Westerners have been (5) to do since childhood. But they are (6) stupid. They can (7) the most subtle changes in the jungle, good for (8) the tracks of a predator or for finding the way back home. They know which insects to leave alone. know where food exists, can build and tear down (9) with ease. Diamond, who had never spent time in such places, has no (10) to pay attention to these things. Were he to be tested on such tasks, he also would perform poorly.`,
+    koreanTranslation: `일상생활에서, 우리는 어디에 집중해야 할지를 예측하기 위해 이전 경험을 사용한다. 다른 환경은 다른 기대를 만든다. 이것은 과학자 Jared Diamond에 의해 그의 저서인 Guns. Germs, and Steel에서 깊이 있게 설명되었다. 그는 New Guinea 정글을 New Guinea 원주민들과 함께 돌아다닌 모험을 묘사한다. 그는 서구인들이 어린 시절부터 훈련받아 온 과업을 이 원주민들이 잘 수행하지 못하는 경향이 있다고 말한다. 하지만 그들이 멍청한 것은 아니다. 그들은 정글에서 가장 미묘한 변화를 감지할 수 있는데, 이는 포식자의 흔적을 추적하거나 집으로 돌아오는 길을 찾는 데 유용하다. 그들은 어느 곤충을 내버려 두어야 할지 알며, 어디에 음식이 있는지 알고, 피난처를 쉽게 만들고 철거할 수 있다. 그러한 장소에서 시간을 보내본 적이 없는 Diamond는 이러한 것들에 주의를 기울일 수 있는 능력이 없다. 그가 그런 과업들에 대해 시험을 본다면, 그 역시 잘하지 못할 것이다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'previous' },
+      { id: 2, correctAnswer: 'expectations' },
+      { id: 3, correctAnswer: 'wandering' },
+      { id: 4, correctAnswer: 'poorly' },
+      { id: 5, correctAnswer: 'trained' },
+      { id: 6, correctAnswer: 'hardly' },
+      { id: 7, correctAnswer: 'detect' },
+      { id: 8, correctAnswer: 'following' },
+      { id: 9, correctAnswer: 'shelters' },
+      { id: 10, correctAnswer: 'ability' },
+    ],
+  },
+  {
+    id: 13,
+    questionText: `A common mistake made by entrepreneurs, after investing huge amounts of time and effort into creating and (1) new products, is the (2) them. This error occurs because their powerful feeling of (3) over something they personally created distorts their view of its value, which in turn causes them to overprice their products. Although many quickly understand that their (4) prices are too high, not all of them are (5) or happy to lower those prices in order to make their products more (6) Such reluctance can be a very expensive mistake, one that could even lead to the total failure of a new business. The top (7) introducing a new product should be gaining (8) market adoption quickly. To reach this goal, an entrepreneur must be prepared to (9) early profits and lower prices. Once a strong sales volume is established, prices can then be raised to (10) profits.`,
+    koreanTranslation: `신제품을 개발하고 출시하는 데 막대한 시간과 노력을 투자한 기업가들이 저지르는 흔한 실수는 제품 가격을 너무 높게 책정하는 것이다. 이러한 오류는 자신이 직접 만든 것에 대한 강한 주인의식이 그 가치에 대한 시각을 왜곡하고, 결과적으로 제품 가격을 과도하게 매기게 만들기 때문에 발생한다. 비록 많은 이들이 초기 가격이 너무 높다는 것을 금방 깨닫지만, 제품을 더 매력적으로 만들기 위해 모두가 기꺼이 그 가격을 낮추려 하지는 않는다. 그러한 주저함은 매우 값비싼 실수가 될 수 있으며, 신규 사업의 완전한 실패로까지 이어질 수 있다. 신제품을 선보일 때의 최우선 과제는 충분한 시장을 신속하게 확보하는 것이어야 한다. 이 목표를 달성하기 위해 기업가는 초기 이익을 희생하고 가격을 낮출 준비가 되어 있어야 한다. 일단 확고한 판매량이 구축되고 나면, 이익을 극대화하기 위해 가격을 인상할 수 있다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'launching' },
+      { id: 2, correctAnswer: 'overpricing' },
+      { id: 3, correctAnswer: 'ownership' },
+      { id: 4, correctAnswer: 'initial' },
+      { id: 5, correctAnswer: 'willing' },
+      { id: 6, correctAnswer: 'attractive' },
+      { id: 7, correctAnswer: 'priority' },
+      { id: 8, correctAnswer: 'sufficient' },
+      { id: 9, correctAnswer: 'sacrifice' },
+      { id: 10, correctAnswer: 'maximize' },
+    ],
+  },
+  {
+    id: 14,
+    questionText: `In most respects, humans are one of a relatively small number of species that (1) a very different strategy of investing more energy to (2) more slowly. Like apes and elephants, we (3) at a leisurely pace. grow large bodies, and have few babies but (4) much time and energy to (5) them well. This (6) strategy succeeds because while apes and elephants produce fewer babies than mice, a larger percentage of their offspring (7) to then reproduce. A house mouse can become a mother when she is just five weeks old, has four to ten pups per litter, and can have a new litter every two months over the course of her approximately twelve-month life. However, the vast (8) of her pups die young. In contrast, a chimp or elephant mother does not reproduce until she is at least twelve years old, and she gives birth to only one infant (9) five or six years over the next thirty or so years. About half of these offspring (10) it to becoming parents.`,
+    koreanTranslation: `대부분의 측면에서, 인간은 더 많은 에너지를 투자하여 더 천천히 번식하는 매우 다른 전략을 진화시킨 비교적 소수의 종들 중 하나이다. 유인원과 코끼리와 마찬가지로, 우리는 천천히 성숙하고, 몸집을 크게 키우며, 새끼들을 적게 낳지만 그들을 잘 키우는 데 많은 시간과 에너지를 투자한다. 유인원과 코끼리는 생쥐보다 더 적은 수의 새끼를 낳지만. 그들의 새끼 중 더 높은 비율이 살아남아서 번식하기 때문에 이 특이한 전략은 성공한다. 생쥐는 생후 5주 만에 어미가 될 수 있으며, 한 배에서 4마리에서 10마리의 새끼를 낳고, 약 12개월의 생애 동안 2개월마다 새로운 새끼들을 낳을 수 있다. 그러나. 그의 새끼 대부분은 어릴 때 죽는다. 반면, 침팬지나 코끼리 어미는 최소 12살이 될 때까지 번식을 하지 않으며, 이후 30년 정도에 걸쳐 5년 또는 6년마다 단 한 마리의 새끼만 낳는다. 이러한 새끼 중 절반 정도가 부모가 되는 데 성공한다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'evolved' },
+      { id: 2, correctAnswer: 'reproduce' },
+      { id: 3, correctAnswer: 'mature' },
+      { id: 4, correctAnswer: 'devote' },
+      { id: 5, correctAnswer: 'raising' },
+      { id: 6, correctAnswer: 'unusual' },
+      { id: 7, correctAnswer: 'survive' },
+      { id: 8, correctAnswer: 'majority' },
+      { id: 9, correctAnswer: 'every' },
+      { id: 10, correctAnswer: 'make' },
+    ],
+  },
+  {
+    id: 15,
+    questionText: `As a general rule, scientists who prove a certain (1) or uncover a major new finding do not keep the information to (2). Rather, they (3) their findings, rendering their data available for public (4). This practice enables their peers to (5) the data and perhaps challenge the conclusions. More significantly, having the data accessible makes it possible for others to (6) new hypotheses and carry out new experiments. The underlying (7) is that the whole of society ultimately benefits more when information is (8) as widely as possible, instead of being (9) to a select group. Therefore, in a (10) sense, the work of any single scientist truly depends on the efforts of others.`,
+    koreanTranslation: `일반적으로, 특정 가설을 증명하거나 중요한 새로운 발견을 해낸 과학자들은 그 정보를 자신들만 독점하지 않는다. 오히려 그들은 자신의 연구 결과를 발표하여, 데이터를 대중이 검토할 수 있도록 공개한다. 이러한 관행은 동료 과학자들이 그 데이터를 재고하고 어쩌면 그 결론에 이의를 제기하는 것을 가능하게 한다. 더욱 중요한 점은, 데이터에 접근할 수 있다는 사실이 다른 과학자들이 새로운 가설을 세우고 새로운 실험을 수행하는 것을 가능하게 한다는 것이다. 그 기저에 깔린 가정은, 정보가 소수의 특정 집단에 한정되기보다는 가능한 한 널리 퍼질 때 사회 전체가 궁극적으로 더 많은 이익을 얻는다는 것이다. 따라서 엄밀한 의미에서 한 명의 과학자가 이룬 연구는 진정으로 다른 사람들의 노력에 달려 있다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'hypothesis' },
+      { id: 2, correctAnswer: 'themselves' },
+      { id: 3, correctAnswer: 'publish' },
+      { id: 4, correctAnswer: 'inspection' },
+      { id: 5, correctAnswer: 'reconsider' },
+      { id: 6, correctAnswer: 'construct' },
+      { id: 7, correctAnswer: 'assumption' },
+      { id: 8, correctAnswer: 'spread' },
+      { id: 9, correctAnswer: 'limited' },
+      { id: 10, correctAnswer: 'strict' },
+    ],
+  },
+  {
+    id: 16,
+    questionText: `In the 1930s. the British psychologist Sir Frederic Bartlett asked people to listen to folktales from other countries and then (1) these stories at a later date. As you might guess, (2) stories were not remembered as well as familiar stories. Surprisingly, however, errors in memory were not (3) Rather, subjects often rewrote (4) parts of the stories in their own minds particularly the parts that made the (5) sense to them. Bartlett concluded that when (6) problems, humans draw upon mental schemata, or (7) knowledge in our brains, to fill in any (8) gaps in our memories. Therefore, remembering is an (9) process that (10) building upon past experiences.`,
+    koreanTranslation: `1930년대에, 영국의 심리학자 Frederic Bartlett 경은 사람들에게 다른 나라의 민간 설화를 듣고 난 다음 나중에 이 이야기들을 기억해 내도록 요청했다. 당신이 아마 추측할 수 있듯이, 낯선 이야기는 익숙한 이야기만큼 잘 기억되지 않았다. 그러나 놀랍게도 기억의 오류들은 무작위적인 것이 아니었다. 오히려 피험자들은 자신의 마음 속에서 이야기의 비슷한 부분 특히 그들에게 가장 이해가 되지 않는 부분을 종종 다시 썼다. Bartlett은 문제에 직면할 때, 인간은 우리 기억의 사소한 틈을 메우기 위해 정신적 스키마타, 즉 뇌에 저장된 지식의 선반을 활용한다는 결론을 내렸다. 따라서, 기억하는 것은 과거의 경험을 기반으로 하는 것을 포함하는 상상의 과정이다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'recall' },
+      { id: 2, correctAnswer: 'unfamiliar' },
+      { id: 3, correctAnswer: 'random' },
+      { id: 4, correctAnswer: 'similar' },
+      { id: 5, correctAnswer: 'least' },
+      { id: 6, correctAnswer: 'facing' },
+      { id: 7, correctAnswer: 'shelves' },
+      { id: 8, correctAnswer: 'minor' },
+      { id: 9, correctAnswer: 'imaginative' },
+      { id: 10, correctAnswer: 'involves' },
+    ],
+  },
+  {
+    id: 17,
+    questionText: `History, people often say. (1) itself. And looking at the historical records of the ancient civilizations, some things do seem to happen again and again. (2) expand, get overextended, and then (3) as in the cases of Rome, which went under in 476 AD. and the British Empire, which fell apart more than a thousand years later in the post-World War II era. But is this always the (4)? If so, archaeology would be pretty (5) one thing would happen again and again. But that's not what archaeologists see. Some civilizations end (6) like the Aztec and Inca, (7) by invaders in the 1520s AD. Those empires never had the (8) to collapse as a result of (9) So in the case of civilizations. "history repeats itself" seems to be an (10).`,
+    koreanTranslation: `역사는, 사람들이 종종 말하길. 그 자체를 반복한다. 그리고 고대 문명의 역사적 기록들을 보면, 몇 가지 일들이 정말로 반복해서 일어나는 것처럼 보인다. 문명은 서기 476년에 멸망한 로마의 경우와, 천 년 이상 지난 후 제2차 세계 대전 이후에 해체된 대영제국의 사례에서처럼 확장하고, 과도하게 확장되다가. 결국 붕괴한다. 하지만 이것이 항상 그런가? 만약 그렇다면, 고고학은 꽤 지루할 것이다 한 가지 일이 반복해서 일어날 테니 말이다. 하지만 그것은 고고학자들이 보는 것이 아니다. 어떤 문명들은, 서기 1520년대에 침략자들에 의해 정복된 Aztec과 Inca처럼 갑작스럽게 끝난다. 그러한 제국들은 과도한 확장의 결과로 붕괴할 기회조차 없었다. 그래서 문명의 경우에, "역사는 그 자체를 반복한다"라는 말은 지나친 단순화로 보인다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'repeats' },
+      { id: 2, correctAnswer: 'Civilizations' },
+      { id: 3, correctAnswer: 'collapse' },
+      { id: 4, correctAnswer: 'case' },
+      { id: 5, correctAnswer: 'boring' },
+      { id: 6, correctAnswer: 'suddenly' },
+      { id: 7, correctAnswer: 'conquered' },
+      { id: 8, correctAnswer: 'chance' },
+      { id: 9, correctAnswer: 'overexpansion' },
+      { id: 10, correctAnswer: 'oversimplification' },
+    ],
+  },
+  {
+    id: 18,
+    questionText: `Stanford psychology professor Dr. Carol Dweck is the (1) recognized pioneer of the concept of "growth mindset as a way to continually grow, learn, and persevere in our efforts. Dweck found that kids who are told they're "smart" actually (2) in future tasks, by choosing easier tasks to (3) evidence that they are not smart, which Dweck calls having a "fixed mindset." In contrast. Dweck found, kids who are praised not for their smarts (4) for their effort develop what Dweck calls a "growth mindset." They learn that their (5) is what led to their (6) and if they continue to try, over time they'll (7) and achieve more things. These kids end up taking on (8) things, and feel better about themselves. "(9) effort Dweck has explained. gives a child a variable that they can (10).`,
+    koreanTranslation: `Stanford 심리학 교수인 Carol Dweck 박사는 우리의 노력에서 지속적으로 성장하고, 배우며, 인내할 수 있는 방법인 "성장 사고방식" 개념으로 국제적으로 인정받는 선구자이다. Dweck은 "똑똑하다"라는 말을 듣는 아이들은 그들이 똑똑하지 않다는 증거를 피하기 위해 더 쉬운 과제를 선택함으로써 실제로 미래 과제에서 기대에 못 미치는 성과를 낸다는 것을 발견했는데, Dweck은 이를 "고정 사고방식"을 가진 것으로 부른다. 반대로, Dweck은 똑똑함이 아닌 노력에 대해 칭찬받는 아이들은 Dweck이 "성장 사고방식"이라 부르는 것을 발달시킨다는 것을 발견했다. 그들은 그들의 노력이 성공으로 이르게 한 것임을 배우고, 그들이 계속해서 노력한다면, 시간이 지나면서 발전하고 더 많은 것을 성취하게 될 것이다. 이 아이들은 결국 더 힘든 일을 받아들이고, 스스로에 대해 더 좋은 느낌을 갖게 된다. "노력을 강조하는 것은 아이에게 그들이 통제할 수 있는 변수를 제공한다. "라고 Dweck은 설명했다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'internationally' },
+      { id: 2, correctAnswer: 'underperform' },
+      { id: 3, correctAnswer: 'avoid' },
+      { id: 4, correctAnswer: 'but' },
+      { id: 5, correctAnswer: 'effort' },
+      { id: 6, correctAnswer: 'success' },
+      { id: 7, correctAnswer: 'improve' },
+      { id: 8, correctAnswer: 'tougher' },
+      { id: 9, correctAnswer: 'Emphasizing' },
+      { id: 10, correctAnswer: 'control' },
+    ],
+  },
+  {
+    id: 19,
+    questionText: `To (1) our surroundings is to focus on what's outside of ourselves: what we see, hear, smell, feel, and perhaps even taste. But sometimes what really marks a place is something less (2) a feeling within us. An interesting example (3) from a study of subway passenger behavior. Researchers trying to understand why people sit where they sit or stand where they stand in subway and metro trains (4) the factors that shape the way riders used and (5) that space in different situations. One of their findings involved the reasons many riders like to plant themselves (6) to the train's doors. Partly this was the (7) convenience of being able to exit more quickly. But it was shaped partly by a more (8) sensation the desire to avoid the sometimes (9) feeling of accidentally making eye contact with seated passengers. We can't see feelings but they're very real, and they (10) our experience of the world.`,
+    koreanTranslation: `우리 주변을 살피는 것은 우리 자신 바깥에 있는 것에 집중하는 것이다 우리가 보고, 듣고, 냄새 맡고, 느끼고, 어쩌면 맛보기도 하는 것. 그러나 때로는 어떤 장소를 진정으로 특징짓는 것은 덜 구체적인 것 우리 안에 있는 감정이다. 흥미로운 예가 지하철 승객 행동에 관한 연구에서 나왔다. 지하철이나 전철에서 왜 사람들이 그들이 앉는 곳에 앉거나 그들이 서는 곳에 서는지를 이해하려고 노력하는 연구자들은 다양한 상황에서 승객들이 그 공간을 사용하고 탐색하는 방식을 형성하는 요인들을 조사했다. 연구 결과 중 하나는 많은 승객들이 기차의 문 근처에 자리 잡기를 좋아하는 이유들과 관련이 있었다. 부분적으로 이것은 더 빨리 내릴 수 있다는 명확한 편리함 때문이었다. 그러나 이는 부분적으로 더 추상적인 느낌 앉아 있는 승객들과 우연히 눈이 마주치는 때때로 불편한 느낌을 피하려는 욕구에 의해 형성되었다. 우리는 감정들을 볼 수 없다 - 그러나 그것들은 매우 실재하고, 그것들은 세상에 대한 우리의 경험에 영향을 미친다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'monitor' },
+      { id: 2, correctAnswer: 'specific' },
+      { id: 3, correctAnswer: 'emerged' },
+      { id: 4, correctAnswer: 'examined' },
+      { id: 5, correctAnswer: 'navigated' },
+      { id: 6, correctAnswer: 'close' },
+      { id: 7, correctAnswer: 'obvious' },
+      { id: 8, correctAnswer: 'abstract' },
+      { id: 9, correctAnswer: 'uncomfortable' },
+      { id: 10, correctAnswer: 'influence' },
+    ],
+  },
+  {
+    id: 20,
+    questionText: `We have a diving reflex, like other marine mammals. This means that special nerve endings on our faces, around the mouth and nose, (1) this reflex only when the facial region goes under water. If we are in the water, with our head out in the air, there is no diving reflex. But if we (2) just our face in a bowl of water, (3) the whole of the (4) of our body is in the dry air, the diving reflex is triggered. It (5) closes down the airway, reducing the risk of (6) water, and it narrows the small air-passages in the lungs. At the same time the heart rate is slowed down to half speed and blood is shunted to the (7) organs, protecting them from the effects of the (8) stop in breathing. By contrast, if a chimpanzee or a gorilla found itself in water with its face below the surface, it would (9) its heart would race and it would quickly (10).`,
+    koreanTranslation: `우리는 다른 해양 포유류처럼 '잠수 반사'를 가지고 있다. 이것은 입과 코 주변의 얼굴에 있는 특수 신경 말단이 얼굴 부위가 물 아래에 들어갈 때만 이 반사를 유발한다는 것을 의미한다. 만약 우리가, 머리는 공기 중에 있는 상태로, 물속에 있으면 잠수 반사는 없다. 하지만 만약 우리가 그릇의 물속에 얼굴만 가라앉히고, 나머지 몸 전체는 물기가 없는 공기 중에 있으면, 잠수 반사가 유발된다. 이것은 기도를 자동으로 닫아. 물을 삼킬 위험을 줄이고, 폐 속의 작은 공기 통로를 좁힌다. 동시에 심박수가 절반 속도로 느려지고 혈액이 중요한 장기들로 보내져. 짧은 호흡 정지로 인한 영향으로부터 그것들을 보호한다. 반면, 침팬지나 고릴라가 표면 아래에 얼굴이 있는 상태로 물속에 있는 자신을 발견하면, 그것은 당황하여, 그것의 심장이 빨리 뛰고 금방 익사할 것이다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'trigger' },
+      { id: 2, correctAnswer: 'sink' },
+      { id: 3, correctAnswer: 'while' },
+      { id: 4, correctAnswer: 'rest' },
+      { id: 5, correctAnswer: 'automatically' },
+      { id: 6, correctAnswer: 'swallowing' },
+      { id: 7, correctAnswer: 'vital' },
+      { id: 8, correctAnswer: 'brief' },
+      { id: 9, correctAnswer: 'panic' },
+      { id: 10, correctAnswer: 'drown' },
+    ],
+  },
+  {
+    id: 21,
+    questionText: `There is a natural assumption of truth, or a truth bias when humans communicate with one another. In other words, when we're listening to others or reading their words, our (1) assumption is that the person is telling the truth. This usually works out (2). If you ask someone where the restroom is located or if it's raining outside, you can safely assume that most people will not lie in their responses. Imagine how (4) it would be to converse with someone if you assumed that everything they were telling you was (5)! Indeed, (6) the truth of a statement and then choosing not to believe it (7) additional mental steps. For the most part, humans are "cognitive misers. which means we typically don't expend more mental effort than seems (8). in a given situation. It makes (9) then, that when we see something online, even if it is fake, our default is to (10) it, at least at first.`,
+    koreanTranslation: `인간이 서로 소통할 때 진실에 대한 자연스러운 가정, 즉 진실 편향이 있다. 다시 말해, 우리가 다른 사람의 말을 듣거나 그들의 글을 읽을 때. 우리의 자동적인 가정은 상대방이 진실을 말하고 있다는 것이다. 이는 보통 잘 작동한다. 만약 당신이 누군가에게 화장실이 어디 있는지나 밖에 비가 오고 있는지를 물어본다면, 당신은 대부분의 사람들이 그들의 응답에서 거짓말을 하지 않을 것이라고 확신하며 가정할 수 있다. 만약 당신이 그들이 당신에게 말하는 모든 것이 거짓이라고 가정한다면 누군가와 대화하는 것이 얼마나 어려울지 상상해 보라! 정말로, 어떤 진술의 진실성에 의문을 제기하고 그것을 믿지 않는 것을 선택하는 것은 추가적인 정신적인 단계를 요구한다. 대부분의 경우, 인간은 "인지적 구두쇠"이고, 이는 우리가 주어진 상황에서 필요한 것처럼 보이는 것보다 더 많은 정신적인 노력을 전형적으로 기울이지 않는다는 것을 의미한다. 그렇다면 우리가 온라인에서 무언가를 볼때, 비록 그것이 가짜라고 해도, 우리의 기본값은, 적어도 처음에는, 그것을 믿는 것임이 일리가 있다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'automatic' },
+      { id: 2, correctAnswer: 'other' }, // This blank (2) is implied from the korean translation '이는 보통 잘 작동한다.' and from the context.
+      { id: 3, correctAnswer: 'fine' }, // This blank (3) is implied from the korean translation '이는 보통 잘 작동한다.' and from the context.
+      { id: 4, correctAnswer: 'difficult' },
+      { id: 5, correctAnswer: 'false' },
+      { id: 6, correctAnswer: 'questioning' },
+      { id: 7, correctAnswer: 'requires' },
+      { id: 8, correctAnswer: 'necessary' },
+      { id: 9, correctAnswer: 'sense' },
+      { id: 10, correctAnswer: 'believe' },
+    ],
+  },
+  {
+    id: 22,
+    questionText: `Paying with plastic fundamentally changes the way we spend money. (1) the calculus of our financial decisions. When you buy something with cash, the purchase involves an actual (2). your wallet is (3) lighter. Credit cards, however, make the purchase (4) so that you don't really feel the downside of spending money. Brain-imaging experiments suggest that paying with credit cards actually reduces activity in the insula, a brain region associated with (5) feelings. As George Loewenstein, a neuroeconomist at Carnegie Mellon, says, "The nature of credit cards ensures that your brain is anesthetized against the (6) of payment." Spending money doesn't feel bad, so you spend more money. Consider this experiment: Drazen Prelec and Duncan Simester, two business professors at MIT, organized a real-life, sealed-bid auction for tickets to a Boston Celtics game. Half the participants in the auction were (7) that they had to pay with cash: the (8) half were told they had to pay with credit cards. Prelec and Simester then (9) the bids for the two different groups. It turns out that the average credit card bid was twice as (10) as the average cash bid. When people used their credit cards, their bids were (11) more reckless. They no longer felt the need to (12) expenses.`,
+    koreanTranslation: `신용카드로 지불하는 것은 우리가 돈을 소비하는 방식을 근본적으로 바꾸며, 우리의 재정적 결정에 대한 계산법을 변화시킨다. 당신이 무언가를 현금으로 구매할 때, 그 구매는 실제 손실을 수반한다 당신의 지갑이 말 그대로 더 가벼워진다. 하지만, 신용카드는 구매를 추상화시켜, 당신은 돈을 소비하는 것의 부정적인 면을 실제로 느끼지 못한다. 뇌 영상 실험은 신용카드로 지불하는 것이 부정적인 감정과 관련된 뇌 영역인 뇌섬엽에서의 활동을 실제로 감소시킨다는 것을 보여준다. Carnegie Mellon의 신경경제학자 George Loewenstein이 말하듯이. "신용카드의 본질은 당신의 뇌가 지불의 고통에 대해 마비되는 것을 확실하게 한다." 돈을 쓰는 것이 나쁘게 느껴지지 않아서, 당신은 더 많은 돈을 쓴다. 이 실험을 생각해 보자: MIT의 두 경영학 교수인 Drazen Prelec과 Duncan Simester는 Boston Celtics 경기 티켓을 위한 실재의 봉인 입찰 경매를 준비했다. 경매에 참여한 사람들 중 절반은 현금으로 지불해야 한다는 말을 들었고: 나머지 절반은 신용카드로 지불해야 한다는 말을 들었다. 그러고 나서 Prelec과 Simester는 다른 두 집단의 입찰가의 평균을 냈다. 평균 신용카드 입찰 금액은 평균 현금 입찰 금액의 두 배만큼 높은 것으로 나타났다. 사람들이 신용카드를 사용할 때, 그들의 입찰은 훨씬 더 무모했다. 그들은 더 이상 지출을 억제해야 할 필요성을 느끼지 못했다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'altering' },
+      { id: 2, correctAnswer: 'loss' },
+      { id: 3, correctAnswer: 'literally' },
+      { id: 4, correctAnswer: 'abstract' },
+      { id: 5, correctAnswer: 'negative' },
+      { id: 6, correctAnswer: 'pain' },
+      { id: 7, correctAnswer: 'informed' },
+      { id: 8, correctAnswer: 'other' },
+      { id: 9, correctAnswer: 'averaged' },
+      { id: 10, correctAnswer: 'high' },
+      { id: 11, correctAnswer: 'much' },
+      { id: 12, correctAnswer: 'limit' },
+    ],
+  },
+  {
+    id: 23,
+    questionText: `While the sun was shining on Becky. a(n) (1) teacher on her way to the fruit market, the situation was different for Dana across town. Dana was on a bus, heading to a job interview at the museum, when the sky suddenly (2) just before her stop. Her heart (3) as she was without an umbrella. As raindrops started to fall, Dana got off the bus near the market, the very place where Becky was just completing her shopping. Panic set in for Dana, who worried about arriving at her interview soaked. A quick look revealed no nearby stores to buy an umbrella from, and she had no time to (4) for one. At that moment, Becky walked up to her. (5) one open umbrella and carrying a second, closed one. With a warm smile, Becky offered the closed umbrella to Dana. After a moment of surprise, Dana asked if she was sure, to which Becky replied that she always keeps an (6) one for rainy days. After thanking Becky and taking the umbrella, Dana noticed a small card on its handle with the message "Cover each other." Deeply (7), she rushed to the museum. Arriving completely dry and comfortable allowed her to perform well in her interview. In fact, the Museum CEO was so (8) with Dana that he (9) her the dream job of Event Manager. In the years that followed, she would often reflect on the kindness Becky had shown. (10) by that memory, Dana later developed a museum event named "Cover Each other," which featured paintings of people supporting one another. She (11) half the proceeds from ticket sales to families who had lost their homes in natural disasters. The message from the umbrella was kept framed in her office, serving as a constant (12) of how a single act of kindness could alter a person's life. A simple gesture from a stranger had changed her own path, and she ensured that this spirit of generosity continued to influence the world.`,
+    koreanTranslation: `은퇴한 교사인 Becky가 과일 시장으로 향하며 햇살을 받고 있을 때, 마을 건너편에 있던 Dana의 상황은 달랐습니다. Dana는 박물관 면접을 보러 버스를 타고 가고 있었는데. 그녀가 내릴 정류장이 가까워졌을 때 갑자기 하늘이 어두워졌습니다. 우산이 없었던 그녀는 가슴이 철렁했습니다. 빗방울이 떨어지기 시작할 때, Dana는 시장 근처에서 버스에서 내렸는데, 그곳은 바로 Becky가 막장 보기를 마친 곳이었습니다. 면접에 흠뻑 젖어서 도착할까 봐 걱정된 Dana는 패닉에 빠졌습니다. 주변을 둘러보았지만 우산을 살 만한 가게는 보이지 않았고, 찾아다닐 시간도 없었습니다. 바로 그 순간. Becky가 그녀에게 다가왔습니다. 그녀는 펼친 우산 하나를 쓰고 있었고, 접힌 우산 하나를 더 들고 있었습니다. Becky는 따뜻한 미소를 지으며 접힌 우산을 Dana에게 건넸습니다. 잠시 놀란 Dana가 정말 괜찮냐고 묻자. Becky는 비 오는 날을 대비해 항상 여분의 우산을 가지고 다닌다고 대답했습니다. Becky에게 감사 인사를 하고 우산을 받은 후, Dana는 우산 손잡이에 "서로를 감싸주세요 (Cover each other)"라는 메시지가 적힌 작은 카드를 발견했습니다. 깊은 감동을 받은 그녀는 서둘러 박물관으로 향했습니다. 완전히 마르고 편안한 상태로 도착한 덕분에 그녀는 면접을 잘볼수 있었습니다. 실제로, 박물관 CEO는 Dana에게 깊은 인상을 받아 그녀에게 꿈에 그리던 이벤트 매니저 직책을 제안했습니다. 그 후 몇 년 동안. 그녀는 Becky가 보여준 친절을 종종 되돌아보곤 했습니다. 그 기억에서 영감을 받은 Dana는 나중에 "서로를 감싸주세요 (Cover each other)"라는 이름의 박물관 행사를 기획했습니다. 이 행사에는 서로를 돕는 사람들의 그림들이 전시되었습니다. 그녀는 티켓 판매 수익의 절반을 자연재해로 집을 잃은 가족들에게 기부했습니다. 우산에 있던 메시지는 그녀의 사무실에 액자로 만들어져 보관되었고, 이는 한 번의 친절한 행동이 한 사람의 인생을 어떻게 바꿀 수 있는지를 끊임없이 상기시켜주는 역할을 했습니다. 낯선 사람의 소박한 제스처가 그녀 자신의 길을 바꾸었고, 그녀는 이 관용의 정신이 계속해서 세상에 영향을 미치도록 했습니다.`,
+    blanks: [
+      { id: 1, correctAnswer: 'retired' },
+      { id: 2, correctAnswer: 'darkened' },
+      { id: 3, correctAnswer: 'sank' },
+      { id: 4, correctAnswer: 'search' },
+      { id: 5, correctAnswer: 'holding' },
+      { id: 6, correctAnswer: 'extra' },
+      { id: 7, correctAnswer: 'touched' },
+      { id: 8, correctAnswer: 'impressed' },
+      { id: 9, correctAnswer: 'offered' },
+      { id: 10, correctAnswer: 'Inspired' },
+      { id: 11, correctAnswer: 'donated' },
+      { id: 12, correctAnswer: 'reminder' },
+    ],
+  },
+];
+
+export default function App() {
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [userAnswers, setUserAnswers] = useState({});
+  const [feedback, setFeedback] = useState({}); // { blankId: 'correct' | 'incorrect' }
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [score, setScore] = useState(0);
+  const [quizFinished, setQuizFinished] = useState(false);
+
+  const currentQuestion = allQuestions[currentQuestionIndex];
+
+  // Function to update user's answer for a specific blank
+  const handleInputChange = (blankId, value) => {
+    setUserAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [currentQuestion.id]: {
+        ...(prevAnswers[currentQuestion.id] || {}),
+        [blankId]: value,
+      },
+    }));
+  };
+
+  // Function to check answers for the current question
+  const checkAnswers = () => {
+    let allCorrect = true;
+    const newFeedback = {};
+    let correctCount = 0;
+
+    currentQuestion.blanks.forEach((blank) => {
+      const userAnswer = userAnswers[currentQuestion.id]?.[blank.id] || '';
+      const isCorrect = userAnswer.toLowerCase().trim() === blank.correctAnswer.toLowerCase().trim();
+      newFeedback[blank.id] = isCorrect ? 'correct' : 'incorrect';
+      if (!isCorrect) {
+        allCorrect = false;
+      } else {
+        correctCount++;
+      }
+    });
+
+    setFeedback(newFeedback);
+    setShowAnswer(true);
+
+    // Update score if this is the first time checking this question and it's all correct
+    if (allCorrect && !userAnswers[currentQuestion.id]?.checked) {
+      setScore((prevScore) => prevScore + 1);
+      setUserAnswers((prevAnswers) => ({
+        ...prevAnswers,
+        [currentQuestion.id]: {
+          ...(prevAnswers[currentQuestion.id] || {}),
+          checked: true, // Mark as checked to prevent score increment on re-check
+        },
+      }));
+    } else if (!allCorrect && userAnswers[currentQuestion.id]?.checked) {
+      // If previously correct but now incorrect (user changed answer), decrement score
+      // This is a more complex scenario and might not be needed for simple quizzes
+      // For simplicity, we'll just prevent re-incrementing if already marked correct.
+      // If a user changes a correct answer to incorrect and re-checks, the score won't go down.
+      // To implement that, you'd need to store the score for each question.
+    }
+  };
+
+  // Function to navigate to the next question
+  const goToNextQuestion = () => {
+    if (currentQuestionIndex < allQuestions.length - 1) {
+      setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+      setFeedback({}); // Clear feedback for new question
+      setShowAnswer(false); // Hide answer for new question
+    } else {
+      setQuizFinished(true); // End of quiz
+    }
+  };
+
+  // Function to navigate to the previous question
+  const goToPreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex((prevIndex) => prevIndex - 1);
+      setFeedback({}); // Clear feedback for new question
+      setShowAnswer(false); // Hide answer for new question
+    }
+  };
+
+  // Function to reset the quiz
+  const resetQuiz = () => {
+    setCurrentQuestionIndex(0);
+    setUserAnswers({});
+    setFeedback({});
+    setShowAnswer(false);
+    setScore(0);
+    setQuizFinished(false);
+  };
+
+  // Render the question text with input fields for blanks
+  const renderQuestionText = () => {
+    let text = currentQuestion.questionText;
+    currentQuestion.blanks.forEach((blank) => {
+      const inputId = `q${currentQuestion.id}_blank${blank.id}`;
+      const userAnswer = userAnswers[currentQuestion.id]?.[blank.id] || '';
+      const fbClass = feedback[blank.id] === 'correct' ? 'bg-green-100 border-green-500' :
+                      feedback[blank.id] === 'incorrect' ? 'bg-red-100 border-red-500' :
+                      '';
+      const inputElement = `
+        <input
+          type="text"
+          id="${inputId}"
+          value="${userAnswer}"
+          oninput="handleInputProxy(event, ${blank.id})"
+          class="inline-block w-32 px-2 py-1 mx-1 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${fbClass}"
+          placeholder="${blank.id}"
+        />
+      `;
+      text = text.replace(`(${blank.id})`, inputElement);
+    });
+    return (
+      <div
+        dangerouslySetInnerHTML={{ __html: text }}
+      ></div>
+    );
+  };
+
+  // Global proxy for React event handlers in dangerouslySetInnerHTML
+  useEffect(() => {
+    window.handleInputProxy = (event, blankId) => {
+      handleInputChange(blankId, event.target.value);
+    };
+  }, [userAnswers, currentQuestionIndex]); // Re-attach proxy if userAnswers or question changes
+
+  return (
+    <div className="min-h-screen bg-gray-100 font-inter p-4 flex flex-col items-center justify-center">
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+      <script src="https://cdn.tailwindcss.com"></script>
+
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-3xl flex flex-col h-full">
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-6 rounded-md p-2 bg-blue-100">
+          2025학년도 6월 학평 고1 영어 지문확인 문제
+        </h1>
+
+        {quizFinished ? (
+          <div className="flex flex-col items-center justify-center p-8 text-center">
+            <p className="text-2xl font-semibold text-gray-700 mb-4">모든 문제를 다 푸셨습니다!</p>
+            <p className="text-xl text-gray-600 mb-8">총 점수: {score} / {allQuestions.length}</p>
+            <button
+              onClick={resetQuiz}
+              className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 transition duration-300 transform hover:scale-105"
+            >
+              처음부터 다시 시작하기
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="text-center text-lg text-gray-600 mb-4">
+              문제 {currentQuestionIndex + 1} / {allQuestions.length}
+            </div>
+
+            <div className="border border-gray-200 rounded-md p-4 mb-4 bg-gray-50 flex-grow overflow-y-auto">
+              {currentQuestion.imageUrl && (
+                <div className="flex justify-center mb-4">
+                  <img src={currentQuestion.imageUrl} alt="Question related image" className="max-w-full h-auto rounded-md shadow-sm" />
+                </div>
+              )}
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                문제 {currentQuestion.id}.
+              </h2>
+              <div className="text-gray-700 leading-relaxed text-lg mb-4">
+                {renderQuestionText()}
+              </div>
+              <div className="mt-4 p-3 bg-gray-100 rounded-md text-gray-600 text-sm italic">
+                <p><strong>[한국어 번역]</strong></p>
+                <p>{currentQuestion.koreanTranslation}</p>
+              </div>
+            </div>
+
+            <div className="mt-auto pt-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+              <button
+                onClick={goToPreviousQuestion}
+                disabled={currentQuestionIndex === 0}
+                className={`px-4 py-2 rounded-md font-semibold transition duration-300 ${
+                  currentQuestionIndex === 0
+                    ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                    : 'bg-indigo-500 text-white shadow-md hover:bg-indigo-600 transform hover:scale-105'
+                }`}
+              >
+                이전 문제
+              </button>
+
+              <button
+                onClick={checkAnswers}
+                className="px-6 py-3 bg-green-500 text-white font-semibold rounded-md shadow-md hover:bg-green-600 transition duration-300 transform hover:scale-105"
+              >
+                정답 확인
+              </button>
+
+              <button
+                onClick={goToNextQuestion}
+                className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-md shadow-md hover:bg-blue-600 transition duration-300 transform hover:scale-105"
+              >
+                {currentQuestionIndex === allQuestions.length - 1 ? '퀴즈 완료' : '다음 문제'}
+              </button>
+            </div>
+
+            {showAnswer && (
+              <div className="mt-4 p-4 border border-gray-300 rounded-md bg-yellow-50 shadow-inner">
+                <h3 className="text-lg font-semibold text-yellow-800 mb-2">정답:</h3>
+                <ul className="list-disc list-inside text-gray-800">
+                  {currentQuestion.blanks.map((blank) => (
+                    <li key={blank.id} className="mb-1">
+                      ({blank.id}) {blank.correctAnswer}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>흥덕고 한국사 기말고사 최종 예측 분석</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: A single-page, vertically-scrolling dashboard designed for intuitive exploration of the exam prediction analysis. A sticky header with navigation links allows users to jump to key sections: 'Teacher's Style', 'Guaranteed Topics', 'Predicted Question Types', and 'Practice Tests'. This structure was chosen to break down the dense analysis into digestible, task-oriented chunks, making it easier for a student to quickly find and review specific information. Interactivity, like clickable cards, an interactive timeline, and practice tests with toggleable answers, is used to engage the user and present complex information in a more memorable format. -->
+    <!-- Visualization & Content Choices:
+    - Teacher's Style: Goal: Inform. Method: Styled list with icons (HTML/CSS). Interaction: Static. Justification: Clear and quick overview of the teacher's habits.
+    - Guaranteed Topics: Goal: Inform/Organize. Method: Interactive cards (HTML/CSS/JS) and a custom interactive timeline for the 'Annexation Process' (HTML/CSS/JS). Interaction: Click to expand details. Justification: Cards organize dense information neatly. The timeline visually represents chronological flow, which is crucial for this topic and a known preference of the teacher.
+    - Predicted Question Types: Goal: Compare/Practice. Method: Q&A format with collapsible answers (HTML/CSS/JS). Justification: Simulates a self-testing environment, helping with active recall.
+    - Topic Importance Chart: Goal: Compare. Method: Bar chart (Chart.js/Canvas). Interaction: Hover for tooltips. Justification: Provides a quick visual summary of which topics require the most attention based on the teacher's emphasis.
+    - Practice Tests: Goal: Practice/Self-Assess. Method: Tabbed interface for two full mock exams with toggleable answers. Justification: Mimics the actual exam format (23 multiple-choice questions) to provide the most realistic preparation experience possible, directly addressing user feedback.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #F8F7F4; /* Warm Neutral Background */
+            scroll-behavior: smooth;
+        }
+        .accent-color {
+            background-color: #004445; /* Deep Teal Accent */
+        }
+        .accent-text {
+            color: #004445;
+        }
+        .secondary-bg {
+            background-color: #FFFFF0; /* Ivory Secondary */
+        }
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -33px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #F8F7F4;
+            border: 4px solid #004445;
+        }
+        .timeline-item.active::before {
+             background-color: #2C7873; /* Lighter Teal for active */
+        }
+        .timeline-line {
+            position: absolute;
+            left: -24px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #004445;
+        }
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            background-color: #004445;
+            color: white;
+            border-bottom-color: #004445;
+        }
+         .tab-btn:not(.active) {
+            background-color: #e0e0e0;
+        }
+        .question-option { list-style-type: none; padding-left: 0; }
+        .question-option li { margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-20 shadow-md">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold accent-text">흥덕고 기말고사 최종분석</div>
+            <div class="hidden md:flex space-x-6">
+                <a href="#style" class="hover:text-teal-700 transition">선생님 출제 스타일</a>
+                <a href="#topics" class="hover:text-teal-700 transition">출제 확률 100% 주제</a>
+                <a href="#questions" class="hover:text-teal-700 transition">예상 문제 유형</a>
+                <a href="#practice-tests" class="hover:text-teal-700 transition">실전 모의고사</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-4 md:p-8">
+
+        <!-- Intro -->
+        <section class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-2">기말고사, 이렇게 나온다!</h1>
+            <p class="text-lg text-gray-600">중간고사, 교과서, 학습지, 수업 노트를 종합 분석한 최종 예측</p>
+        </section>
+
+        <!-- Teacher's Style Analysis -->
+        <section id="style" class="mb-12 scroll-mt-20">
+            <h2 class="text-3xl font-bold mb-6 pb-2 border-b-2 border-teal-800 accent-text">1. 선생님 출제 스타일 분석</h2>
+            <div class="secondary-bg p-6 rounded-lg card-shadow">
+                <p class="mb-6">중간고사 시험지를 분석한 결과, 선생님의 출제 경향은 명확합니다. 아래 특징들을 꼭 기억하고 시험에 임하세요.</p>
+                <ul class="space-y-4 text-lg">
+                    <li class="flex items-start"><span class="accent-text font-bold mr-3 text-2xl">①</span> <div><strong>사료/자료 제시는 필수:</strong> 거의 모든 문제에 사료, 지도, 연표, 사진 등 시각 자료를 활용합니다. 교과서의 자료를 꼼꼼히 봐야 합니다.</div></li>
+                    <li class="flex items-start"><span class="accent-text font-bold mr-3 text-2xl">②</span> <div><strong>'사이에 있었던 일' 유형 선호:</strong> 중간고사 8번, 14번 문제처럼 특정 사건들 사이의 일을 묻는 문제를 좋아하십니다. 사건의 순서를 정확히 암기하는 것이 매우 중요합니다.</div></li>
+                    <li class="flex items-start"><span class="accent-text font-bold mr-3 text-2xl">③</span> <div><strong>인물의 활동 연결:</strong> 특정 인물(왕, 신하, 사상가 등)과 그 업적/활동을 정확히 연결하는 능력을 중요하게 평가합니다.</div></li>
+                    <li class="flex items-start"><span class="accent-text font-bold mr-3 text-2xl">④</span> <div><strong>정확한 용어 이해:</strong> '위정척사', '통리기무아문', '지계'처럼 핵심 용어의 정확한 의미와 그로 인한 결과를 묻습니다. 학습지 빈칸은 반드시 암기해야 합니다.</div></li>
+                    <li class="flex items-start"><span class="accent-text font-bold mr-3 text-2xl">⑤</span> <div><strong>정교한 선택지 구성:</strong> 오답은 주로 맞는 설명 같지만 시기가 약간 다르거나, 인과관계가 틀린 내용으로 구성됩니다. 꼼꼼한 학습이 필요합니다.</div></li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 100% Topics -->
+        <section id="topics" class="mb-12 scroll-mt-20">
+            <h2 class="text-3xl font-bold mb-6 pb-2 border-b-2 border-teal-800 accent-text">2. 출제 확률 100% 핵심 주제</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Chart -->
+                <div class="secondary-bg p-6 rounded-lg card-shadow">
+                    <h3 class="font-bold text-xl mb-4 text-center">주제별 출제 강조도</h3>
+                    <div class="chart-container" style="position: relative; height:40vh; width:100%; max-width: 600px; margin: auto;">
+                        <canvas id="topicsChart"></canvas>
+                    </div>
+                     <p class="text-center text-sm text-gray-500 mt-4">수업 중 선생님의 강조 빈도를 바탕으로 시각화했습니다.</p>
+                </div>
+                <!-- Topics List -->
+                <div id="topic-cards" class="space-y-4">
+                     <div class="topic-card secondary-bg p-4 rounded-lg card-shadow cursor-pointer" onclick="toggleDetails('details-1')">
+                        <h3 class="font-bold text-xl">을사늑약 (1905)</h3>
+                        <div id="details-1" class="topic-details hidden mt-2 text-gray-700">
+                           <p><strong>강조점:</strong> "시험 100%", "안 나올 수가 없다!"</p>
+                           <p><strong>포인트:</strong> 외교권 박탈, 통감부 설치(초대 통감: 이토 히로부미), 헤이그 특사 파견과 고종 강제 퇴위로 이어지는 흐름을 반드시 암기해야 합니다.</p>
+                        </div>
+                    </div>
+                    <div class="topic-card secondary-bg p-4 rounded-lg card-shadow cursor-pointer" onclick="toggleDetails('details-2')">
+                        <h3 class="font-bold text-xl">갑신정변 개혁 정강</h3>
+                        <div id="details-2" class="topic-details hidden mt-2 text-gray-700">
+                           <p><strong>강조점:</strong> "최소 두 문제 나옵니다~"</p>
+                           <p><strong>포인트:</strong> 문벌 폐지, 지조법 개혁, 내각제 수립, 혜상공국 혁파 등 핵심 조항의 의미를 정확히 알아야 합니다. (교과서 117쪽 참고)</p>
+                        </div>
+                    </div>
+                    <div class="topic-card secondary-bg p-4 rounded-lg card-shadow cursor-pointer" onclick="toggleDetails('details-3')">
+                        <h3 class="font-bold text-xl">항일 의병 운동 (3단계 비교)</h3>
+                        <div id="details-3" class="topic-details hidden mt-2 text-gray-700">
+                           <p><strong>강조점:</strong> "시험 포인트", "가능성 높음"</p>
+                           <p><strong>포인트:</strong> 을미/을사/정미의병의 원인과 특징(주도세력, 규모)을 비교하는 문제가 유력합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <!-- Timeline Section -->
+            <div class="mt-12 secondary-bg p-6 rounded-lg card-shadow">
+                <h3 class="font-bold text-2xl mb-6 text-center accent-text">국권 피탈 과정 타임라인 (선생님 강조)</h3>
+                <div class="relative pl-10">
+                    <div class="timeline-line"></div>
+                    <div id="timeline-container">
+                        <!-- Timeline items will be injected by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Predicted Questions -->
+        <section id="questions" class="mb-12 scroll-mt-20">
+            <h2 class="text-3xl font-bold mb-6 pb-2 border-b-2 border-teal-800 accent-text">3. 예상 문제 유형 및 공략</h2>
+            <div class="space-y-6">
+                <!-- Question 1 -->
+                <div class="secondary-bg p-6 rounded-lg card-shadow">
+                    <h3 class="font-bold text-xl mb-2">유형 1: 사료(자료) 분석 문제</h3>
+                    <p class="font-semibold mb-2">Q. 다음은 동학농민군이 제시한 개혁안의 일부이다. 이를 통해 알 수 있는 당시 사회의 모습으로 적절하지 않은 것은?</p>
+                    <div class="bg-gray-100 p-4 rounded text-gray-600 mb-4">
+                        <p>5. 노비 문서는 불태워 버릴 것</p>
+                        <p>7. 젊어서 남편을 잃은 여자의 재가를 허용할 것</p>
+                        <p>12. 토지는 평균으로 나누어 농사짓게 할 것</p>
+                    </div>
+                    <button onclick="toggleAnswer('answer-1')" class="accent-color text-white px-4 py-2 rounded hover:bg-teal-700 transition">정답 및 공략 보기</button>
+                    <div id="answer-1" class="hidden mt-4 p-4 bg-teal-50 rounded-lg">
+                        <p><strong>정답: ④ 입헌 군주제에 대한 요구가 나타나고 있었다.</strong></p>
+                        <p><strong>공략법:</strong> 학습지 9쪽의 폐정 개혁안 분석표를 완벽히 숙지해야 합니다. 각 조항이 신분제, 토지 문제, 봉건적 악습 등 어떤 사회 문제를 해결하기 위한 것인지 이해하는 것이 중요합니다. 입헌 군주제 요구는 독립협회와 관련이 깊습니다.</p>
+                    </div>
+                </div>
+                <!-- Question 2 -->
+                <div class="secondary-bg p-6 rounded-lg card-shadow">
+                    <h3 class="font-bold text-xl mb-2">유형 2: 두 세력 비교 분석 문제</h3>
+                    <p class="font-semibold mb-2">Q. (가)와 (나)가 추구한 정치 체제에 대한 설명으로 옳은 것은?</p>
+                     <div class="bg-gray-100 p-4 rounded text-gray-600 mb-4">
+                        <p>(가) 독립협회가 관민공동회에서 헌의 6조를 결의하였다.</p>
+                        <p>(나) 고종이 대한국 국제를 반포하여 황제의 권한을 명시하였다.</p>
+                    </div>
+                    <button onclick="toggleAnswer('answer-2')" class="accent-color text-white px-4 py-2 rounded hover:bg-teal-700 transition">정답 및 공략 보기</button>
+                    <div id="answer-2" class="hidden mt-4 p-4 bg-teal-50 rounded-lg">
+                        <p><strong>정답: ③ (가)는 (나)와 달리 민권의 성장을 긍정적으로 보았다.</strong></p>
+                        <p><strong>공략법:</strong> 수업 노트에서 "독립협회는 입헌 군주제, 대한제국은 전제 군주제! 헷갈리면 안 돼요~" 라고 강조하셨습니다. 독립협회(가)는 국민의 참정권을 주장하며 입헌 군주제를 지향했고, 대한제국(나)은 대한국 국제를 통해 황제 중심의 전제 군주제를 지향했습니다. 이 차이점을 명확히 알아야 합니다.</p>
+                    </div>
+                </div>
+                 <!-- Question 3 -->
+                <div class="secondary-bg p-6 rounded-lg card-shadow">
+                    <h3 class="font-bold text-xl mb-2">유형 3: 사건 순서 배열 문제</h3>
+                    <p class="font-semibold mb-2">Q. (가)~(라)의 사건을 일어난 순서대로 바르게 배열한 것은?</p>
+                     <div class="bg-gray-100 p-4 rounded text-gray-600 mb-4">
+                        <p>(가) 일본이 대한제국의 외교권을 박탈하고 통감부를 설치하였다.</p>
+                        <p>(나) 고종이 헤이그에 특사를 파견하였으나, 이 일로 강제 퇴위당했다.</p>
+                        <p>(다) 일본이 전쟁 수행을 위해 대한제국의 영토를 군용지로 사용할 수 있게 되었다.</p>
+                        <p>(라) 대한제국 군대가 해산되고, 일본인 차관이 각 부의 실권을 장악했다.</p>
+                    </div>
+                    <button onclick="toggleAnswer('answer-3')" class="accent-color text-white px-4 py-2 rounded hover:bg-teal-700 transition">정답 및 공략 보기</button>
+                    <div id="answer-3" class="hidden mt-4 p-4 bg-teal-50 rounded-lg">
+                        <p><strong>정답: ① (다) → (가) → (나) → (라)</strong></p>
+                        <p><strong>공략법:</strong> (다)한일의정서(1904.2) → (가)을사늑약(1905.11) → (나)헤이그특사/고종퇴위(1907.7) → (라)정미7조약(1907.7)/군대해산(1907.8) 순서입니다. 선생님이 강조하신 국권 피탈 과정 흐름을 그대로 외우는 것이 가장 효과적입니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Practice Tests -->
+        <section id="practice-tests" class="mb-12 scroll-mt-20">
+            <h2 class="text-3xl font-bold mb-6 pb-2 border-b-2 border-teal-800 accent-text">4. 기말고사 실전 모의고사 (2회분)</h2>
+            <div class="flex mb-4 border-b-2 border-gray-300">
+                <button id="tab-1-btn" class="tab-btn flex-1 p-3 font-bold text-lg active" onclick="showTab(1)">모의고사 1회</button>
+                <button id="tab-2-btn" class="tab-btn flex-1 p-3 font-bold text-lg" onclick="showTab(2)">모의고사 2회</button>
+            </div>
+            <div id="practice-test-content">
+                <!-- Test 1 -->
+                <div id="tab-1" class="practice-test space-y-4">
+                    <!-- Questions for test 1 will be injected by JavaScript -->
+                </div>
+                <!-- Test 2 -->
+                <div id="tab-2" class="practice-test space-y-4 hidden">
+                    <!-- Questions for test 2 will be injected by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center p-6 mt-12 bg-gray-200">
+        <p>윤서님, 이 자료가 시험 준비에 큰 도움이 되길 바랍니다. 꼭 좋은 결과 있을 거예요. 응원합니다!</p>
+    </footer>
+
+<script>
+    function createQuestionHTML(item, testNumber, index) {
+        const answerId = `a-${testNumber}-${index + 1}`;
+        let optionsHtml = item.options.map((opt, i) => `<li class="p-2"><strong>${String.fromCharCode(9312 + i)}</strong> ${opt}</li>`).join('');
+        return `
+            <div class="secondary-bg p-4 rounded-lg card-shadow">
+                <p class="font-semibold mb-2">${item.q}</p>
+                ${item.extra ? item.extra : ''}
+                <ul class="question-option mb-4">${optionsHtml}</ul>
+                <button onclick="toggleAnswer('${answerId}')" class="accent-color text-white px-3 py-1 text-sm rounded hover:bg-teal-700 transition">정답 및 해설 보기</button>
+                <div id="${answerId}" class="hidden mt-3 p-3 bg-teal-50 rounded-lg">
+                    <p><strong>정답: ${item.answer}</strong></p>
+                    <p>${item.explanation}</p>
+                </div>
+            </div>
+        `;
+    }
+
+    function populateTest(testNumber, questions) {
+        const container = document.getElementById(`tab-${testNumber}`);
+        container.innerHTML = '';
+        questions.forEach((item, index) => {
+            container.innerHTML += createQuestionHTML(item, testNumber, index);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const practiceTest1 = [
+            { q: "1. 다음 중 흥선대원군의 정책으로 옳은 것을 <보기>에서 모두 고른 것은?", options: ["ㄱ. 척화비 건립", "ㄴ. 통리기무아문 설치", "ㄷ. 사창제 실시", "ㄹ. 나선 정벌 단행"], answer: "② ㄱ, ㄷ", explanation: "통리기무아문은 개항 이후, 나선 정벌은 효종 때의 일입니다. 흥선대원군은 서양과의 통상 수교를 거부하며 척화비를 건립했고, 환곡의 폐단을 바로잡기 위해 사창제를 실시했습니다.", type: "보기" },
+            { q: "2. 다음 조약에 대한 설명으로 옳지 않은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>제1조 조선국은 자주국이며 일본국과 평등한 권리를 가진다.<br>제7조 조선국 연해의 도서를 일본국 항해자가 자유로이 측량하도록 허가한다.</div>", options: ["조선이 맺은 최초의 근대적 조약이다.", "운요호 사건을 빌미로 체결되었다.", "일본의 정치적, 군사적 침략 의도가 담겨있다.", "조약 체결 이후 미국, 영국 등과도 수교하였다.", "청의 종주권을 부정하여 조선에 유리한 조항이었다."], answer: "⑤", explanation: "1조는 청의 영향력을 배제하고 일본의 침략을 용이하게 하려는 의도가 숨어있는 조항입니다. 7조(해안측량권) 등 불평등한 조항을 포함하고 있습니다." },
+            { q: "3. (가) 시기에 있었던 사실로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>임오군란(1882) → (가) → 동학농민운동(1894)</div>", options: ["별기군이 창설되었다.", "통리기무아문이 설치되었다.", "갑신정변이 일어났다.", "삼정이정청이 설치되었다.", "독립협회가 창립되었다."], answer: "③", explanation: "갑신정변은 임오군란 이후 청의 내정 간섭이 심화된 상황에서 급진개화파가 일으킨 정변(1884)입니다." },
+            { q: "4. 다음 가상 대화에 나타난 두 세력에 대한 설명으로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>A: 청의 양무운동을 본받아 점진적으로 개혁해야 합니다.<br>B: 아닙니다. 일본의 메이지 유신처럼 제도와 사상까지 급진적으로 바꿔야 합니다.</div>", options: ["A는 위정척사파, B는 개화파이다.", "B는 A에 비해 청과의 사대 관계 유지를 중시했다.", "A는 갑신정변을, B는 갑오개혁을 주도하였다.", "A는 온건 개화파, B는 급진 개화파로 볼 수 있다.", "A, B 모두 민중의 지지를 폭넓게 받았다."], answer: "④", explanation: "A는 청의 양무운동을 모델로 한 온건 개화파, B는 일본의 메이지 유신을 모델로 한 급진 개화파의 주장입니다." },
+            { q: "5. 다음 개혁안이 발표된 사건에 대한 설명으로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>- 문벌을 폐지하여 인민 평등의 권리를 세운다.<br>- 혜상공국을 혁파한다.</div>", options: ["우정총국 개국 축하연을 계기로 일어났다.", "전주 화약 체결의 배경이 되었다.", "일본의 군사적 지원으로 성공하였다.", "3일 만에 실패했으나, 근대 국가 건설의 방향을 제시했다.", "고종이 홍범 14조를 반포하여 지지를 표명했다."], answer: "④", explanation: "제시된 개혁안은 갑신정변의 14개조 개혁 정강의 일부입니다. 갑신정변은 청군의 개입과 일본의 배신으로 3일 만에 실패로 끝났습니다." },
+            { q: "6. 다음 자료와 관련된 운동에 대한 설명으로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>- 안으로는 탐관오리의 머리를 베고 밖으로는 강폭한 적의 무리를 구축하고자 한다.<br>- 토지는 평균으로 나누어 경작하게 한다.</div>", options: ["교조 신원 운동에서 시작되었다.", "일본의 황무지 개간권 요구에 반대하였다.", "집강소를 설치하여 폐정 개혁을 실천하였다.", "서재필이 주도하여 민중 계몽에 힘썼다.", "13도 창의군을 결성하여 서울 진공 작전을 펼쳤다."], answer: "③", explanation: "제시된 자료는 동학 농민 운동의 격문과 폐정 개혁안의 일부입니다. 동학농민군은 전주 화약 이후 집강소를 설치하여 개혁을 추진했습니다." },
+            { q: "7. (가)에 들어갈 개혁 내용으로 옳지 않은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>일본은 경복궁을 점령한 뒤, 군국기무처를 중심으로 (가) 제1차 갑오개혁을 추진하였다.</div>", options: ["공사 노비법 폐지", "과거제 폐지", "재정을 탁지아문으로 일원화", "단발령 실시", "조세의 금납화"], answer: "④", explanation: "단발령은 을미사변 이후 추진된 을미개혁(제3차 갑오개혁)의 내용입니다." },
+            { q: "8. 다음과 같은 활동을 한 단체는?", options: ["보안회", "신민회", "대한자강회", "독립협회", "헌정연구회"], extra: "<div class='text-sm bg-gray-100 p-2 my-2 rounded'>- 만민공동회를 개최하여 러시아의 절영도 조차 요구를 저지하였다.<br>- 입헌군주제 수립을 목표로 관민공동회에서 헌의 6조를 결의하였다.</div>", answer: "④", explanation: "러시아의 이권 침탈에 맞서 만민공동회를 개최하고, 입헌군주제 수립을 위해 헌의 6조를 결의한 단체는 독립협회입니다." },
+            { q: "9. 다음 조약이 체결된 이후의 사실로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>제2조 일본국 정부는 한국과 타국 간에 현존하는 조약의 실행을 완수하는 임무를 담당하고...<br>제3조 일본국 정부는 그 대표자로 한국 황제 폐하 궐하에 1명의 통감을 둔다.</div>", options: ["대한제국이 국외 중립을 선언하였다.", "일본의 주도로 화폐정리사업이 시작되었다.", "고종이 헤이그에 특사를 파견하였다.", "안중근이 하얼빈에서 이토 히로부미를 처단하였다.", "13도 창의군이 서울 진공 작전을 전개하였다."], answer: "③", explanation: "제시된 조약은 을사늑약(1905)입니다. 고종은 을사늑약의 부당함을 알리기 위해 1907년 헤이그에 특사를 파견하였습니다." },
+            { q: "10. 다음 중 정미의병이 일어나게 된 직접적인 배경을 <보기>에서 모두 고른 것은?", options: ["ㄱ. 을미사변", "ㄴ. 단발령 시행", "ㄷ. 고종의 강제 퇴위", "ㄹ. 대한제국 군대 해산"], answer: "⑤ ㄷ, ㄹ", explanation: "정미의병(1907)은 헤이그 특사 파견을 구실로 한 고종의 강제 퇴위와 이어진 군대 해산에 반발하여 전국적으로 확산되었습니다. 해산된 군인들이 의병에 합류하며 전투력이 크게 강화되었습니다.", type: "보기" },
+            { q: "11. 밑줄 친 '이 책'이 국내에 유포되면서 나타난 영향으로 가장 적절한 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>2차 수신사 김홍집이 일본에서 돌아오며 <u>'이 책'</u>을 들여왔다. 그 내용은 러시아를 막기 위해 중국, 일본, 미국과 연대해야 한다는 것이었다.</div>", options: ["척화주전론이 힘을 얻었다.", "조·미 수호 통상 조약 체결에 영향을 주었다.", "급진개화파가 정변을 일으키는 계기가 되었다.", "정부가 교정청을 설치하여 개혁을 추진하였다.", "위정척사 운동이 항일 의병 운동으로 전환되었다."], answer: "②", explanation: "밑줄 친 '이 책'은 황준헌의 『조선책략』입니다. 이 책의 유포는 정부 내에서 미국과의 수교 여론을 형성하는 데 영향을 주어 조·미 수호 통상 조약(1882) 체결의 배경이 되었습니다." },
+            { q: "12. 다음 사건의 결과로 체결된 조약의 내용으로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>구식 군인들은 13개월 만에 받은 급료에 겨와 모래가 섞여 있자 분노하여 봉기하였다. 여기에 도시 빈민층이 합세하여 일본 공사관을 습격하고 민씨 고관들을 살해하였다.</div>", options: ["청과 일본 군대가 조선에서 철수한다.", "조선은 일본에 배상금을 지불하고, 일본 공사관 경비를 위한 군대 주둔을 허용한다.", "조선은 청에 조공을 바치는 허례를 폐지한다.", "조선 정부는 외국과의 조약 체결 시 중추원 의장의 서명을 받아야 한다.", "일본은 랴오둥반도를 청에 반환한다."], answer: "②", explanation: "제시된 사건은 임오군란(1882)입니다. 이 사건의 결과 조선은 일본과 제물포 조약을 체결하여 배상금 지불 및 일본군 주둔을 허용하게 되었습니다." },
+            { q: "13. 다음 선언문이 발표된 시기에 추진된 개혁으로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>“우리나라는 곧 삼한의 땅인데, 나라 이름을 ‘대한’으로 정한다고 해서 안 될 것이 없다. ... 짐이 이제 모든 신하들과 의논하여 하늘에 제사를 지내고 황제의 자리에 오르노라.”</div>", options: ["통리기무아문을 중심으로 개혁이 추진되었다.", "‘구본신참’을 원칙으로 양전 사업과 지계 발급이 이루어졌다.", "군국기무처의 주도로 신분제가 폐지되었다.", "급진개화파에 의해 내각 제도가 도입되었다.", "독립협회의 건의를 받아들여 헌의 6조를 이행하였다."], answer: "②", explanation: "제시된 자료는 대한제국 수립(1897) 선포문입니다. 대한제국은 '옛것을 근본으로 새것을 참고한다'는 구본신참의 원칙 아래 광무개혁을 추진하였고, 대표적인 정책이 양전 사업과 지계 발급입니다." },
+            { q: "14. 다음 가상 일기의 밑줄 친 ‘의병’에 대한 설명으로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>국모의 원수를 갚고 상투를 지키기 위해 의병을 일으켰다. 그러나 임금님께서 해산을 명하시니 따를 수밖에...</div>", options: ["평민 출신 의병장인 신돌석이 활약하였다.", "13도 창의군을 결성하여 서울로 진격하고자 하였다.", "고종의 해산 권고 조칙으로 대부분 해산하였다.", "해산된 군인들이 합류하여 전투력이 강화되었다.", "국권 회복을 목표로 한 본격적인 항일 전쟁으로 발전하였다."], answer: "③", explanation: "국모(명성황후) 시해(을미사변)와 상투(단발령) 언급으로 보아 을미의병임을 알 수 있습니다. 을미의병은 아관파천 이후 고종의 해산 권고 조칙으로 대부분 해산되었습니다." },
+            { q: "15. (가) 단체에 대한 설명으로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>우리 (가)는 국권 회복과 공화정 수립을 목표로 한 비밀 결사이다. 우리는 교육을 통해 인재를 양성하고(대성학교, 오산학교), 산업을 진흥(자기회사, 태극서관)하며, 국외에 독립군 기지를 건설하고자 한다.</div>", options: ["일본의 황무지 개간권 요구를 저지시켰다.", "고종의 강제 퇴위 반대 운동을 전개하다 해산되었다.", "105인 사건으로 와해되었다.", "만민공동회를 열어 자주 국권을 수호하려 하였다.", "언론 활동을 통해 입헌 군주제 수립을 주장하였다."], answer: "③", explanation: "공화정 수립, 비밀 결사, 교육 및 산업 진흥, 국외 독립운동 기지 건설 등은 신민회의 주요 활동입니다. 신민회는 일제가 조작한 105인 사건으로 국내 조직이 와해되었습니다." },
+            { q: "16. 다음 중 제1차 갑오개혁(1894)의 내용에 해당하지 않는 것은?", options: ["과거제 폐지", "신분제 폐지", "재정의 탁지아문 일원화", "은 본위제 채택", "태양력 사용"], answer: "⑤", explanation: "태양력 사용은 을미개혁(1895) 때 시행되었습니다." },
+            { q: "17. 자료의 (가), (나)에 대한 설명으로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>(가) 동학농민군이 전주 화약 이후 전라도 일대에 설치한 자치 기구<br>(나) 갑오개혁 추진을 위해 정부에 설치된 개혁 기구</div>", options: ["(가)에서는 친일파를 중심으로 개혁이 논의되었다.", "(나)에서는 동학농민군의 요구가 일부 반영되었다.", "(가)는 갑신정변의 개혁 정강을 계승하였다.", "(나)는 일본의 간섭 없이 자주적으로 운영되었다.", "(가)와 (나)는 모두 동학농민운동 진압을 위해 설치되었다."], answer: "②", explanation: "(가)는 집강소, (나)는 군국기무처(또는 교정청 이후)입니다. 군국기무처에서 추진된 제1차 갑오개혁에는 신분제 폐지 등 동학농민군의 요구가 일부 반영되었습니다." },
+            { q: "18. 다음 중 시기적으로 가장 나중에 일어난 사건은?", options: ["갑신정변", "을미사변", "아관파천", "대한제국 수립", "독립협회 창립"], answer: "④", explanation: "갑신정변(1884) → 을미사변(1895) → 아관파천(1896.2) → 독립협회 창립(1896.7) → 대한제국 수립(1897.10) 순입니다." },
+            { q: "19. 다음에서 설명하는 조약은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>러일 전쟁에서 승리한 일본이 미국의 중재로 러시아와 체결하였다. 이 조약으로 러시아는 일본의 한국 지배를 인정하였다.</div>", options: ["시모노세키 조약", "가쓰라-태프트 밀약", "제2차 영일 동맹", "포츠머스 조약", "을사늑약"], answer: "④", explanation: "러일 전쟁을 마무리 지으며 러시아가 일본의 한국 지배를 인정한 조약은 포츠머스 조약입니다." },
+            { q: "20. (가)와 (나) 사이 시기에 있었던 사실로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>(가) 일본이 대한제국의 외교권을 박탈하였다.<br>↓<br>(나) 일본이 대한제국의 군대를 해산시켰다.</div>", options: ["러일전쟁이 발발하였다.", "보안회가 일본의 황무지 개간권 요구를 저지하였다.", "고종이 헤이그에 특사를 파견하였다.", "안중근이 하얼빈에서 이토 히로부미를 처단하였다.", "독립협회가 만민공동회를 개최하였다."], answer: "③", explanation: "(가)는 을사늑약(1905), (나)는 정미7조약에 따른 군대 해산(1907)입니다. 고종은 을사늑약의 부당함을 알리기 위해 그 사이인 1907년에 헤이그 특사를 파견했습니다." },
+            { q: "21. 다음 인물들의 공통적인 활동으로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>안창호, 양기탁, 이회영, 이동휘</div>", options: ["독립협회를 이끌었다.", "애국계몽운동 단체인 신민회를 조직하였다.", "13도 창의군을 결성하여 의병 활동을 주도하였다.", "국채 보상 운동을 전국적으로 확산시켰다.", "갑오개혁 당시 내각에 참여하여 개혁을 추진하였다."], answer: "②", explanation: "제시된 인물들은 모두 애국계몽운동 단체인 신민회의 핵심 멤버들입니다." },
+            { q: "22. 다음에서 설명하는 신문은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>영국인 베델과 양기탁이 함께 창간하였으며, 일본의 침략을 비판하고 의병 활동을 호의적으로 보도하여 큰 호응을 얻었다.</div>", options: ["한성순보", "독립신문", "황성신문", "대한매일신보", "제국신문"], answer: "④", explanation: "영국인 베델이 발행인이라 일본의 탄압에서 비교적 자유로웠던 대한매일신보에 대한 설명입니다." },
+            { q: "23. 밑줄 친 '이 사건'에 대한 설명으로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>일본은 데라우치 총독 암살 미수 사건을 조작하여 서북 지방의 민족 운동가들을 대거 체포하였다. 이로 인해 신민회의 국내 조직이 와해되었다.</div>", options: ["아관파천의 배경이 되었다.", "을미의병이 일어나는 계기가 되었다.", "105인 사건이라고도 불린다.", "헤이그 특사 파견의 빌미가 되었다.", "동학농민운동의 도화선이 되었다."], answer: "③", explanation: "데라우치 총독 암살 미수 사건을 조작하여 신민회 회원들을 탄압한 사건은 105인 사건입니다." }
+        ];
+
+        const practiceTest2 = [
+            { q: "1. 다음 중 개항기 서양 열강과 맺은 불평등 조약의 공통적인 내용으로 옳은 것을 <보기>에서 모두 고른 것은?", options: ["ㄱ. 거중 조정", "ㄴ. 영사 재판권(치외법권)", "ㄷ. 최혜국 대우", "ㄹ. 관세 자주권 인정"], answer: "③ ㄴ, ㄷ", explanation: "영사 재판권과 최혜국 대우는 개항기 서양 열강과 맺은 불평등 조약에 공통적으로 포함된 대표적인 독소 조항입니다. 거중 조정은 조미수호통상조약에, 관세 자주권은 인정되지 않았습니다." },
+            { q: "2. 다음 사건들을 일어난 순서대로 바르게 배열한 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>ㄱ. 병인양요<br>ㄴ. 운요호 사건<br>ㄷ. 신미양요<br>ㄹ. 오페르트 도굴 미수 사건</div>", options: ["ㄱ-ㄴ-ㄷ-ㄹ", "ㄱ-ㄹ-ㄷ-ㄴ", "ㄷ-ㄱ-ㄹ-ㄴ", "ㄹ-ㄱ-ㄴ-ㄷ", "ㄴ-ㄱ-ㄹ-ㄷ"], answer: "②", explanation: "병인양요(1866) → 오페르트 도굴 미수 사건(1868) → 신미양요(1871) → 운요호 사건(1875) 순서로 일어났습니다." },
+            { q: "3. 다음 가상 인터뷰의 (가)에 들어갈 인물에 대한 설명으로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>기자: 선생께서는 왜 개항에 반대하십니까?<br>(가): 저 왜인들은 서양 오랑캐와 한가지입니다. 화친을 하면 사학(천주교)이 퍼져 나라의 근본이 무너질 것입니다.</div>", options: ["갑신정변을 주도하였다.", "위정척사 사상을 대표한다.", "통리기무아문의 핵심 관료였다.", "보빙사의 일원으로 미국에 파견되었다.", "동학 농민 운동을 이끌었다."], answer: "②", explanation: "'왜양일체론'을 주장하며 개항에 반대한 인물은 위정척사 사상가 최익현입니다. 이는 성리학적 전통 질서를 지키려는 위정척사 사상의 대표적인 주장입니다." },
+            { q: "4. 다음 요구안이 등장하게 된 배경으로 가장 적절한 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>- 고부성을 격파하고 군수 조병갑을 내쫓을 것<br>- 우리는 먼저 전주성을 점령하고 곧바로 서울로 진격할 것이다.</div>", options: ["정부의 개화 정책에 대한 구식 군인들의 불만", "지방관의 탐학과 과도한 세금 수탈", "일본의 내정 간섭과 명성황후 시해 사건", "러시아의 절영도 조차 요구", "고종의 강제 퇴위와 군대 해산"], answer: "②", explanation: "고부 군수 조병갑의 탐학은 동학 농민 운동의 직접적인 도화선이었습니다. 이는 당시 만연했던 지방관의 수탈과 삼정의 문란을 보여줍니다." },
+            { q: "5. (가)와 (나) 사이의 시기에 있었던 사실로 옳지 않은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>(가) 동학농민군, 황토현에서 관군을 격파하다.<br>↓<br>(나) 일본군, 경복궁을 점령하다.</div>", options: ["동학농민군이 전주성을 점령하였다.", "정부와 동학농민군이 전주 화약을 체결하였다.", "농민들이 자치 기구인 집강소를 설치하였다.", "정부가 개혁 기구로 교정청을 설치하였다.", "농민군이 우금치에서 일본군과 격전을 벌였다."], answer: "⑤", explanation: "우금치 전투는 일본의 경복궁 점령 이후 재봉기한 2차 동학 농민 운동 때의 일입니다. (가)와 (나) 사이에는 1차 봉기의 과정과 그 결과(전주화약, 집강소/교정청 설치)가 있었습니다." },
+            { q: "6. 다음 중 을미개혁(1895)의 내용으로 옳은 것을 <보기>에서 모두 고른 것은?", options: ["ㄱ. 태양력 채용", "ㄴ. 종두법 실시", "ㄷ. ‘건양’ 연호 사용", "ㄹ. 지계 발급"], answer: "④ ㄱ, ㄴ, ㄷ", explanation: "을미개혁은 태양력 채용, 종두법 실시, '건양' 연호 사용, 단발령 시행 등을 내용으로 합니다. 지계 발급은 대한제국의 광무개혁 시기에 이루어졌습니다." },
+            { q: "7. 다음에서 설명하는 사건의 영향으로 가장 적절한 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>청일 전쟁에서 승리한 일본은 랴오둥반도를 차지했으나, 러시아가 프랑스, 독일과 함께 일본을 압박하여 이를 청에 다시 돌려주게 하였다.</div>", options: ["갑신정변이 일어났다.", "조선에서 친러 내각이 수립되고 일본의 영향력이 약화되었다.", "일본이 러일 전쟁을 일으켰다.", "대한제국이 수립되었다.", "영국이 거문도를 불법 점령하였다."], answer: "②", explanation: "삼국 간섭으로 일본의 위신이 떨어지자, 조선 정부는 러시아에 접근하여 일본을 견제하려 했고, 그 결과 친러 내각이 수립되었습니다. 이에 위기를 느낀 일본이 을미사변을 일으키게 됩니다." },
+            { q: "8. 다음 자료와 관련된 단체의 활동으로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>제1조 외국인에게 의지하지 말고 관민이 힘을 합쳐 전제 황권을 공고히 할 것.<br>제6조 정해진 규정을 실천할 것.</div>", options: ["보안회", "신민회", "대한자강회", "독립협회", "헌정연구회"], answer: "④", explanation: "제시된 자료는 독립협회가 관민공동회에서 결의한 헌의 6조의 일부입니다. 전제 황권 공고화는 황제의 권위를 인정하되, 다른 조항을 통해 권한을 제한하려는 의도가 담겨 있습니다." },
+            { q: "9. 다음 조약들 중 대한제국의 군사권이 실질적으로 일본에 넘어가는 계기가 된 것은?", options: ["한일의정서", "제1차 한일협약", "을사늑약", "정미7조약", "기유각서"], answer: "④", explanation: "정미7조약(한일신협약)의 부수 각서로 대한제국 군대가 해산되면서, 대한제국은 스스로를 지킬 군사력을 완전히 상실하게 되었습니다." },
+            { q: "10. 다음은 어떤 의병에 대한 설명인가?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>해산된 군인들이 합류하면서 조직력과 전투력이 크게 강화되었다. 이인영을 총대장으로 하는 13도 창의군이 결성되어 서울 진공 작전을 시도하였다.</div>", options: ["을미의병", "을사의병", "정미의병", "활빈당", "독립군"], answer: "③", explanation: "해산 군인의 합류, 13도 창의군 결성, 서울 진공 작전은 정미의병의 가장 중요한 특징입니다." },
+            { q: "11. 다음과 같은 주장을 한 세력에 대한 설명으로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>“나라의 독립은 자강(自强)에 있으며, 자강의 방법은 교육 진흥과 산업 발전에 있다. 실력을 양성하면 독립을 회복할 기회를 얻을 수 있을 것이다.”</div>", options: ["급진개화파", "위정척사파", "동학농민군", "애국계몽운동 세력", "온건개화파"], answer: "④", explanation: "교육과 산업을 통해 실력을 키워 국권을 회복하자는 주장은 애국 계몽 운동 세력의 핵심 논리입니다." },
+            { q: "12. (가)에 들어갈 조약으로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>일본은 러시아와의 전쟁에서 유리해지자, 대한 제국에 외교 고문과 재정 고문을 둘 것을 내용으로 하는 (가)을/를 강요하였다.</div>", options: ["한일의정서", "제1차 한일협약", "을사늑약", "정미7조약", "한일병합조약"], answer: "②", explanation: "외교 고문(스티븐스)과 재정 고문(메가타)을 두어 내정에 간섭하기 시작한 것은 제1차 한일협약의 내용입니다." },
+            { q: "13. 다음 인물과 관련된 설명으로 옳지 않은 것은?", options: ["의병 활동에 참여하였다.", "하얼빈에서 이토 히로부미를 처단하였다.", "뤼순 감옥에서 순국하였다.", "동양평화론을 저술하였다.", "13도 창의군 총대장으로 활동하였다."], extra: "<div class='text-center my-2'><img src='https://placehold.co/100x120/ccc/000?text=안중근' alt='안중근 의사' class='mx-auto rounded'></div>", answer: "⑤", explanation: "안중근 의사는 의병 활동, 하얼빈 의거, 뤼순 감옥 순국, 동양평화론 저술 등과 관련이 있습니다. 13도 창의군 총대장은 이인영입니다." },
+            { q: "14. 다음 개혁과 가장 관련 깊은 용어는?", options: ["중체서용", "구본신참", "위정척사", "문명개화", "실력양성"], extra: "<div class='text-sm bg-gray-100 p-2 my-2 rounded'>대한제국 시기, 황제권을 강화하고 옛 제도를 근본으로 삼아 근대 문물을 받아들이려 한 개혁</div>", answer: "②", explanation: "옛 제도를 근본으로 새것을 참고한다는 '구본신참(舊本新參)'은 광무개혁의 기본 방향이었습니다." },
+            { q: "15. (가)와 (나)는 특정 단체가 세운 학교이다. 이 단체에 대한 설명으로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>(가) 대성학교(평양)<br>(나) 오산학교(정주)</div>", options: ["일진회의 친일 행위를 규탄하였다.", "황무지 개간권 반대 운동을 전개하였다.", "국권 회복과 공화정 수립을 목표로 하였다.", "고종의 강제 퇴위에 반대하다 해산되었다.", "만민 공동회를 개최하여 민중을 계몽하였다."], answer: "③", explanation: "대성학교와 오산학교는 비밀결사 조직인 신민회가 민족 교육을 위해 설립한 학교입니다. 신민회의 목표는 국권 회복과 공화정 수립이었습니다." },
+            { q: "16. 다음 중 을사늑약(1905)에 대한 저항으로 볼 수 없는 것은?", options: ["장지연의 '시일야방성대곡' 발표", "민영환, 조병세 등의 자결 순국", "나철, 오기호의 자신회 조직", "이재명의 이완용 저격 시도", "최익현의 의병 봉기"], answer: "④", explanation: "이재명의 이완용 저격 의거는 1909년의 일입니다. 나머지는 모두 을사늑약 직후에 일어난 대표적인 저항 활동입니다." },
+            { q: "17. 자료의 (가), (나)에 들어갈 말을 바르게 짝지은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>독립협회는 입헌 군주제를 지향했으나, 대한제국은 (가) 국제 반포를 통해 (나) 군주제를 지향했다.</div>", options: ["헌의 6조, 입헌", "대한국, 전제", "홍범 14조, 입헌", "대한국, 공화", "헌의 6조, 전제"], answer: "②", explanation: "대한제국은 대한국 국제를 반포하여 황제가 모든 권력을 갖는 전제 군주제 국가임을 명확히 했습니다." },
+            { q: "18. 다음 자료와 관련된 설명으로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>“전하! 머리를 깎는 것은 신체의 일부를 훼손하는 것이니, 이는 부모에게서 물려받은 것을 소중히 여기라는 가르침에 어긋납니다. 통촉하여 주시옵소서.”</div>", options: ["갑오개혁에 대한 반발이다.", "을미의병이 일어나는 계기가 되었다.", "위정척사 사상의 한계를 보여준다.", "독립협회가 주도한 상소 운동이다.", "광무개혁에 대한 보수 유생의 비판이다."], answer: "②", explanation: "제시된 자료는 단발령에 대한 유생들의 반발을 보여줍니다. 단발령은 을미사변과 함께 을미의병이 일어나는 중요한 계기가 되었습니다." },
+            { q: "19. 다음과 같은 주장이 확산된 계기가 된 사건은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>“나라 빚 1,300만 원은 우리 대한제국의 존망에 관련된 것이다. 2천만 동포가 담배를 끊고 그 돈을 모아 빚을 갚아 국권을 지키자.”</div>", options: ["일본의 화폐 정리 사업", "제1차 한일 협약 체결", "을사늑약 체결", "러일 전쟁 패배", "일본의 차관 강요 정책"], answer: "⑤", explanation: "국채 보상 운동은 일본이 각종 사업을 빌미로 대한제국에 막대한 차관을 강요하여 경제적 예속을 심화시키자, 이에 맞서 국민의 힘으로 빚을 갚기 위해 일어난 운동입니다." },
+            { q: "20. 다음 사건들을 시간 순서대로 바르게 나열한 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>ㄱ. 동학농민운동<br>ㄴ. 임오군란<br>ㄷ. 갑오개혁<br>ㄹ. 갑신정변</div>", options: ["ㄴ-ㄹ-ㄱ-ㄷ", "ㄱ-ㄷ-ㄴ-ㄹ", "ㄴ-ㄱ-ㄹ-ㄷ", "ㄹ-ㄴ-ㄱ-ㄷ", "ㄱ-ㄴ-ㄷ-ㄹ"], answer: "①", explanation: "임오군란(1882) → 갑신정변(1884) → 동학농민운동(1894) → 갑오개혁(1894) 순서입니다. 동학농민운동이 원인이 되어 청일전쟁과 갑오개혁이 거의 동시에 일어났습니다." },
+            { q: "21. 다음 중 성격이 다른 하나는?", options: ["보안회", "헌정연구회", "대한자강회", "신민회", "활빈당"], answer: "⑤", explanation: "활빈당은 을미의병 해산 이후 일부 농민들이 조직한 반봉건·반침략 성격의 무장 집단입니다. 나머지는 모두 교육, 산업, 언론 등을 통해 실력을 키워 국권을 회복하려 한 애국계몽운동 단체입니다." },
+            { q: "22. 다음에서 설명하는 조약의 결과로 옳은 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>조·청 상민 수륙 무역 장정</div>", options: ["조선에 대한 청의 내정 간섭이 심화되었다.", "일본의 경제적 침투가 본격화되었다.", "조선이 서양 열강과 수교하는 계기가 되었다.", "조선이 관세 자주권을 회복하였다.", "거문도 사건이 일어나는 배경이 되었다."], answer: "①", explanation: "조·청 상민 수륙 무역 장정은 임오군란 이후 청이 조선에 대한 종주권을 명시하고 경제적 이권을 확대하기 위해 체결한 조약으로, 이를 통해 내정 간섭이 더욱 심화되었습니다." },
+            { q: "23. 다음은 1907년에 일어난 사건들이다. 이 사건들의 공통적인 영향으로 가장 적절한 것은?<br><div class='text-sm bg-gray-100 p-2 my-2 rounded'>- 헤이그 특사 파견 실패<br>- 고종 황제 강제 퇴위<br>- 대한제국 군대 해산</div>", options: ["애국 계몽 운동이 시작되었다.", "항일 의병 운동이 전국적으로 확산되었다.", "독립협회가 해산되었다.", "대한제국이 수립되었다.", "을사늑약이 체결되었다."], answer: "②", explanation: "1907년에 연이어 일어난 이 사건들은 일본의 국권 침탈이 노골화되었음을 보여주며, 특히 해산된 군인들이 의병에 대거 합류하면서 정미의병이 전국적인 항일 전쟁 양상으로 발전하는 직접적인 계기가 되었습니다." }
+        ];
+
+        populateTest(1, practiceTest1);
+        populateTest(2, practiceTest2);
+        
+        // Activate first timeline item
+        const firstTimelineItem = document.querySelector('.timeline-item');
+        if (firstTimelineItem) {
+            firstTimelineItem.classList.add('active');
+        }
+    });
+
+
+    // Accordion for topic cards
+    function toggleDetails(id) {
+        const details = document.getElementById(id);
+        details.classList.toggle('hidden');
+    }
+
+    // Toggle for answers
+    function toggleAnswer(id) {
+        const answer = document.getElementById(id);
+        answer.classList.toggle('hidden');
+    }
+
+    // Tabs for practice tests
+    function showTab(tabNumber) {
+        document.querySelectorAll('.practice-test').forEach(tab => tab.classList.add('hidden'));
+        document.getElementById(`tab-${tabNumber}`).classList.remove('hidden');
+        
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`tab-${tabNumber}-btn`).classList.add('active');
+    }
+
+    // Chart.js implementation
+    const ctx = document.getElementById('topicsChart').getContext('2d');
+    const topicsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['을사늑약', '갑신정변 개혁정강', '항일의병운동', '국권피탈과정'],
+            datasets: [{
+                label: '선생님 강조도',
+                data: [100, 90, 85, 95],
+                backgroundColor: [
+                    'rgba(0, 68, 69, 0.7)',
+                    'rgba(44, 120, 115, 0.7)',
+                    'rgba(143, 193, 191, 0.7)',
+                    'rgba(94, 153, 151, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(0, 68, 69, 1)',
+                    'rgba(44, 120, 115, 1)',
+                    'rgba(143, 193, 191, 1)',
+                    'rgba(94, 153, 151, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + "%"
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `출제 강조도: ${context.raw}%`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Timeline Data
+    const timelineData = [
+        { year: '1904.02', event: '러일전쟁 발발 & 한일의정서', description: '일본이 전쟁 수행을 위해 대한제국 영토를 군용지로 사용.' },
+        { year: '1904.08', event: '제1차 한일협약', description: '일본이 추천한 재정/외교 고문을 두어 내정 간섭 시작.' },
+        { year: '1905.11', event: '을사늑약', description: '외교권 박탈, 통감부 설치. 사실상 보호국으로 전락.' },
+        { year: '1907.07', event: '헤이그 특사 & 고종 강제 퇴위', description: '을사늑약의 부당함을 알리려다 실패, 고종이 강제로 퇴위됨.' },
+        { year: '1907.07', event: '정미7조약', description: '일본인 차관이 실권을 장악(차관정치).'},
+        { year: '1907.08', event: '대한제국 군대 해산', description: '정미7조약 부수 각서에 따라 군대 해산. 정미의병의 도화선이 됨.'},
+        { year: '1910.08', event: '한일병합조약', description: '대한제국의 국권을 완전히 상실하고 일본의 식민지가 됨.' }
+    ];
+
+    const timelineContainer = document.getElementById('timeline-container');
+    timelineData.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'timeline-item mb-8 pl-8 relative';
+        div.innerHTML = `
+            <h4 class="font-bold text-lg accent-text">${item.year} - ${item.event}</h4>
+            <p class="text-gray-600">${item.description}</p>
+        `;
+        div.onclick = function() {
+            document.querySelectorAll('.timeline-item').forEach(el => el.classList.remove('active'));
+            this.classList.add('active');
+        };
+        timelineContainer.appendChild(div);
+    });
+
+</script>
+</body>
+</html>

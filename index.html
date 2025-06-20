@@ -31,8 +31,6 @@
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 
-  <!-- Removed Babel Standalone as we are no longer using JSX in the browser -->
-  
   <script>
     // Main App component for the study dashboard
     const App = () => {
@@ -46,6 +44,8 @@
         { name: '국어', link: '/kor/', iconClass: 'fas fa-pen-nib', description: '국어 문학을 깊이 있게 공부하는 공간' },
         { name: '공지사항', link: '/notice/', iconClass: 'fas fa-bell', description: '중요한 공지사항을 확인하는 공간' },
         { name: '정보', link: '/com/', iconClass: 'fas fa-laptop-code', description: '정보 및 컴퓨터 지식을 쌓는 공간' },
+        // New: Add a new subject for "수행평가"
+        { name: '수행평가', link: '/performance-eval/', iconClass: 'fas fa-clipboard-list', description: '수행평가 자료를 관리하는 공간' },
       ];
 
       // Use React.createElement directly instead of JSX

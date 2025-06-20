@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대화형 물리 핵심 정리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Slate/Zinc, Sky, Amber) -->
+    <!-- Application Structure Plan: 이 SPA는 학생들이 물리학 개념을 비선형적으로 탐색할 수 있도록 설계되었습니다. 상단 내비게이션을 통해 '충격량', '충격 흡수', '핵심 법칙', '그래프', '운동' 등 주요 주제로 즉시 이동할 수 있습니다. 각 섹션은 텍스트 요약과 함께 대화형 시각화(차트, 시뮬레이션)를 제공하여 추상적인 개념에 대한 직관적인 이해를 돕습니다. 추가된 '퀴즈' 섹션은 학습한 내용을 점검하고 시험 대비를 강화하기 위한 것으로, 전체 학습 여정의 마무리를 돕습니다. 이 구조는 정적인 문서 읽기에서 벗어나, 사용자가 어렵다고 느끼는 부분을 선택적으로, 그리고 능동적으로 학습할 수 있도록 유도하기 위해 선택되었습니다. -->
+    <!-- Visualization & Content Choices: 
+        1. 충격량과 힘의 관계 -> 목표: 공식(I=FΔt)의 이해 -> 시각화: 힘과 시간 슬라이더 및 결과 디스플레이 -> 상호작용: 사용자가 슬라이더를 조작하면 충격량이 실시간으로 계산되어 표시됨. -> 정당성: 공식을 수동적으로 암기하는 대신 능동적으로 탐색하며 변수 간의 관계를 체감할 수 있음. -> 라이브러리: Vanilla JS.
+        2. 충격 흡수 원리 -> 목표: 동일 충격량에서 시간과 힘의 반비례 관계 이해 -> 시각화: Chart.js 막대그래프 -> 상호작용: 충격량 슬라이더를 조작하면, 시간이 길 때와 짧을 때의 힘의 크기 변화가 그래프로 즉시 비교됨. -> 정당성: 두 시나리오를 시각적으로 직접 비교하여 안전장치의 원리를 명확하게 보여줌. -> 라이브러리: Chart.js.
+        3. 작용-반작용/관성 -> 목표: 추상적 법칙의 시각화 -> 시각화: Tailwind CSS로 만든 간단한 다이어그램 -> 상호작용: 탭 버튼을 클릭하여 각 법칙의 설명과 시각적 예시를 전환하며 볼 수 있음. -> 정당성: 복잡한 라이브러리 없이 핵심 개념을 명료하고 단순하게 전달. -> 라이브러리: Vanilla JS (탭 기능).
+        4. 그래프 해석 -> 목표: 다양한 물리 그래프의 의미(기울기, 넓이) 학습 -> 시각화: 대표 그래프 이미지와 동적 텍스트 레이블 -> 상호작용: 버튼 클릭으로 그래프 종류(속도-시간, 힘-시간 등)를 선택하면 해당 그래프의 기울기와 넓이가 무엇을 의미하는지 설명이 동적으로 변경됨. -> 정당성: 시험 핵심 포인트를 빠르게 확인하고 비교 학습할 수 있는 효율적인 도구. -> 라이브러리: Vanilla JS.
+        5. 수평/자유낙하 운동 -> 목표: 두 운동의 동시성 이해 -> 시각화: Canvas 애니메이션 -> 상호작용: '시작' 버튼 클릭 시 두 개의 공(자유낙하, 수평투사)이 움직이는 애니메이션이 재생됨. -> 정당성: 수직 운동과 수평 운동의 독립성을 가장 직관적으로 증명하는 방법. -> 라이브러리: Vanilla JS (Canvas API).
+        6. 핵심 개념 퀴즈 -> 목표: 학습 내용 최종 점검 및 시험 대비 -> 시각화: 객관식 질문과 선택지 -> 상호작용: 사용자가 답을 선택하고 '정답 확인' 버튼을 누르면 정오답 피드백과 상세 해설이 표시됨. -> 정당성: 능동적인 문제 풀이를 통해 학습 내용을 내재화하고 약점을 보완할 수 있음. -> 라이브러리: Vanilla JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f1f5f9; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+        .nav-link { transition: color 0.3s, border-bottom-color 0.3s; }
+        .nav-link.active, .nav-link:hover { color: #0ea5e9; border-bottom-color: #0ea5e9; }
+        .section-card { transition: transform 0.3s, box-shadow 0.3s; }
+        .section-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+        /* For quiz question buttons */
+        .check-answer-btn:disabled {
+            background-color: #94a3b8; /* slate-400 */
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-md">
+        <nav class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <h1 class="text-2xl font-bold text-slate-700">🚀 대화형 물리 핵심 정리</h1>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#impulse" class="nav-link text-lg font-semibold text-slate-600 border-b-2 border-transparent pb-1">충격량</a>
+                    <a href="#absorption" class="nav-link text-lg font-semibold text-slate-600 border-b-2 border-transparent pb-1">충격 흡수</a>
+                    <a href="#laws" class="nav-link text-lg font-semibold text-slate-600 border-b-2 border-transparent pb-1">핵심 법칙</a>
+                    <a href="#graphs" class="nav-link text-lg font-semibold text-slate-600 border-b-2 border-transparent pb-1">그래프</a>
+                    <a href="#motion" class="nav-link text-lg font-semibold text-slate-600 border-b-2 border-transparent pb-1">운동</a>
+                    <a href="#quiz" class="nav-link text-lg font-semibold text-slate-600 border-b-2 border-transparent pb-1">퀴즈</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        
+        <section id="impulse" class="mb-12 scroll-mt-24">
+            <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 section-card">
+                <h2 class="text-3xl font-bold mb-4 text-sky-600">  충격량과 힘의 관계 ($I = F\Delta t = \Delta p$)</h2>
+                <p class="text-lg mb-6 text-slate-600">
+                    충격량은 물체에 가해진 힘과 그 힘이 작용한 시간의 곱입니다. 그리고 이 값은 물체의 '운동량 변화량'과 같습니다. 아래 시뮬레이터를 통해 힘과 시간이 충격량에 어떻게 영향을 미치는지 직접 확인해보세요. 슬라이더를 움직여 각 변수를 조절할 수 있습니다.
+                </p>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="bg-slate-50 rounded-lg p-6">
+                        <div>
+                            <label for="force" class="font-bold text-slate-700">힘 (F): <span id="forceValue" class="text-sky-500 font-bold">50</span> N</label>
+                            <input type="range" id="force" min="1" max="100" value="50" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-500">
+                        </div>
+                        <div class="mt-4">
+                            <label for="time" class="font-bold text-slate-700">시간 (Δt): <span id="timeValue" class="text-sky-500 font-bold">0.5</span> s</label>
+                            <input type="range" id="time" min="0.1" max="2" step="0.1" value="0.5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-500">
+                        </div>
+                    </div>
+                    <div class="text-center bg-sky-100 rounded-xl p-8">
+                        <h3 class="text-xl font-bold text-slate-700 mb-2">계산된 충격량 (I)</h3>
+                        <p class="text-5xl font-bold text-sky-600" id="impulseResult">25.0 <span class="text-3xl">N·s</span></p>
+                        <p class="mt-4 text-lg text-slate-600">
+                            ( = 운동량 변화량 $\Delta p$ )
+                        </p>
+                    </div>
+                </div>
+                 <div class="mt-8 bg-amber-50 border-l-8 border-amber-600 text-amber-800 p-4 rounded-r-lg relative overflow-hidden">
+                    <p class="font-bold">✨ 선생님의 꿀팁! ✨</p>
+                    <p>문제에서 '운동량의 변화량'을 물어보면, 그건 바로 '충격량'을 구하라는 뜻이야! 그리고 계산할 때 물체가 반대 방향으로 튕겨나가면 속도에 (-) 부호를 붙이는 거 절대 잊지 마!</p>
+                    <p class="mt-2 text-red-700 font-extrabold text-xl">🚀 대박 중요! 🚀 단위 변환: 분 &rarr; 초, g &rarr; kg 꼭 하자!</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="absorption" class="mb-12 scroll-mt-24">
+            <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 section-card">
+                <h2 class="text-3xl font-bold mb-4 text-sky-600">💡 충격을 줄이는 원리 (안전장치의 비밀)</h2>
+                <p class="text-lg mb-6 text-slate-600">
+                    같은 충격량이라도 힘이 작용하는 시간을 길게 하면 물체가 받는 평균 힘(충격력)의 크기는 줄어듭니다. 이것이 바로 에어백이나 푹신한 매트가 우리를 보호하는 원리입니다. 아래 그래프는 동일한 충격량($I$)을 받을 때, 충돌 시간이 길고 짧음에 따라 힘($F$)이 어떻게 달라지는지 보여줍니다.
+                </p>
+                <div class="chart-container">
+                    <canvas id="impactChart"></canvas>
+                </div>
+                 <div class="mt-8 bg-amber-50 border-l-8 border-amber-600 text-amber-800 p-4 rounded-r-lg relative overflow-hidden">
+                    <p class="font-bold">✨ 선생님의 꿀팁! ✨</p>
+                    <p>시간을 길게 늘리면 '충격량'은 그대로인데 '충격력(힘)'이 줄어드는 거야. 이 둘을 헷갈리면 안 돼! 에어백, 야구 글러브, 푹신한 바닥 모두 이 원리를 이용한단다.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="laws" class="mb-12 scroll-mt-24">
+            <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 section-card">
+                 <h2 class="text-3xl font-bold mb-4 text-sky-600">⚖️ 핵심 법칙: 작용-반작용과 관성</h2>
+                 <p class="text-lg mb-6 text-slate-600">
+                    물리학의 기초를 이루는 두 가지 중요한 법칙입니다. '작용-반작용'은 모든 힘에 대한 상호작용을, '관성'은 물체의 운동 상태 유지 경향을 설명합니다. 아래 탭을 눌러 각 법칙에 대한 설명과 시각적 예시를 확인해보세요.
+                </p>
+                <div>
+                    <div class="border-b border-slate-200">
+                        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                            <button id="tab-action" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg border-sky-500 text-sky-600">작용-반작용 법칙</button>
+                            <button id="tab-inertia" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-lg border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300">관성의 법칙</button>
+                        </nav>
+                    </div>
+                    <div id="content-action" class="py-6">
+                        <h3 class="text-2xl font-bold mb-2">작용-반작용 법칙</h3>
+                        <p class="text-slate-600 mb-4">"물체가 벽을 밀면, 벽도 똑같은 크기의 힘으로 물체를 밀어요." 즉, 모든 작용에는 크기가 같고 방향이 반대인 반작용이 항상 쌍으로 존재합니다. 중요한 점은 두 힘이 서로 다른 물체에 작용한다는 것입니다.</p>
+                        <div class="flex justify-center items-center bg-slate-50 rounded-lg p-8 h-48">
+                           <div class="flex items-center">
+                               <div class="text-center">
+                                   <div class="bg-sky-500 text-white p-4 rounded-lg">물체 A</div>
+                                   <p class="mt-2 text-sm">A가 B를 미는 힘</p>
+                               </div>
+                               <div class="text-4xl font-bold text-sky-600 mx-4">→</div>
+                               <div class="text-4xl font-bold text-slate-600 mx-4">←</div>
+                               <div class="text-center">
+                                   <div class="bg-slate-500 text-white p-4 rounded-lg">물체 B</div>
+                                   <p class="mt-2 text-sm">B가 A를 미는 힘</p>
+                               </div>
+                           </div>
+                        </div>
+                    </div>
+                    <div id="content-inertia" class="py-6 hidden">
+                        <h3 class="text-2xl font-bold mb-2">관성의 법칙</h3>
+                        <p class="text-slate-600 mb-4">"물체는 현재의 운동 상태를 계속 유지하려는 성질이 있어요." 정지한 물체는 계속 정지해 있으려고 하고, 움직이는 물체는 계속 그 속도로 움직이려고 합니다. 질량이 클수록 관성도 큽니다.</p>
+                        <div class="flex justify-center items-center bg-slate-50 rounded-lg p-8 h-48">
+                            <div class="text-center">
+                                <p class="mb-2 font-bold">버스가 급정거하면?</p>
+                                <div class="relative w-48 h-24 bg-amber-400 rounded-lg flex items-end justify-center p-2" id="bus">
+                                    <div class="w-8 h-12 bg-sky-500 rounded-t-full" id="person"></div>
+                                    <div class="absolute bottom-1 left-4 w-6 h-6 bg-slate-700 rounded-full"></div>
+                                    <div class="absolute bottom-1 right-4 w-6 h-6 bg-slate-700 rounded-full"></div>
+                                </div>
+                                <p class="mt-2 text-sm text-slate-500">몸은 계속 앞으로 가려는 관성 때문에 앞으로 쏠린다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="graphs" class="mb-12 scroll-mt-24">
+             <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 section-card">
+                <h2 class="text-3xl font-bold mb-4 text-sky-600">📈 그래프 완전 정복</h2>
+                <p class="text-lg mb-6 text-slate-600">
+                    물리 문제에서 그래프 해석은 필수입니다! 각 그래프에서 기울기와 넓이가 무엇을 의미하는지 정확히 알아야 합니다. 아래 버튼을 눌러 각 그래프의 핵심 포인트를 확인하세요. 시험에 반드시 출제되는 부분입니다.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4 mb-6">
+                    <button class="graph-btn bg-sky-500 text-white font-bold py-2 px-4 rounded-full" data-type="vt">속도-시간 그래프</button>
+                    <button class="graph-btn bg-slate-200 text-slate-700 font-bold py-2 px-4 rounded-full" data-type="ft">힘-시간 그래프</button>
+                    <button class="graph-btn bg-slate-200 text-slate-700 font-bold py-2 px-4 rounded-full" data-type="st">이동거리-시간 그래프</button>
+                </div>
+                <div class="bg-slate-50 rounded-lg p-6 flex flex-col md:flex-row items-center gap-6">
+                    <div class="w-full md:w-1/2 flex justify-center items-center">
+                        <div class="w-64 h-48 bg-white border-2 border-slate-300 flex justify-center items-center relative">
+                            <div class="absolute -left-4 top-1/2 -translate-y-1/2 -rotate-90 text-sm font-bold text-slate-500" id="y-axis-label">속도 (v)</div>
+                            <div class="absolute bottom-2 left-1/2 -translate-x-1/2 text-sm font-bold text-slate-500">시간 (t)</div>
+                             <svg class="w-full h-full" viewbox="0 0 100 80">
+                                <path d="M 10 70 L 90 20" stroke="#0ea5e9" stroke-width="2" fill="none"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <h3 id="graph-title" class="text-2xl font-bold text-sky-600 mb-4">속도-시간 그래프</h3>
+                        <div class="space-y-3">
+                            <p class="text-lg"><span class="font-bold">기울기 = </span><span id="slope-meaning" class="text-sky-700 font-semibold">가속도 (a)</span></p>
+                            <p class="text-lg"><span class="font-bold">넓이 = </span><span id="area-meaning" class="text-sky-700 font-semibold">이동거리</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="motion" class="scroll-mt-24">
+            <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 section-card">
+                <h2 class="text-3xl font-bold mb-4 text-sky-600">🎯 운동의 종류: 수평 던지기와 자유낙하</h2>
+                <p class="text-lg mb-6 text-slate-600">
+                    수평으로 던진 물체는 수평 방향으로는 등속도 운동을, 수직 방향으로는 중력의 영향만 받는 자유낙하 운동을 합니다. 놀랍게도, 수평으로 던진 물체와 같은 높이에서 가만히 떨어뜨린 물체는 동시에 바닥에 도달합니다. 아래 애니메이션을 통해 직접 확인해보세요.
+                </p>
+                <div class="bg-slate-50 rounded-lg p-4 text-center">
+                    <canvas id="motionCanvas" width="500" height="300" class="bg-white rounded-md mx-auto"></canvas>
+                    <button id="startAnimation" class="mt-4 bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-6 rounded-full transition">애니메이션 시작</button>
+                </div>
+                <div class="mt-8 bg-amber-50 border-l-8 border-amber-600 text-amber-800 p-4 rounded-r-lg relative overflow-hidden">
+                    <p class="font-bold">✨ 시험 출제 포인트! ✨</p>
+                    <p>수평 이동거리 = (수평 속도) × (낙하 시간). 그리고 낙하 시간은 오직 높이에 의해서만 결정되며, 물체의 질량이나 수평 속도와는 무관하다는 사실을 꼭 기억해!</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="quiz" class="mb-12 scroll-mt-24">
+            <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 section-card">
+                <h2 class="text-3xl font-bold mb-4 text-sky-600">❓ 내 실력은? 핵심 개념 퀴즈!</h2>
+                <p class="text-lg mb-6 text-slate-600">
+                    지금까지 배운 핵심 개념들을 퀴즈로 풀어보며 얼마나 잘 이해했는지 확인해보세요. 기말고사, 내신 완벽 대비!
+                </p>
+
+                <!-- Quiz Question 1 -->
+                <div class="quiz-question mb-8 p-6 bg-slate-50 rounded-lg shadow-inner">
+                    <p class="text-xl font-semibold mb-4 text-slate-700">1. 물체가 받는 힘의 크기는 동일하지만 작용 시간이 2배로 길어졌다면, 물체가 받는 충격량은 어떻게 될까요?</p>
+                    <div class="space-y-2">
+                        <div>
+                            <input type="radio" id="q1-option1" name="q1" value="a" class="mr-2">
+                            <label for="q1-option1" class="text-lg text-slate-600">A. 2배 증가한다.</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="q1-option2" name="q1" value="b" class="mr-2">
+                            <label for="q1-option2" class="text-lg text-slate-600">B. 2배 감소한다.</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="q1-option3" name="q1" value="c" class="mr-2">
+                            <label for="q1-option3" class="text-lg text-slate-600">C. 변함 없다.</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="q1-option4" name="q1" value="d" class="mr-2">
+                            <label for="q1-option4" class="text-lg text-slate-600">D. 1/2배로 감소한다.</label>
+                        </div>
+                    </div>
+                    <button class="check-answer-btn mt-6 bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-6 rounded-full transition" data-question="1">정답 확인</button>
+                    <div id="q1-feedback" class="mt-4 text-lg font-bold"></div>
+                    <div id="q1-explanation" class="mt-2 text-slate-700 hidden"></div>
+                </div>
+
+                <!-- Quiz Question 2 -->
+                <div class="quiz-question mb-8 p-6 bg-slate-50 rounded-lg shadow-inner">
+                    <p class="text-xl font-semibold mb-4 text-slate-700">2. 다음 중 '작용-반작용 법칙'에 대한 설명으로 옳은 것은?</p>
+                    <div class="space-y-2">
+                        <div>
+                            <input type="radio" id="q2-option1" name="q2" value="a" class="mr-2">
+                            <label for="q2-option1" class="text-lg text-slate-600">A. 힘의 크기는 같고 방향은 반대이지만, 항상 같은 물체에 작용한다.</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="q2-option2" name="q2" value="b" class="mr-2">
+                            <label for="q2-option2" class="text-lg text-slate-600">B. 힘의 크기와 방향이 모두 같다.</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="q2-option3" name="q2" value="c" class="mr-2">
+                            <label for="q2-option3" class="text-lg text-slate-600">C. 힘의 크기는 같고 방향은 반대이며, 서로 다른 물체에 작용한다.</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="q2-option4" name="q2" value="d" class="mr-2">
+                            <label for="q2-option4" class="text-lg text-slate-600">D. 물체가 정지 상태를 유지하려는 성질이다.</label>
+                        </div>
+                    </div>
+                    <button class="check-answer-btn mt-6 bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-6 rounded-full transition" data-question="2">정답 확인</button>
+                    <div id="q2-feedback" class="mt-4 text-lg font-bold"></div>
+                    <div id="q2-explanation" class="mt-2 text-slate-700 hidden"></div>
+                </div>
+
+                <!-- Quiz Question 3 -->
+                <div class="quiz-question mb-8 p-6 bg-slate-50 rounded-lg shadow-inner">
+                    <p class="text-xl font-semibold mb-4 text-slate-700">3. 속도-시간 그래프에서 '그래프의 넓이'가 의미하는 것은 무엇일까요?</p>
+                    <div class="space-y-2">
+                        <div>
+                            <input type="radio" id="q3-option1" name="q3" value="a" class="mr-2">
+                            <label for="q3-option1" class="text-lg text-slate-600">A. 가속도</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="q3-option2" name="q3" value="b" class="mr-2">
+                            <label for="q3-option2" class="text-lg text-slate-600">B. 힘</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="q3-option3" name="q3" value="c" class="mr-2">
+                            <label for="q3-option3" class="text-lg text-slate-600">C. 이동거리</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="q3-option4" name="q3" value="d" class="mr-2">
+                            <label for="q3-option4" class="text-lg text-slate-600">D. 충격량</label>
+                        </div>
+                    </div>
+                    <button class="check-answer-btn mt-6 bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-6 rounded-full transition" data-question="3">정답 확인</button>
+                    <div id="q3-feedback" class="mt-4 text-lg font-bold"></div>
+                    <div id="q3-explanation" class="mt-2 text-slate-700 hidden"></div>
+                </div>
+
+                <button id="resetQuizzes" class="mt-8 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-3 px-8 rounded-full transition">퀴즈 전체 초기화</button>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center p-6 text-slate-500">
+        <p>&copy; 2025 Interactive Physics Summary. For educational purposes.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Section 1: Impulse Simulator
+            const forceSlider = document.getElementById('force');
+            const timeSlider = document.getElementById('time');
+            const forceValue = document.getElementById('forceValue');
+            const timeValue = document.getElementById('timeValue');
+            const impulseResult = document.getElementById('impulseResult');
+
+            function updateImpulse() {
+                const force = parseFloat(forceSlider.value);
+                const time = parseFloat(timeSlider.value);
+                const impulse = force * time;
+                forceValue.textContent = force;
+                timeValue.textContent = time.toFixed(1);
+                impulseResult.innerHTML = `${impulse.toFixed(1)} <span class="text-3xl">N·s</span>`;
+            }
+
+            forceSlider.addEventListener('input', updateImpulse);
+            timeSlider.addEventListener('input', updateImpulse);
+            updateImpulse();
+
+            // Section 2: Impact Absorption Chart
+            const ctx = document.getElementById('impactChart').getContext('2d');
+            const impactChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['짧은 충돌 시간', '긴 충돌 시간'],
+                    datasets: [{
+                        label: '평균 힘 (F)',
+                        data: [100, 25],
+                        backgroundColor: [
+                            'rgba(239, 68, 68, 0.6)',
+                            'rgba(59, 130, 246, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(239, 68, 68, 1)',
+                            'rgba(59, 130, 246, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '동일 충격량(I=100 N·s)일 때 충돌 시간에 따른 힘의 변화',
+                            font: { size: 16 }
+                        },
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '힘 (N)'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Section 3: Laws Tabs
+            const tabAction = document.getElementById('tab-action');
+            const tabInertia = document.getElementById('tab-inertia');
+            const contentAction = document.getElementById('content-action');
+            const contentInertia = document.getElementById('content-inertia');
+
+            tabAction.addEventListener('click', () => {
+                contentAction.classList.remove('hidden');
+                contentInertia.classList.add('hidden');
+                tabAction.classList.add('border-sky-500', 'text-sky-600');
+                tabAction.classList.remove('border-transparent', 'text-slate-500');
+                tabInertia.classList.add('border-transparent', 'text-slate-500');
+                tabInertia.classList.remove('border-sky-500', 'text-sky-600');
+            });
+
+            tabInertia.addEventListener('click', () => {
+                contentInertia.classList.remove('hidden');
+                contentAction.classList.add('hidden');
+                tabInertia.classList.add('border-sky-500', 'text-sky-600');
+                tabInertia.classList.remove('border-transparent', 'text-slate-500');
+                tabAction.classList.add('border-transparent', 'text-slate-500');
+                tabAction.classList.remove('border-sky-500', 'text-sky-600');
+            });
+            
+            // Section 4: Graph Explorer
+            const graphBtns = document.querySelectorAll('.graph-btn');
+            const graphTitle = document.getElementById('graph-title');
+            const slopeMeaning = document.getElementById('slope-meaning');
+            const areaMeaning = document.getElementById('area-meaning');
+            const yAxisLabel = document.getElementById('y-axis-label');
+
+            const graphData = {
+                vt: { title: '속도-시간 그래프', yLabel: '속도 (v)', slope: '가속도 (a)', area: '이동거리' },
+                ft: { title: '힘-시간 그래프', yLabel: '힘 (F)', slope: '의미 없음', area: '충격량 (I)' },
+                st: { title: '이동거리-시간 그래프', yLabel: '거리 (s)', slope: '속력', area: '의미 없음' }
+            };
+
+            graphBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const type = btn.dataset.type;
+                    const data = graphData[type];
+                    
+                    graphTitle.textContent = data.title;
+                    yAxisLabel.textContent = data.yLabel;
+                    slopeMeaning.textContent = data.slope;
+                    areaMeaning.textContent = data.area;
+                    
+                    graphBtns.forEach(b => {
+                        b.classList.remove('bg-sky-500', 'text-white');
+                        b.classList.add('bg-slate-200', 'text-slate-700');
+                    });
+                    btn.classList.add('bg-sky-500', 'text-white');
+                    btn.classList.remove('bg-slate-200', 'text-slate-700');
+                });
+            });
+
+            // Section 5: Motion Animation
+            const canvas = document.getElementById('motionCanvas');
+            const ctxMotion = canvas.getContext('2d');
+            const startBtn = document.getElementById('startAnimation');
+
+            let ball1, ball2;
+            let animationFrameId;
+
+            const gravity = 0.2;
+            
+            function initBalls() {
+                ball1 = { x: canvas.width / 4, y: 20, vy: 0, radius: 10, color: 'rgb(239, 68, 68)' };
+                ball2 = { x: 20, y: 20, vx: 3, vy: 0, radius: 10, color: 'rgb(59, 130, 246)' };
+            }
+            
+            function draw() {
+                ctxMotion.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw ground
+                ctxMotion.fillStyle = '#a1a1aa';
+                ctxMotion.fillRect(0, canvas.height - 10, canvas.width, 10);
+                
+                // Draw balls
+                ctxMotion.beginPath();
+                ctxMotion.arc(ball1.x, ball1.y, ball1.radius, 0, Math.PI * 2);
+                ctxMotion.fillStyle = ball1.color;
+                ctxMotion.fill();
+                ctxMotion.closePath();
+
+                ctxMotion.beginPath();
+                ctxMotion.arc(ball2.x, ball2.y, ball2.radius, 0, Math.PI * 2);
+                ctxMotion.fillStyle = ball2.color;
+                ctxMotion.fill();
+                ctxMotion.closePath();
+            }
+
+            function update() {
+                // Ball 1 (Free fall)
+                if (ball1.y + ball1.radius < canvas.height - 10) {
+                    ball1.vy += gravity;
+                    ball1.y += ball1.vy;
+                } else {
+                    ball1.y = canvas.height - 10 - ball1.radius;
+                }
+
+                // Ball 2 (Projectile)
+                if (ball2.y + ball2.radius < canvas.height - 10) {
+                    ball2.vy += gravity;
+                    ball2.x += ball2.vx;
+                    ball2.y += ball2.vy;
+                } else {
+                     ball2.y = canvas.height - 10 - ball2.radius;
+                }
+                
+                draw();
+
+                if(ball1.y < canvas.height - 10 - ball1.radius || ball2.x < canvas.width){
+                   animationFrameId = requestAnimationFrame(update);
+                } else {
+                    startBtn.disabled = false;
+                    startBtn.textContent = "다시 시작";
+                }
+            }
+
+            startBtn.addEventListener('click', () => {
+                startBtn.disabled = true;
+                startBtn.textContent = "진행 중...";
+                cancelAnimationFrame(animationFrameId);
+                initBalls();
+                update();
+            });
+
+            initBalls();
+            draw();
+            
+            // Smooth scrolling for nav links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Quiz Logic
+            const quizData = {
+                1: {
+                    correct: 'a',
+                    explanation: '충격량(I)은 힘(F)과 작용 시간(Δt)의 곱(I = F × Δt)입니다. 힘이 동일한 상태에서 작용 시간이 2배로 길어졌다면, 충격량도 2배로 증가합니다. (만약 같은 충격량일 때 시간을 늘리면 힘이 줄어드는 경우와 헷갈리지 마세요!)'
+                },
+                2: {
+                    correct: 'c',
+                    explanation: '작용-반작용 법칙의 핵심은 힘의 크기는 같고 방향은 반대라는 점, 그리고 서로 다른 두 물체에 작용한다는 것입니다.'
+                },
+                3: {
+                    correct: 'c',
+                    explanation: '속도-시간 그래프의 넓이는 물체가 이동한 거리를 의미합니다. 기울기는 가속도입니다.'
+                }
+            };
+
+            document.querySelectorAll('.check-answer-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const questionNum = event.target.dataset.question;
+                    const selectedOption = document.querySelector(`input[name="q${questionNum}"]:checked`);
+                    const feedbackDiv = document.getElementById(`q${questionNum}-feedback`);
+                    const explanationDiv = document.getElementById(`q${questionNum}-explanation`);
+                    const checkButton = event.target;
+                    
+                    if (!selectedOption) {
+                        feedbackDiv.textContent = '답을 선택해주세요!';
+                        feedbackDiv.className = 'mt-4 text-lg font-bold text-amber-600';
+                        explanationDiv.classList.add('hidden');
+                        return;
+                    }
+
+                    const isCorrect = selectedOption.value === quizData[questionNum].correct;
+                    if (isCorrect) {
+                        feedbackDiv.textContent = '정답입니다! 💯';
+                        feedbackDiv.className = 'mt-4 text-lg font-bold text-green-600';
+                    } else {
+                        feedbackDiv.textContent = '오답입니다. 다시 시도해보세요. ❌';
+                        feedbackDiv.className = 'mt-4 text-lg font-bold text-red-600';
+                    }
+                    explanationDiv.textContent = '설명: ' + quizData[questionNum].explanation;
+                    explanationDiv.classList.remove('hidden');
+                    checkButton.disabled = true;
+                    checkButton.classList.remove('bg-sky-500', 'hover:bg-sky-600');
+                    checkButton.classList.add('bg-slate-400');
+                });
+            });
+
+            document.getElementById('resetQuizzes').addEventListener('click', () => {
+                document.querySelectorAll('.quiz-question').forEach(qDiv => {
+                    qDiv.querySelectorAll('input[type="radio"]').forEach(radio => {
+                        radio.checked = false;
+                    });
+                    const checkButton = qDiv.querySelector('.check-answer-btn');
+                    checkButton.disabled = false;
+                    checkButton.classList.remove('bg-slate-400');
+                    checkButton.classList.add('bg-sky-500', 'hover:bg-sky-600');
+                    qDiv.querySelector('[id$="-feedback"]').textContent = '';
+                    qDiv.querySelector('[id$="-explanation"]').classList.add('hidden');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+ 

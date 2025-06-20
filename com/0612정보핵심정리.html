@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정보 시험 인쇄용 핵심 정리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        @media print {
+            .no-print {
+                display: none;
+            }
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .printable-content {
+                 box-shadow: none;
+                 border: none;
+            }
+        }
+        pre {
+            background-color: #f3f4f6;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        code {
+             font-family: 'D2Coding', monospace;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <div class="no-print bg-white p-4 rounded-lg shadow-sm mb-6 flex justify-between items-center">
+            <h1 class="text-xl font-bold">인쇄용 미리보기</h1>
+            <button onclick="window.print()" class="bg-teal-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-700 transition-colors">
+                🖨️ PDF로 저장 또는 인쇄하기
+            </button>
+        </div>
+
+        <div class="printable-content bg-white p-8 md:p-12 rounded-lg shadow-lg">
+            <h1 class="text-3xl font-bold border-b pb-4 mb-6">정보 교과 시험 완벽 대비 핵심 정리</h1>
+
+            <section class="mb-8">
+                <h2 class="text-2xl font-bold mb-4">Ⅰ. 시험 범위 및 핵심 (★★★)</h2>
+                <p class="mb-4">선생님께서 **지필 시험**과 **프로그램 실습 평가** 두 가지를 본다고 하셨습니다.</p>
+                <ol class="list-decimal list-inside space-y-2 text-lg">
+                    <li><strong>지필 시험 범위</strong>: <strong>리스트(List)까지</strong> 입니다.</li>
+                    <li><strong>프로그램 실습 평가 범위</strong>: <strong>제어 구조(Control Structure)까지</strong> 입니다.
+                        <ul class="list-disc list-inside ml-6 mt-1 text-base">
+                            <li>다음 주까지 제어 구조 진도가 끝나지 않으면, 시험은 그 다음 주로 연기될 수 있습니다.</li>
+                        </ul>
+                    </li>
+                </ol>
+            </section>
+
+            <section class="mb-8">
+                <h2 class="text-2xl font-bold mb-4">Ⅱ. 실습 문제 풀이: 용병 리스트 (★★★★★)</h2>
+                <p class="mb-4">이 문제는 시험에 나올 확률이 매우 높습니다. 코드의 각 부분을 완벽하게 이해해야 합니다.</p>
+                <p class="mb-4"><strong>문제 상황</strong>: 2차원 리스트 `soldier`에 용병의 이름과 무기가 저장되어 있습니다. 사용자에게 번호를 입력받아 해당 용병의 무기를 출력하는 프로그램입니다.</p>
+                <pre><code># 제공된 2차원 리스트
+soldier = [
+    ['암살자', '광전사', '추적자', '마법사', '사냥꾼'],
+    ['단검', '도끼', '활', '지팡이', '채찍']
+]</code></pre>
+
+                <div class="mt-6">
+                    <h3 class="text-xl font-bold mb-2">1단계: 용병 목록 출력하기</h3>
+                    <p class="mb-2"><strong>목표</strong>: `print` 함수와 문자열 포매팅(`%s`)을 사용하여 용병 목록을 정해진 형식으로 출력합니다.</p>
+                    <pre><code># 핵심 코드
+print("용병은 다음과 같습니다.")
+print("1. %s 2. %s 3. %s 4. %s 5. %s" % (
+    soldier[0][0], # 암살자
+    soldier[0][1], # 광전사
+    soldier[0][2], # 추적자
+    soldier[0][3], # 마법사
+    soldier[0][4]  # 사냥꾼
+))</code></pre>
+                    <div class="mt-2 p-4 bg-amber-50 border-l-4 border-amber-400 text-amber-800">
+                        <p><strong>⭐️ 중요 포인트</strong>: 여러 개의 값을 `%`를 이용해 포매팅할 때는 `(값1, 값2, ...)` 처럼 <strong>괄호로 묶어줘야 합니다.</strong></p>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <h3 class="text-xl font-bold mb-2">2단계: 사용자에게 용병 번호 입력받기</h3>
+                    <p class="mb-2"><strong>목표</strong>: `input()` 함수로 사용자에게 번호를 입력받고, `int()` 함수로 숫자로 변환합니다.</p>
+                    <pre><code># 핵심 코드
+select_str = input("용병을 입력하세요: ")
+select_num = int(select_str)</code></pre>
+                     <div class="mt-2 p-4 bg-amber-50 border-l-4 border-amber-400 text-amber-800">
+                        <p><strong>⭐️ 중요 포인트</strong>: `input()`으로 받은 값은 문자열(string)이므로, 반드시 `int()`를 사용해 <strong>정수(integer)로 변환</strong>해야 합니다.</p>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <h3 class="text-xl font-bold mb-2">3단계: 선택한 용병의 무기 출력하기</h3>
+                     <p class="mb-2"><strong>목표</strong>: 입력받은 번호를 이용해 `soldier` 리스트에서 해당 용병의 무기를 찾아 출력합니다.</p>
+                    <pre><code># 핵심 코드
+print("용병의 필살 무기는 %s입니다." % (soldier[1][select_num - 1]))</code></pre>
+                    <div class="mt-2 p-4 bg-red-50 border-l-4 border-red-400 text-red-800">
+                        <p><strong>⭐️ 매우 중요 포인트</strong>: 사용자는 1부터 입력하지만 리스트 인덱스는 0부터 시작하므로, 입력받은 값에서 **반드시 1을 빼야**(`select_num - 1`) 정확한 위치를 찾을 수 있습니다.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="mb-8">
+                <h2 class="text-2xl font-bold mb-4">Ⅲ. 코딩 시 흔히 하는 실수 및 주의사항</h2>
+                <ul class="list-disc list-inside space-y-2">
+                    <li><strong>오타(Typo)</strong>: 변수 이름, 함수 이름을 잘못 쓰는 경우가 가장 흔합니다.</li>
+                    <li><strong>인덱스 오류</strong>: 리스트의 범위를 벗어나거나 `+`나 `-` 계산을 잘못하는 경우입니다.</li>
+                    <li><strong>문법 오류</strong>: 쉼표(,), 괄호(), 따옴표("") 등 작은 문법 실수를 주의해야 합니다.</li>
+                </ul>
+            </section>
+            
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Ⅳ. 선생님의 추가 강조: 미래 기술과 프로그래밍</h2>
+                 <ul class="list-disc list-inside space-y-2">
+                    <li><strong>데이터 분석의 중요성</strong>: 이제 전공과 상관없이 데이터 분석 능력은 필수입니다.</li>
+                    <li><strong>생성형 AI와 바이브 코딩</strong>: AI에게 정확히 질문하여 프로그램을 만드는 능력이 중요해졌습니다.</li>
+                    <li><strong>교내 '언락(Unlock)' 프로젝트</strong>: 생성형 AI를 이용한 프로그래밍을 체험하고, 진로 활동에 특별한 경험을 더할 좋은 기회입니다.</li>
+                </ul>
+            </section>
+            
+             <div class="mt-12 pt-6 border-t">
+                <p class="text-center text-slate-600 font-bold">1순위는 '용병 리스트' 문제를 완벽하게 이해하고 스스로 짜보는 것입니다. 꼭 전교 1등 하세요! 🔥</p>
+             </div>
+        </div>
+    </div>
+
+</body>
+</html>

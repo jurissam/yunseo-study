@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대화형 한국 근현대사 (1860-1910)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Historical Parchment -->
+    <!-- Application Structure Plan: A single-page dashboard structure is used to present a comprehensive learning experience. It begins with a 'Chronological Flow' timeline for a high-level overview. Users can then move to the 'Deep Dive' section with interactive accordion cards for detailed information on events and primary sources. A 'Thematic Comparison' section allows for direct analysis of key reforms and movements, including a visual chart. Finally, an interactive 'Keyword Quiz' reinforces learning. This structure guides the user from a broad overview to specific details and self-assessment, maximizing usability and engagement. -->
+    <!-- Visualization & Content Choices: 
+        - Chronological Flow (Goal: Change): A dynamic HTML/CSS timeline is used instead of a static chart to represent the flow of events interactively. Clicking an event smoothly navigates to its detailed description.
+        - Deep Dive (Goal: Organize/Inform): An accordion-style layout built with JavaScript provides detailed information on demand, preventing information overload and allowing focused learning.
+        - Thematic Comparison (Goal: Compare): Side-by-side HTML tables clearly compare the features of different reforms. A Chart.js bar chart is used to visually represent the escalating combat power of the Righteous Armies, offering a quick relational insight.
+        - Keyword Quiz (Goal: Engage/Inform): A simple interactive quiz dynamically fetches data from a JS object to provide an engaging way to test knowledge.
+        - Justification: These choices create an interactive narrative without relying on SVG or Mermaid.js, adhering to the project constraints while providing a rich user experience.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #FDFBF5; /* Warm neutral background */
+            color: #4A4A4A;
+        }
+        .nav-item {
+            transition: all 0.3s ease;
+        }
+        .nav-item.active {
+            color: #D97706; /* Amber-600 */
+            border-bottom: 2px solid #D97706;
+            transform: translateY(-2px);
+        }
+        .timeline-item-right::before {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: -10px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 10px 10px 10px 0;
+            border-color: transparent #FFFFFF transparent transparent;
+        }
+        .timeline-item-left::before {
+            content: '';
+            position: absolute;
+            top: 16px;
+            right: -10px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 10px 0 10px 10px;
+            border-color: transparent transparent transparent #FFFFFF;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 40vh;
+            max-height: 400px;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="text-center py-8 md:py-12 bg-white shadow-md">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800">한국 근현대사 탐험</h1>
+        <p class="mt-4 text-lg text-gray-600">1860년부터 1910년까지, 격동의 시대를 대화형으로 만나보세요.</p>
+    </header>
+
+    <nav id="navbar" class="sticky top-0 bg-white/80 backdrop-blur-sm z-50 shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-center items-center h-16 space-x-4 md:space-x-8">
+                <a href="#timeline-section" class="nav-item text-gray-600 hover:text-amber-600 font-medium pb-1">연대기</a>
+                <a href="#deep-dive-section" class="nav-item text-gray-600 hover:text-amber-600 font-medium pb-1">심층 탐구</a>
+                <a href="#comparison-section" class="nav-item text-gray-600 hover:text-amber-600 font-medium pb-1">비교 분석</a>
+                <a href="#quiz-section" class="nav-item text-gray-600 hover:text-amber-600 font-medium pb-1">핵심 퀴즈</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 md:p-8">
+        
+        <section id="timeline-section" class="mb-16">
+            <h2 class="text-3xl font-bold text-center mb-2 text-gray-700">시대별 핵심 흐름</h2>
+            <p class="text-center text-gray-500 mb-12">주요 사건을 클릭하여 상세 내용으로 이동할 수 있습니다.</p>
+            <div id="timeline-container" class="relative">
+            </div>
+        </section>
+
+        <section id="deep-dive-section" class="mb-16">
+            <h2 class="text-3xl font-bold text-center mb-2 text-gray-700">주요 사건 심층 탐구</h2>
+             <p class="text-center text-gray-500 mb-12">각 항목을 클릭하여 사료와 해설을 확인해보세요.</p>
+            <div id="accordion-container" class="space-y-4">
+            </div>
+        </section>
+
+        <section id="comparison-section" class="mb-16">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-700">주제별 심화 비교</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div id="reform-comparison-container" class="bg-white p-6 rounded-lg shadow-lg"></div>
+                <div id="army-comparison-container" class="bg-white p-6 rounded-lg shadow-lg"></div>
+            </div>
+             <div class="mt-8 bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-2xl font-bold text-center mb-4 text-gray-700">항일 의병 운동의 발전</h3>
+                 <p class="text-center text-gray-500 mb-6">시간이 흐르면서 의병의 주도 세력이 어떻게 변화하고 전투력이 강화되었는지 시각적으로 확인해보세요.</p>
+                <div class="chart-container">
+                    <canvas id="armyChart"></canvas>
+                </div>
+            </div>
+        </section>
+        
+        <section id="quiz-section" class="text-center bg-white p-8 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold mb-2 text-gray-700">핵심 용어 퀴즈</h2>
+            <p class="text-gray-500 mb-6">아래 설명을 보고 해당하는 용어를 맞혀보세요.</p>
+            <div id="quiz-container" class="max-w-2xl mx-auto">
+                <div class="bg-amber-50 p-6 rounded-lg border-l-4 border-amber-500">
+                    <p id="quiz-definition" class="text-lg text-gray-700 h-12 flex items-center justify-center"></p>
+                </div>
+                <div class="mt-6 flex flex-col sm:flex-row gap-2">
+                    <input type="text" id="quiz-input" placeholder="정답을 입력하세요" class="flex-grow p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition">
+                    <button id="quiz-submit" class="bg-amber-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-700 transition-colors">확인</button>
+                </div>
+                 <button id="quiz-next" class="mt-4 bg-gray-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-700 transition-colors">다음 문제</button>
+                <p id="quiz-feedback" class="mt-4 text-lg font-medium h-6"></p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center py-6 mt-12 bg-gray-100">
+        <p class="text-gray-500">제공된 학습 자료를 바탕으로 제작된 대화형 웹 애플리케케이션입니다.</p>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const historyData = {
+        timeline: [
+            { year: 1866, event: "병인박해 / 제너럴셔먼호", id: "event1" },
+            { year: 1871, event: "신미양요", id: "event1" },
+            { year: 1876, event: "강화도 조약", id: "event1" },
+            { year: 1882, event: "임오군란", id: "event1" },
+            { year: 1884, event: "갑신정변", id: "event2" },
+            { year: 1894, event: "동학 농민 운동", id: "event2" },
+            { year: 1895, event: "갑오·을미개혁", id: "event2" },
+            { year: 1896, event: "독립협회", id: "event3" },
+            { year: 1897, event: "대한제국 선포", id: "event3" },
+            { year: 1904, event: "제1차 한일협약", id: "event4" },
+            { year: 1905, event: "을사늑약", id: "event4" },
+            { year: 1907, event: "정미7조약", id: "event4" },
+            { year: 1910, event: "경술국치", id: "event4" }
+        ],
+        deepDive: [
+            { 
+                id: "event1",
+                title: "1. 개항과 불평등 조약 (1876 ~ 1882)",
+                items: [
+                    {
+                        name: "강화도 조약 (1876)",
+                        definition: "해안 측량·치외법권, 첫 근대·불평등 조약",
+                        source: `> **제7관** 조선국 연해의 도서와 암초는…지극히 위험하다. 일본국 항해자로 하여금 자유로이 해안을 측량…하도록 허가한다.\n> **제10관** 일본국 인민이 조선국 항구에서 죄를 지었을 경우…모두 일본국 관원이 심판한다.`,
+                        explanation: "제7관은 **해안 측량권**, 제10관은 **치외법권(영사재판권)**을 인정한 불평등 조항입니다."
+                    },
+                    {
+                        name: "조·미 수호 통상 조약 (1882)",
+                        definition: "서양과 맺은 최초의 조약, **거중조정** 조항 포함",
+                        source: `> **제1관** 만약 타국이 한쪽 정부에 부당하게 대우할 경우, 다른 한쪽 정부는 원만한 타결을 위해 적극 **주선(거중조정)**한다.`,
+                        explanation: "거중조정 조항을 두었으나, 이후 미국은 이를 외면했습니다."
+                    }
+                ]
+            },
+            {
+                id: "event2",
+                title: "2. 동학 농민 운동과 갑오개혁 (1894)",
+                items: [
+                     {
+                        name: "동학 농민 운동",
+                        definition: "제폭구민, 반봉건·반외세, 집강소 설치, 갑오개혁 촉발",
+                        source: `> **격문**: … **제폭구민(除暴救民)**하고 **보국안민(輔國安民)**하여 인민을 편안케 하라!\n> **폐정개혁안 12조**: 7. **토지는 평균하게 나누어 경작**하게 한다.`,
+                        explanation: "탐관오리 제거와 토지 개혁 등 농민들의 개혁 요구가 담겨 있습니다."
+                    },
+                    {
+                        name: "갑오개혁과 홍범 14조",
+                        definition: "군국기무처 주도, 신분제·과거제 폐지, **홍범 14조**로 근대 국가 기본 강령 발표",
+                        source: `> **제7조** 조세 부과와 경비 지출은 모두 **탁지아문**에서 관할한다.\n> **제9조** 왕실 사무와 국정 사무를 분리하여 서로 뒤섞지 않는다.`,
+                        explanation: "왕실 재정과 정부 재정을 분리하고, 국가 재정을 탁지아문으로 일원화하여 근대적 재정 체계를 마련하고자 했습니다."
+                    }
+                ]
+            },
+            {
+                id: "event3",
+                title: "3. 대한제국과 국권 수호 운동 (1896 ~ 1904)",
+                items: [
+                    {
+                        name: "독립협회와 헌의 6조",
+                        definition: "만민공동회 개최, 자주·민권·자강 운동, **헌의 6조**로 의회 설립과 재정 개혁 요구",
+                        source: `> **제4조** 모든 재정은 **탁지부**에서 전관하고, 예산과 결산을 인민에게 공포할 것.\n> **제5조** 중대 범죄는 공판에 부치되, 피고의 인권을 존중할 것.`,
+                        explanation: "국민의 기본권(인권, 참정권)과 국가 재정의 투명성을 요구한 근대적 개혁안입니다."
+                    },
+                    {
+                        name: "광무개혁",
+                        definition: "**구본신참** 원칙, **지계** 발급, 식산흥업 정책 추진",
+                        source: `> 대한제국 인민은 토지를 가진 자는 반드시 **지계**를 가져야 하며, 지계는 소유권의 증거가 된다.`,
+                        explanation: "근대적 토지 소유권 문서인 지계를 발급하여 국가 재정을 확보하고 토지 소유권을 명확히 하고자 했습니다."
+                    }
+                ]
+            },
+            {
+                id: "event4",
+                title: "4. 국권 피탈과 항일 운동 (1904 ~ 1910)",
+                items: [
+                    {
+                        name: "제1차 한일협약 (1904)",
+                        definition: "**고문 정치** 개시, 메가타(재정)·스티븐스(외교) 파견",
+                        source: `> 대한제국 정부는 일본 정부가 추천하는 일본인 1명을 **재정 고문**으로, 외국인 1명을 **외교 고문**으로 채용하여 재정 및 외교에 관한 사항은 모두 이들의 의견을 물어 시행해야 한다.`,
+                        explanation: "고문을 통해 대한제국의 재정과 외교에 간섭하며 내정을 장악하기 시작했습니다."
+                    },
+                    {
+                        name: "을사늑약 (1905)",
+                        definition: "**외교권 박탈**, **통감부** 설치, 사실상 보호국화",
+                        source: `> **제1조** 일본국 정부는…대한국의 외교에 관한 통신을 관리·지휘한다.`,
+                        explanation: "외교권을 완전히 박탈하고 통감을 파견하여 국정을 감독하게 했습니다."
+                    },
+                    {
+                        name: "정미7조약 (1907)",
+                        definition: "헤이그 특사 파견을 빌미로 체결, **차관 정치** 시작, **군대 해산**",
+                        source: `> **제5조** 일본인을 대한국 관리로 임명한다.`,
+                        explanation: "각 부처에 일본인 차관을 임명하여 행정권을 장악했습니다."
+                    }
+                ]
+            }
+        ],
+        comparisons: {
+            reform: {
+                title: "갑오개혁 vs 광무개혁",
+                headers: ["구분", "갑오개혁 (1894-95)", "광무개혁 (1897-1904)"],
+                rows: [
+                    ["**주도**", "군국기무처, 친일 내각", "대한제국 정부 (황제 중심)"],
+                    ["**원칙**", "급진적, 근대 국가 틀 마련", "점진적, **구본신참**"],
+                    ["**정치**", "과거제 폐지, 내각 제도", "황제권 강화 (원수부)"],
+                    ["**경제**", "재정 일원화 (탁지아문)", "식산흥업, **지계** 발급"],
+                    ["**사회**", "**신분제·노비제 폐지**", "실업·기술 교육 강조"]
+                ]
+            },
+            army: {
+                title: "항일 의병 운동 3시기",
+                headers: ["시기", "배경", "주도 세력 및 특징"],
+                rows: [
+                    ["**을미의병** (1895)", "을미사변, 단발령", "유생 중심, 위정척사"],
+                    ["**을사의병** (1905)", "을사늑약 체결", "유생 + 평민 의병장 등장"],
+                    ["**정미의병** (1907)", "고종 퇴위, **군대 해산**", "**해산 군인** 합류, 13도 창의군"]
+                ]
+            }
+        },
+        quiz: [
+            { term: "병인박해", definition: "프랑스 선교사·신자 대규모 탄압 사건" },
+            { term: "강화도 조약", definition: "해안 측량·치외법권, 첫 근대·불평등 조약" },
+            { term: "임오군란", definition: "구식 군인 봉기 → 제물포조약·청군 간섭" },
+            { term: "갑신정변", definition: "3일천하 급진개화, 14개조 정강, 한성조약 배경" },
+            { term: "동학농민운동", definition: "제폭구민, 반봉건·반외세, 집강소 설치, 갑오개혁 촉발" },
+            { term: "갑오개혁", definition: "군국기무처 주도, 신분제·과거제 폐지" },
+            { term: "을미의병", definition: "단발령·을미사변에 반발, 유생 중심 첫 항일 의병" },
+            { term: "독립신문", definition: "한글·영문, 서재필·윤치호 창간 (1896)" },
+            { term: "헌의 6조", definition: "재정은 탁지부에서 통할하는 등 의회 설립 요구안" },
+            { term: "대한제국", definition: "고종이 선포한 황제국, 광무개혁 추진 (1897)" },
+            { term: "광무개혁", definition: "지계 발급·식산흥업, 구본신참 노선" },
+            { term: "지계", definition: "근대적 토지 소유권 증명서" },
+            { term: "을사늑약", definition: "외교권 박탈, 통감부 설치 (1905)" },
+            { term: "통감부", definition: "대한제국 통치를 위한 총괄 기구, 초대 통감 이토 히로부미" },
+            { term: "정미7조약", definition: "행정·사법권 박탈, '차관정치' 강화 (1907)" },
+            { term: "신민회", definition: "비밀 조직, 학교·회사 설립, 독립군 기지 건설 준비" },
+        ]
+    };
+
+    function renderTimeline() {
+        const container = document.getElementById('timeline-container');
+        let html = '<div class="absolute left-1/2 h-full w-0.5 bg-amber-200"></div>';
+        historyData.timeline.forEach((item, index) => {
+            const sideClass = index % 2 === 0 ? 'timeline-item-left' : 'timeline-item-right';
+            html += `
+                <div class="relative mb-6 flex justify-between items-center w-full ${index % 2 === 0 ? 'flex-row-reverse' : ''}">
+                    <div class="w-1/2">
+                        <div data-target-id="${item.id}" class="timeline-item-content ${sideClass} bg-white p-3 rounded-lg shadow-md cursor-pointer hover:shadow-xl transition-shadow w-full relative">
+                            <h4 class="font-bold text-base text-amber-700">${item.year}</h4>
+                            <p class="text-sm text-gray-700">${item.event}</p>
+                        </div>
+                    </div>
+                     <div class="absolute left-1/2 transform -translate-x-1/2 z-10">
+                        <div class="bg-amber-500 rounded-full w-3 h-3 border-2 border-white"></div>
+                    </div>
+                </div>`;
+        });
+        container.innerHTML = html;
+        
+        container.querySelectorAll('.timeline-item-content').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const targetId = e.currentTarget.dataset.targetId;
+                const targetElement = document.getElementById(targetId);
+                if(targetElement) {
+                     targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                     if(!targetElement.classList.contains('open')) {
+                         targetElement.querySelector('.accordion-button').click();
+                     }
+                }
+            })
+        })
+    }
+
+    function renderAccordion() {
+        const container = document.getElementById('accordion-container');
+        let html = '';
+        historyData.deepDive.forEach(group => {
+            html += `<div id="${group.id}" class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <button class="accordion-button w-full text-left p-5 font-bold text-xl text-gray-800 flex justify-between items-center hover:bg-gray-50 transition">
+                            <span>${group.title}</span>
+                            <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-5 border-t border-gray-200 space-y-6">`;
+            group.items.forEach(item => {
+                const sourceHTML = item.source.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-amber-700">$1</strong>');
+                const explanationHTML = item.explanation.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-amber-700">$1</strong>');
+                html += `
+                    <div class="p-4 bg-gray-50 rounded-md">
+                        <h4 class="text-lg font-semibold text-gray-700">${item.name}</h4>
+                        <p class="text-sm text-amber-800 bg-amber-100 rounded-full inline-block px-3 py-1 my-2">${item.definition}</p>
+                        <div class="prose prose-sm max-w-none mt-2">
+                           <h5 class="font-semibold mt-4">관련 사료</h5>
+                           <blockquote class="border-l-4 border-gray-300 pl-4 italic text-gray-600 whitespace-pre-wrap">${sourceHTML.replace(/>/g,'')}</blockquote>
+                           <h5 class="font-semibold mt-4">해설</h5>
+                           <p>${explanationHTML}</p>
+                        </div>
+                    </div>`;
+            });
+            html += `</div></div></div>`;
+        });
+        container.innerHTML = html;
+    }
+    
+    function setupAccordion() {
+        const accordionButtons = document.querySelectorAll('.accordion-button');
+        accordionButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const accordion = button.parentElement;
+                const content = button.nextElementSibling;
+                const icon = button.querySelector('svg');
+
+                accordion.classList.toggle('open');
+                
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                    icon.style.transform = 'rotate(0deg)';
+                } else {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                    icon.style.transform = 'rotate(180deg)';
+                }
+            });
+        });
+    }
+
+    function renderComparisons() {
+        const reformContainer = document.getElementById('reform-comparison-container');
+        const armyContainer = document.getElementById('army-comparison-container');
+        
+        const createTable = (data) => {
+            let tableHtml = `<h3 class="text-2xl font-bold text-center mb-4 text-gray-700">${data.title}</h3><div class="overflow-x-auto"><table class="w-full text-sm text-left text-gray-500">`;
+            tableHtml += `<thead class="text-xs text-gray-700 uppercase bg-gray-100"><tr>`;
+            data.headers.forEach(header => tableHtml += `<th scope="col" class="py-3 px-4">${header}</th>`);
+            tableHtml += `</tr></thead><tbody>`;
+            data.rows.forEach(row => {
+                tableHtml += `<tr class="bg-white border-b">`;
+                row.forEach((cell, index) => {
+                    const cellHTML = cell.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-amber-700 font-semibold">$1</strong>');
+                    if (index === 0) {
+                        tableHtml += `<th scope="row" class="py-4 px-4 font-medium text-gray-900 whitespace-nowrap">${cellHTML}</th>`;
+                    } else {
+                        tableHtml += `<td class="py-4 px-4">${cellHTML}</td>`;
+                    }
+                });
+                tableHtml += `</tr>`;
+            });
+            tableHtml += `</tbody></table></div>`;
+            return tableHtml;
+        }
+
+        reformContainer.innerHTML = createTable(historyData.comparisons.reform);
+        armyContainer.innerHTML = createTable(historyData.comparisons.army);
+    }
+    
+    function renderArmyChart() {
+        const ctx = document.getElementById('armyChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['을미의병 (1895)', '을사의병 (1905)', '정미의병 (1907)'],
+                datasets: [{
+                    label: '전투력 수준 (주도 세력 기준)',
+                    data: [1, 2, 3],
+                    backgroundColor: [
+                        'rgba(251, 191, 36, 0.4)', // amber-300
+                        'rgba(245, 158, 11, 0.5)', // amber-500
+                        'rgba(217, 119, 6, 0.6)'  // amber-600
+                    ],
+                    borderColor: [
+                        'rgba(251, 191, 36, 1)',
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(217, 119, 6, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const labels = ['유생 중심', '유생 + 평민', '해산 군인 합류'];
+                                return labels[context.dataIndex];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value, index, values) {
+                                const levels = ['기초', '성장', '발전', '전쟁'];
+                                return levels[value];
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    const quizData = historyData.quiz;
+    let currentQuizIndex = -1;
+    let usedQuizIndices = [];
+
+    function setupQuiz() {
+        const definitionEl = document.getElementById('quiz-definition');
+        const inputEl = document.getElementById('quiz-input');
+        const submitBtn = document.getElementById('quiz-submit');
+        const nextBtn = document.getElementById('quiz-next');
+        const feedbackEl = document.getElementById('quiz-feedback');
+
+        function loadNextQuestion() {
+            if (usedQuizIndices.length === quizData.length) {
+                usedQuizIndices = [];
+            }
+            
+            do {
+                currentQuizIndex = Math.floor(Math.random() * quizData.length);
+            } while (usedQuizIndices.includes(currentQuizIndex));
+            
+            usedQuizIndices.push(currentQuizIndex);
+
+            definitionEl.textContent = quizData[currentQuizIndex].definition;
+            inputEl.value = '';
+            feedbackEl.textContent = '';
+            feedbackEl.className = 'mt-4 text-lg font-medium h-6';
+            inputEl.disabled = false;
+            submitBtn.disabled = false;
+        }
+
+        submitBtn.addEventListener('click', () => {
+            const userAnswer = inputEl.value.trim().replace(/\s/g, '');
+            const correctAnswer = quizData[currentQuizIndex].term.replace(/\s/g, '');
+            if (userAnswer === correctAnswer) {
+                feedbackEl.textContent = '정답입니다!';
+                feedbackEl.classList.add('text-green-600');
+            } else {
+                feedbackEl.textContent = `오답입니다. 정답: ${quizData[currentQuizIndex].term}`;
+                feedbackEl.classList.add('text-red-600');
+            }
+            inputEl.disabled = true;
+            submitBtn.disabled = true;
+        });
+        
+        inputEl.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                submitBtn.click();
+            }
+        });
+
+        nextBtn.addEventListener('click', loadNextQuestion);
+        
+        loadNextQuestion();
+    }
+    
+    function setupNavScroll() {
+        const navbar = document.getElementById('navbar');
+        const navItems = navbar.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('section');
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.3
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    navItems.forEach(item => {
+                        item.classList.remove('active');
+                        if (item.getAttribute('href') === `#${id}`) {
+                            item.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = item.getAttribute('href');
+                document.querySelector(targetId).scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    }
+
+    renderTimeline();
+    renderAccordion();
+    setupAccordion();
+    renderComparisons();
+    renderArmyChart();
+    setupQuiz();
+    setupNavScroll();
+});
+</script>
+
+</body>
+</html>

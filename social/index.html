@@ -1,57 +1,80 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>요약 정리 모음</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f8f9fa;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      color: #2c3e50;
-    }
-    ul {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 0;
-      list-style: none;
-    }
-    li {
-      background: #ffffff;
-      padding: 10px 15px;
-      margin: 8px 0;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    a {
-      text-decoration: none;
-      color: #2980b9;
-      font-weight: bold;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🌐 지리 및 사회 요약 자료</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the Inter font and smooth transitions */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        a {
+            transition: all 0.2s ease-in-out;
+        }
+        a:hover {
+            transform: translateX(5px); /* Small slide effect on hover */
+        }
+    </style>
 </head>
-<body>
-  <h1>요약 정리 파일 목록</h1>
-  <ul>
-    <li><a href="0521지리요약정리.html">0521지리요약정리</a></li>
-    <li><a href="0522지리요약정리.html">0522지리요약정리</a></li>
-    <li><a href="0526사회요약정리.html">0526사회요약정리</a></li>
-    <li><a href="0528지리요약정리.html">0528지리요약정리</a></li>
-    <li><a href="0529지리자연요약정리.html">0529지리자연요약정리</a></li>
-    <li><a href="0605사회요약정리.html">0605사회요약정리</a></li>
-    <li><a href="0610사회요약정리.html">0610사회요약정리</a></li>
-    <li><a href="0611사회요약정리.html">0611사회요약정리</a></li>
-    <li><a href="0612지리요약정리.html">0612지리요약정리</a></li>
-    <li><a href="0613사회요약정리.html">0613사회요약정리</a></li>
-    <li><a href="0617사회요약정리.html">0617사회요약정리</a></li>
-    <li><a href="0618사회요약정리.html">0618사회요약정리</a></li>
-    <li><a href="0619사회요약정리.html">0619사회요약정리</a></li>
-  </ul>
+<body class="bg-gradient-to-br from-green-50 to-emerald-100 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white p-8 md:p-12 rounded-xl shadow-2xl max-w-4xl w-full border border-green-200">
+        <!-- Main Header -->
+        <h1 class="text-4xl md:text-5xl font-extrabold text-center text-green-700 mb-8 flex items-center justify-center space-x-3">
+            <span class="text-5xl md:text-6xl animate-pulse">🌐</span>
+            <span>지리 및 사회 요약 자료</span>
+        </h1>
+
+        <!-- Content Sections (Horizontal Layout on large screens, vertical on small) -->
+        <div class="flex flex-col lg:flex-row lg:space-x-8 space-y-8 lg:space-y-0">
+            <!-- HTML Notes Section -->
+            <div class="lg:w-1/2 flex-shrink-0">
+                <h2 class="text-2xl font-bold text-gray-700 mb-4 border-b-2 pb-2 border-green-300">
+                    📝 HTML 요약 노트
+                </h2>
+                <ul class="space-y-3 text-lg">
+                    <li><a href="0521지리요약정리.html" class="block p-3 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 transition duration-300 ease-in-out transform hover:scale-105">0521 지리 요약 정리</a></li>
+                    <li><a href="0522지리요약정리.html" class="block p-3 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 transition duration-300 ease-in-out transform hover:scale-105">0522 지리 요약 정리</a></li>
+                    <li><a href="0526사회요약정리.html" class="block p-3 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 transition duration-300 ease-in-out transform hover:scale-105">0526 사회 요약 정리</a></li>
+                    <li><a href="0528사회요약정리.html" class="block p-3 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 transition duration-300 ease-in-out transform hover:scale-105">0528 사회 요약 정리</a></li>
+                    <li><a href="0528지리요약정리.html" class="block p-3 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 transition duration-300 ease-in-out transform hover:scale-105">0528 지리 요약 정리</a></li>
+                    <li><a href="0529지리요약정리.html" class="block p-3 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 transition duration-300 ease-in-out transform hover:scale-105">0529 지리 요약 정리</a></li>
+                    <li><a href="0605사회요약정리.html" class="block p-3 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 transition duration-300 ease-in-out transform hover:scale-105">0605 사회 요약 정리</a></li>
+                    <li><a href="0610사회요약정리.html" class="block p-3 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 transition duration-300 ease-in-out transform hover:scale-105">0610 사회 요약 정리</a></li>
+                    <li><a href="0611사회요약정리.html" class="block p-3 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 transition duration-300 ease-in-out transform hover:scale-105">0611 사회 요약 정리</a></li>
+                    <li><a href="0612지리요약정리.html" class="block p-3 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 transition duration-300 ease-in-out transform hover:scale-105">0612 지리 요약 정리</a></li>
+                    <li><a href="0616사회요약정리.html" class="block p-3 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 transition duration-300 ease-in-out transform hover:scale-105">0616 사회 요약 정리</a></li>
+                    <li><a href="0617사회요약정리.html" class="block p-3 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 transition duration-300 ease-in-out transform hover:scale-105">0617 사회 요약 정리</a></li>
+                    <li><a href="0618사회요약정리.html" class="block p-3 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 transition duration-300 ease-in-out transform hover:scale-105">0618 사회 요약 정리</a></li>
+                    <li><a href="0619사회요약정리.html" class="block p-3 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 transition duration-300 ease-in-out transform hover:scale-105">0619 사회 요약 정리</a></li>
+                </ul>
+            </div>
+
+            <!-- PDF Notes Section -->
+            <div class="lg:w-1/2 flex-shrink-0">
+                <h2 class="text-2xl font-bold text-gray-700 mb-4 border-b-2 pb-2 border-green-300">
+                    📄 PDF 정리본
+                </h2>
+                <ul class="space-y-3 text-lg">
+                    <li><a href="0521지리요약정리.pdf" target="_blank" class="block p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-800 transition duration-300 ease-in-out transform hover:scale-105">0521 지리 요약 정리</a></li>
+                    <li><a href="0522지리요약정리.pdf" target="_blank" class="block p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-800 transition duration-300 ease-in-out transform hover:scale-105">0522 지리 요약 정리</a></li>
+                    <li><a href="0526사회요약정리.pdf" target="_blank" class="block p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-800 transition duration-300 ease-in-out transform hover:scale-105">0526 사회 요약 정리</a></li>
+                    <li><a href="0528사회요약정리.pdf" target="_blank" class="block p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-800 transition duration-300 ease-in-out transform hover:scale-105">0528 사회 요약 정리</a></li>
+                    <li><a href="0528지리요약정리.pdf" target="_blank" class="block p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-800 transition duration-300 ease-in-out transform hover:scale-105">0528 지리 요약 정리</a></li>
+                    <li><a href="0529지리자연관요약정리.pdf" target="_blank" class="block p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-800 transition duration-300 ease-in-out transform hover:scale-105">0529 지리 자연관 요약 정리</a></li>
+                    <li><a href="0605사회요약정리.pdf" target="_blank" class="block p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-800 transition duration-300 ease-in-out transform hover:scale-105">0605 사회 요약 정리</a></li>
+                    <li><a href="0610사회요약정리.pdf" target="_blank" class="block p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-800 transition duration-300 ease-in-out transform hover:scale-105">0610 사회 요약 정리</a></li>
+                    <li><a href="0611사회요약정리.pdf" target="_blank" class="block p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-800 transition duration-300 ease-in-out transform hover:scale-105">0611 사회 요약 정리</a></li>
+                    <li><a href="0612사회요약정리.pdf" target="_blank" class="block p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-800 transition duration-300 ease-in-out transform hover:scale-105">0612 사회 요약 정리</a></li>
+                    <li><a href="0616사회요약정리.pdf" target="_blank" class="block p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-800 transition duration-300 ease-in-out transform hover:scale-105">0616 사회 요약 정리</a></li>
+                    <li><a href="0617사회요약정리.pdf" target="_blank" class="block p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-800 transition duration-300 ease-in-out transform hover:scale-105">0617 사회 요약 정리</a></li>
+                    <li><a href="0618사회요약정리.pdf" target="_blank" class="block p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-800 transition duration-300 ease-in-out transform hover:scale-105">0618 사회 요약 정리</a></li>
+                    <li><a href="0619사회요약정리.pdf" target="_blank" class="block p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 hover:text-emerald-800 transition duration-300 ease-in-out transform hover:scale-105">0619 사회 요약 정리</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

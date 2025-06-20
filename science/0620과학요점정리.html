@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>판 구조론 완전 정복: 대화형 학습 페이지</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Study (Background: Off-white/Light Stone, Accents: Muted Blue, Green, Orange) -->
+    <!-- Application Structure Plan: A single-page, vertical scroll layout with a sticky top navigation for quick access to thematic sections (Divergent, Convergent, Transform, Quiz). This task-oriented design prioritizes learning and quick review over the original report's linear flow. An interactive central diagram acts as a hub, while tabbed interfaces for complex topics (like convergent boundaries) prevent information overload, enhancing usability for a student under exam pressure. -->
+    <!-- Visualization & Content Choices: 1. Plate Motion -> Goal: Inform -> Viz: CSS Animated diagrams -> Interaction: None (looping) -> Justification: Clearly shows movement without user input. 2. Boundary Comparisons -> Goal: Compare -> Viz: Chart.js Bar Chart -> Interaction: Hover tooltips -> Justification: Visually quantifies differences in geological activity, more impactful than text alone. 3. Convergent Sub-types -> Goal: Organize -> Viz: JS-powered Tabs -> Interaction: Click to switch content -> Justification: Manages the most complex topic by showing one case at a time. 4. Knowledge Check -> Goal: Reinforce -> Viz: HTML/JS Quiz -> Interaction: Click to answer -> Justification: Promotes active recall for better retention. All diagrams are HTML/CSS/Canvas-based. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .teacher-pick {
+            border-left: 5px solid #fbbf24; /* amber-400 */
+            background-color: #fefce8; /* yellow-50 */
+            transition: transform 0.2s ease-in-out;
+        }
+        .teacher-pick:hover {
+            transform: scale(1.02);
+        }
+        .boundary-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 120px;
+            background-color: #f3f4f6; /* gray-100 */
+            border-radius: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .plate {
+            width: 45%;
+            height: 60%;
+            background-color: #fde68a; /* amber-200 */
+            border: 2px solid #ca8a04; /* amber-600 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: absolute;
+        }
+        .plate-arrow {
+            font-size: 2rem;
+            color: #b45309; /* amber-700 */
+        }
+        @keyframes diverge-left {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-15%); }
+        }
+        @keyframes diverge-right {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(15%); }
+        }
+        .divergent .plate-left { animation: diverge-left 2s ease-in-out infinite alternate; left: 10%; }
+        .divergent .plate-right { animation: diverge-right 2s ease-in-out infinite alternate; right: 10%; }
+
+        @keyframes converge-left {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(15%); }
+        }
+        @keyframes converge-right {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-15%); }
+        }
+        .convergent .plate-left { animation: converge-left 2s ease-in-out infinite alternate; left: 20%; }
+        .convergent .plate-right { animation: converge-right 2s ease-in-out infinite alternate; right: 20%; }
+        
+        @keyframes transform-up {
+            0% { transform: translateY(0%); }
+            100% { transform: translateY(-15%); }
+        }
+        @keyframes transform-down {
+            0% { transform: translateY(0%); }
+            100% { transform: translateY(15%); }
+        }
+        .transform .plate-left { animation: transform-up 2s ease-in-out infinite alternate; left: 25%; }
+        .transform .plate-right { animation: transform-down 2s ease-in-out infinite alternate; right: 25%; }
+        
+        .tab-button.active {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+        }
+
+        .quiz-option.correct { background-color: #dcfce7; /* green-100 */ border-color: #22c55e; /* green-500 */}
+        .quiz-option.incorrect { background-color: #fee2e2; /* red-100 */ border-color: #ef4444; /* red-500 */}
+        .quiz-feedback {
+            font-weight: bold;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+        }
+        .feedback-correct { color: #16a34a; /* green-600 */ }
+        .feedback-incorrect { color: #dc2626; /* red-600 */ }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-white shadow-md text-center py-6">
+        <h1 class="text-3xl md:text-4xl font-bold text-blue-600">🌍 판 구조론 완전 정복</h1>
+        <p class="text-gray-600 mt-2">대화형 학습 페이지로 기말고사를 완벽 대비하세요!</p>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 bg-white/80 backdrop-blur-sm shadow-sm z-10">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-center space-x-2 md:space-x-8 py-3 text-sm md:text-base">
+                <a href="#intro" class="nav-link font-semibold text-gray-700 hover:text-blue-500 transition">판의 경계란?</a>
+                <a href="#divergent" class="nav-link font-semibold text-gray-700 hover:text-blue-500 transition">발산형</a>
+                <a href="#convergent" class="nav-link font-semibold text-gray-700 hover:text-blue-500 transition">수렴형</a>
+                <a href="#transform" class="nav-link font-semibold text-gray-700 hover:text-blue-500 transition">보존형</a>
+                <a href="#comparison" class="nav-link font-semibold text-gray-700 hover:text-blue-500 transition">한눈에 비교</a>
+                <a href="#quiz" class="nav-link font-semibold text-gray-700 hover:text-blue-500 transition">핵심 퀴즈</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-4 md:p-8">
+
+        <!-- Intro Section -->
+        <section id="intro" class="my-8 scroll-mt-20">
+            <h2 class="text-2xl font-bold mb-4 text-center">판의 경계: 모든 것의 시작</h2>
+            <p class="max-w-3xl mx-auto text-center text-gray-700 mb-6">
+                지구의 껍데기(판)는 가만히 있지 않고 계속 움직여요. 이 판들이 서로 만나거나, 멀어지거나, 스쳐 지나가면서 지진과 화산 같은 놀라운 자연 현상들이 일어나죠. 판의 경계는 딱 3가지만 기억하면 돼요! 아래에서 각 경계를 자세히 알아봅시다.
+            </p>
+            <div class="teacher-pick p-4 rounded-lg max-w-3xl mx-auto">
+                <p class="font-bold text-lg">⭐ 선생님's PICK! 🎓</p>
+                <p class="mt-1">판을 움직이는 근본적인 힘은 바로 맨틀 아래쪽에서 뜨거운 물질이 올라오고 차가운 물질이 내려가는 **맨틀 대류** 때문이라는 점, **시험에 꼭 나와요!**</p>
+            </div>
+        </section>
+
+        <!-- Divergent Boundary -->
+        <section id="divergent" class="my-16 scroll-mt-20">
+            <h2 class="text-2xl font-bold mb-2 text-center text-green-600">1. 발산형 경계: "우리 멀어지자!" 🌊</h2>
+            <p class="text-center text-gray-600 mb-6">두 판이 서로 **멀어지는** 경계</p>
+            <div class="boundary-diagram divergent mb-6">
+                <div class="plate plate-left"><span class="plate-arrow">←</span> 대륙판</div>
+                <div class="plate plate-right">대륙판 <span class="plate-arrow">→</span></div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="font-bold text-lg mb-2">🌋 주요 지형</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong>해령:</strong> 바다 밑에서 새로운 해양판이 만들어지며 생기는 거대한 해저 산맥.</li>
+                        <li><strong>열곡대:</strong> 대륙이 갈라지면서 만들어지는 V자 모양의 깊은 계곡.</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="font-bold text-lg mb-2">💥 지질 활동</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong>지진:</strong> 땅이 찢어지므로, 얕은 곳에서만 지진(**천발 지진**)이 발생.</li>
+                        <li><strong>화산 활동:</strong> 맨틀 물질이 올라와 마그마가 되므로 **화산 활동 활발!**</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Convergent Boundary -->
+        <section id="convergent" class="my-16 scroll-mt-20">
+            <h2 class="text-2xl font-bold mb-2 text-center text-red-600">2. 수렴형 경계: "부딪히면 어떡해?" 💥</h2>
+            <p class="text-center text-gray-600 mb-6">두 판이 서로 **만나 부딪히는** 경계. 가장 복잡하고 중요해요!</p>
+            
+            <div class="mb-4 text-center">
+                <button data-type="ocean-continent" class="tab-button active px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-400 hover:text-white transition">해양판 vs 대륙판</button>
+                <button data-type="ocean-ocean" class="tab-button px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-400 hover:text-white transition">해양판 vs 해양판</button>
+                <button data-type="continent-continent" class="tab-button px-4 py-2 rounded-md bg-gray-200 hover:bg-blue-400 hover:text-white transition">대륙판 vs 대륙판</button>
+            </div>
+
+            <div id="convergent-content">
+                <!-- Content will be dynamically inserted here -->
+            </div>
+        </section>
+
+        <!-- Transform Boundary -->
+        <section id="transform" class="my-16 scroll-mt-20">
+            <h2 class="text-2xl font-bold mb-2 text-center text-yellow-600">3. 보존형 경계: "우린 스쳐 지나갈 뿐" ↔️</h2>
+            <p class="text-center text-gray-600 mb-6">두 판이 서로 **어긋나며 스쳐 지나가는** 경계</p>
+            <div class="boundary-diagram transform mb-6">
+                 <div class="plate plate-left" style="background-color: #c7d2fe; border-color: #6366f1;"><span class="plate-arrow">↑</span> 판 A</div>
+                <div class="plate plate-right" style="background-color: #c7d2fe; border-color: #6366f1;">판 B <span class="plate-arrow">↓</span></div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="font-bold text-lg mb-2">🏞️ 주요 지형</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong>변환 단층:</strong> 판이 생성되거나 소멸되지 않고 어긋나 거대한 단층이 생김.</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="font-bold text-lg mb-2">💥 지질 활동</h3>
+                     <ul class="list-disc list-inside space-y-2">
+                        <li><strong>지진:</strong> 판이 서로 긁히면서 얕은 곳에서만 **천발 지진** 발생.</li>
+                        <li class="font-bold text-red-700">⭐ **화산 활동:** 마그마가 생성되지 않으므로 **화산 활동은 거의 없음! (시험 포인트!)**</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Comparison Section -->
+        <section id="comparison" class="my-16 scroll-mt-20">
+            <h2 class="text-2xl font-bold mb-4 text-center">📊 한눈에 비교하기</h2>
+            <p class="max-w-3xl mx-auto text-center text-gray-700 mb-8">
+                각 판의 경계에서 나타나는 지진의 최대 깊이와 화산 활동 여부를 비교해봅시다. 수렴형 경계, 특히 섭입이 일어나는 곳에서 깊은 지진이 발생하고 화산 활동이 활발한 것을 볼 수 있습니다.
+            </p>
+            <div class="bg-white p-4 md:p-8 rounded-lg shadow-lg">
+                <div class="chart-container">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section id="quiz" class="my-16 scroll-mt-20">
+            <h2 class="text-2xl font-bold mb-4 text-center">📝 최종 점검! 핵심 퀴즈</h2>
+            <p class="max-w-3xl mx-auto text-center text-gray-700 mb-8">
+                지금까지 학습한 내용을 바탕으로 퀴즈를 풀어보며 실력을 점검해 보세요.
+            </p>
+            <div id="quiz-container" class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md space-y-6">
+                <!-- Quiz questions will be generated here -->
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="text-center py-6 bg-gray-800 text-white">
+        <p>기말고사 화이팅! 💪</p>
+    </footer>
+
+    <script>
+        const convergentData = {
+            'ocean-continent': {
+                title: "⭐ 해양판 vs 대륙판 (가장 중요!)",
+                description: "밀도가 큰 해양판이 대륙판 아래로 파고들어가는 **섭입**이 발생해요.",
+                diagram: `<div class="boundary-diagram convergent mb-6">
+                                <div class="plate plate-left" style="background-color: #a5f3fc; border-color: #0891b2;">해양판 <span class="plate-arrow">→</span></div>
+                                <div class="plate plate-right" style="z-index: 1; top: 40%; transform: translateY(-50%); animation: none;"><span class="plate-arrow">←</span> 대륙판</div>
+                           </div>`,
+                geography: "<li><strong>해구:</strong> 섭입하는 경계에 생기는 깊은 골짜기.</li><li><strong>습곡 산맥:</strong> 대륙판이 구겨져 만들어지는 높은 산맥 (ex: 안데스 산맥).</li>",
+                activity: "<li><strong>지진:</strong> 천발~신발까지 **모든 깊이의 지진** 발생.</li><li><strong>화산 활동:</strong> 섭입한 판이 녹아 마그마가 되므로 **화산 활동 활발!**</li>"
+            },
+            'ocean-ocean': {
+                title: "해양판 vs 해양판",
+                description: "둘 중 더 오래되고 밀도가 큰 해양판이 다른 판 아래로 **섭입**해요.",
+                 diagram: `<div class="boundary-diagram convergent mb-6">
+                                <div class="plate plate-left" style="background-color: #a5f3fc; border-color: #0891b2;">해양판 <span class="plate-arrow">→</span></div>
+                                <div class="plate plate-right" style="z-index: 1; top: 40%; transform: translateY(-50%); animation: none; background-color: #a5f3fc; border-color: #0891b2;"><span class="plate-arrow">←</span> 해양판</div>
+                           </div>`,
+                geography: "<li><strong>해구:</strong> 역시 깊은 해구가 생겨요.</li><li><strong>호상 열도:</strong> 마그마가 분출해 활 모양의 화산섬(열도)을 형성 (ex: 일본 열도).</li>",
+                activity: "<li><strong>지진:</strong> 천발~신발까지 **모든 깊이의 지진** 발생.</li><li><strong>화산 활동:</strong> **화산 활동 매우 활발!**</li>"
+            },
+            'continent-continent': {
+                title: "⭐ 대륙판 vs 대륙판 (헷갈림 주의!)",
+                description: "밀도가 비슷해 섭입 없이 그대로 부딪혀 위로 솟아오르는 **충돌**이 일어나요.",
+                diagram: `<div class="boundary-diagram convergent mb-6">
+                                <div class="plate plate-left" style="animation-duration: 3s;">대륙판 <span class="plate-arrow">→</span></div>
+                                <div class="plate plate-right" style="animation-duration: 3s;"><span class="plate-arrow">←</span> 대륙판</div>
+                           </div>`,
+                geography: "<li><strong>거대 습곡 산맥:</strong> 매우 높고 험준한 산맥이 만들어짐 (ex: 히말라야 산맥).</li>",
+                activity: "<li><strong>지진:</strong> 천발, 중발 지진이 주로 발생.</li><li class='font-bold text-red-700'>⭐ **화산 활동:** 섭입이 없어 마그마 생성이 어려워 **화산 활동은 거의 없음! (초중요 시험 포인트!)**</li>"
+            }
+        };
+
+        const quizData = [
+            {
+                question: "새로운 해양 지각이 생성되며 양쪽으로 멀어지는 판의 경계는 무엇일까요?",
+                options: ["수렴형 경계", "보존형 경계", "발산형 경계", "섭입대"],
+                answer: "발산형 경계"
+            },
+            {
+                question: "다음 중 화산 활동이 거의 일어나지 않는 판의 경계를 모두 고르세요.",
+                options: ["해양판과 대륙판이 만나는 곳", "대륙판과 대륙판이 만나는 곳", "해양판과 해양판이 만나는 곳", "판이 서로 스쳐 지나가는 곳"],
+                answer: ["대륙판과 대륙판이 만나는 곳", "판이 서로 스쳐 지나가는 곳"],
+                type: 'checkbox'
+            },
+            {
+                question: "해양판이 대륙판 아래로 파고들 때, 깊은 바다 골짜기인 '이것'이 형성됩니다. '이것'은 무엇일까요?",
+                options: ["해령", "열곡대", "습곡 산맥", "해구"],
+                answer: "해구"
+            },
+            {
+                question: "히말라야 산맥과 같이 매우 높은 습곡 산맥이 형성되는 경계의 특징으로 옳은 것은?",
+                options: ["천발부터 신발 지진까지 모두 발생한다.", "활발한 화산 활동이 동반된다.", "두 해양판이 충돌하여 형성된다.", "두 대륙판이 충돌하며, 화산 활동은 거의 없다."],
+                answer: "두 대륙판이 충돌하며, 화산 활동은 거의 없다."
+            }
+        ];
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const convergentContent = document.getElementById('convergent-content');
+
+            function updateConvergentContent(type) {
+                const data = convergentData[type];
+                convergentContent.innerHTML = `
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="font-bold text-lg mb-2">${data.title}</h3>
+                        <p class="mb-4">${data.description}</p>
+                        ${data.diagram}
+                        <div class="grid md:grid-cols-2 gap-6 mt-4">
+                            <div>
+                                <h4 class="font-semibold text-md mb-2">🌋 주요 지형</h4>
+                                <ul class="list-disc list-inside space-y-2">${data.geography}</ul>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-md mb-2">💥 지질 활동</h4>
+                                <ul class="list-disc list-inside space-y-2">${data.activity}</ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    updateConvergentContent(button.dataset.type);
+                });
+            });
+
+            // Initial load
+            updateConvergentContent('ocean-continent');
+
+            // Chart.js
+            const ctx = document.getElementById('comparisonChart').getContext('2d');
+            const comparisonChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['발산형', '수렴형(해양-대륙)', '수렴형(대륙-대륙)', '보존형'],
+                    datasets: [{
+                        label: '최대 지진 깊이 (km)',
+                        data: [70, 700, 300, 25], // 천발 70, 신발 700, 중발 300
+                        backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: '화산 활동 활성도 (0=없음, 1=있음)',
+                        data: [1, 1, 0, 0],
+                        backgroundColor: 'rgba(239, 68, 68, 0.5)',
+                        borderColor: 'rgba(239, 68, 68, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '판 경계별 지질 활동 비교',
+                            font: { size: 16 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.dataset.label.includes('화산')) {
+                                        label += context.parsed.y === 1 ? '활발' : '거의 없음';
+                                    } else {
+                                        label += context.parsed.y + ' km';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Quiz Generation
+            const quizContainer = document.getElementById('quiz-container');
+            quizData.forEach((q, index) => {
+                const isCheckbox = q.type === 'checkbox';
+                const optionsHtml = q.options.map(option => `
+                    <label class="quiz-option block p-3 border-2 border-gray-200 rounded-md hover:bg-gray-100 cursor-pointer">
+                        <input type="${isCheckbox ? 'checkbox' : 'radio'}" name="question${index}" value="${option}" class="mr-2">
+                        ${option}
+                    </label>
+                `).join('');
+
+                const questionElement = document.createElement('div');
+                questionElement.innerHTML = `
+                    <p class="font-bold mb-3">${index + 1}. ${q.question}</p>
+                    <div class="space-y-2">${optionsHtml}</div>
+                    <button class="check-answer mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">정답 확인</button>
+                    <div class="quiz-feedback mt-2"></div>
+                `;
+                quizContainer.appendChild(questionElement);
+            });
+
+            quizContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('check-answer')) {
+                    const questionDiv = e.target.closest('div');
+                    const questionIndex = Array.from(quizContainer.children).indexOf(questionDiv);
+                    const questionData = quizData[questionIndex];
+                    const feedbackDiv = questionDiv.querySelector('.quiz-feedback');
+                    
+                    const selectedOptions = Array.from(questionDiv.querySelectorAll('input:checked')).map(input => input.value);
+
+                    let isCorrect;
+                    if (questionData.type === 'checkbox') {
+                        isCorrect = selectedOptions.length === questionData.answer.length && selectedOptions.every(val => questionData.answer.includes(val));
+                    } else {
+                        isCorrect = selectedOptions[0] === questionData.answer;
+                    }
+
+                    feedbackDiv.textContent = isCorrect ? '정답입니다! 🎉' : `오답입니다. 다시 생각해 보세요.`;
+                    feedbackDiv.className = isCorrect ? 'quiz-feedback feedback-correct' : 'quiz-feedback feedback-incorrect';
+                    
+                    questionDiv.querySelectorAll('.quiz-option').forEach(label => {
+                        const input = label.querySelector('input');
+                        const isAnswer = Array.isArray(questionData.answer) ? questionData.answer.includes(input.value) : questionData.answer === input.value;
+                        
+                        if (input.checked) {
+                            if (isAnswer) {
+                                label.classList.add('correct');
+                            } else {
+                                label.classList.add('incorrect');
+                            }
+                        } else if (isAnswer) {
+                             label.classList.add('correct');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

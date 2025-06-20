@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한국사 기말 킬러 모의고사</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Gowun Dodum', sans-serif;
+        }
+        .quiz-option.correct {
+            background-color: #d1fae5;
+            border-color: #10b981;
+        }
+        .quiz-option.incorrect {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+        }
+        .explanation {
+            background-color: #f3f4f6;
+            border-left: 4px solid #6b7280;
+            padding: 12px;
+            margin-top: 12px;
+        }
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="w-full max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:p-8 my-8">
+        <header class="text-center mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">흥덕고등학교 2025학년도 1학기 기말고사</h1>
+            <p class="text-lg text-gray-600">한국사 킬러 문항</p>
+        </header>
+
+        <main id="quiz-container">
+            <!-- Questions will be injected here by JavaScript -->
+        </main>
+
+        <footer class="mt-8 flex justify-between items-center">
+            <button id="prev-btn" class="bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors disabled:opacity-50" disabled>이전</button>
+            <div id="progress-indicator" class="text-gray-700 font-semibold"></div>
+            <button id="next-btn" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">다음</button>
+        </footer>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "1. 강화도 조약(1876)에 대한 설명으로 옳은 것은?",
+                options: ["세견선·세사미두 규정이 포함되었다.", "부산·원산·인천 개항이 명문화되었다.", "일본의 해안 측량권이 인정되었다.", "치외법권·거중조정 조항이 없다.", "일본 화폐 유통을 금지하였다."],
+                answer: "일본의 해안 측량권이 인정되었다.",
+                explanation: "강화도 조약은 일본의 강요로 맺어진 불평등 조약으로, 제7관에 연안 측량권을 허용하는 내용이 포함되어 우리나라의 주권을 침해했습니다. ②번도 맞는 사실이지만, 조약의 불평등한 성격을 가장 잘 보여주는 '킬러' 조항은 ③번입니다. ①은 조선 초, ④는 치외법권이 있었고, ⑤는 일본 화폐 유통을 허용했습니다."
+            },
+            {
+                question: "2. 다음 사건을 발생 순서대로 바르게 배열한 것은?<br><br>ㄱ. 을사늑약 &nbsp;&nbsp;ㄴ. 제1차 한일 협약<br>ㄷ. 헤이그 특사 &nbsp;&nbsp;ㄹ. 정미 7조약",
+                options: ["ㄴ - ㄱ - ㄷ - ㄹ", "ㄴ - ㄱ - ㄹ - ㄷ", "ㄱ - ㄴ - ㄷ - ㄹ", "ㄱ - ㄷ - ㄴ - ㄹ", "ㄷ - ㄹ - ㄱ - ㄴ"],
+                answer: "ㄴ - ㄱ - ㄷ - ㄹ",
+                explanation: "국권 피탈 과정의 순서는 다음과 같습니다. <br>ㄴ. 제1차 한일 협약(1904.8) → ㄱ. 제2차 한일 협약(을사늑약, 1905.11) → ㄷ. 헤이그 특사 파견(1907.6) → ㄹ. 한일 신협약(정미 7조약, 1907.7)"
+            },
+            {
+                question: "3. 동학 농민 운동(1894)에 대한 설명으로 옳지 않은 것은?",
+                options: ["집강소를 설치해 질서를 유지하였다.", "폐정 12조에는 과부 재가 허용 조항이 포함되었다.", "제폭구민·보국안민을 기치로 내세웠다.", "전봉준은 2차 봉기 이후 우금치 전투에서 승리하였다.", "정부는 청·일 양군을 불러들여 사태를 수습하려 했다."],
+                answer: "전봉준은 2차 봉기 이후 우금치 전투에서 승리하였다.",
+                explanation: "동학 농민군은 2차 봉기 당시 공주 우금치에서 일본군과 정부군 연합군을 상대로 격렬하게 싸웠으나, 신식 무기의 열세를 극복하지 못하고 패배했습니다. 이 패배로 동학 농민 운동은 사실상 실패로 돌아갔습니다."
+            },
+            {
+                question: "4. 갑오개혁 중 제1차(1894) 개혁 내용으로만 옳게 짝지어진 것은?",
+                options: ["은본위 화폐 제도 - 탁지아문 설치", "공·사 노비제 혁파 - 과거제 폐지", "태양력 사용 - 홍범 14조 반포", "종두법 시행 - 재정 일원화", "단발령 - 23부제 실시"],
+                answer: "공·사 노비제 혁파 - 과거제 폐지",
+                explanation: "제1차 갑오개혁(1894.7~12) 시기 군국기무처 주도로 신분제(공·사 노비제) 및 과거제 폐지, 재정의 탁지아문 일원화 등이 이루어졌습니다. 은본위제, 홍범 14조, 23부제는 제2차 갑오개혁, 태양력과 단발령은 을미개혁의 내용입니다."
+            },
+            {
+                question: "5. 독립협회 활동으로 직접 연결되지 않는 것은?",
+                options: ["독립신문 발간", "만민공동회 개최", "한성 전기회사 설립", "헌의 6조 결의", "관민공동회 건의서 채택"],
+                answer: "한성 전기회사 설립",
+                explanation: "한성 전기회사는 대한제국 황실의 자본으로 설립되었습니다. 독립협회는 독립문 건립, 독립신문 발간, 토론회 및 만민공동회 개최 등 주로 국민을 계몽하고 자주 국권을 수호하기 위한 정치 활동에 집중했습니다."
+            },
+            {
+                question: "6. 의병 운동에 관한 설명으로 옳은 것을 모두 고르시오.<br><br>ㄱ. 을미의병은 단발령과 명성황후 시해가 배경이었다.<br>ㄴ. 을사의병은 유생층 중심에서 평민 주도층으로 확대되었다.<br>ㄷ. 정미의병은 13도 창의군을 결성해 서울 진공 작전을 시도했다.",
+                options: ["ㄱ", "ㄱ, ㄴ", "ㄱ, ㄷ", "ㄴ, ㄷ", "ㄱ, ㄴ, ㄷ"],
+                answer: "ㄱ, ㄴ, ㄷ",
+                explanation: "제시된 보기 3개는 모두 의병 운동에 대한 옳은 설명입니다. 을미의병(단발령, 을미사변), 을사의병(평민 의병장 등장 등 계층 확대), 정미의병(군대 해산 후 군인 합류, 13도 창의군 결성)의 핵심 특징을 정확히 서술하고 있습니다."
+            },
+             {
+                question: `7. 다음 자료에 해당하는 조약을 추론할 때 가장 적절한 것은?
+                <div class="text-sm my-2 p-3 bg-gray-50 rounded-md border">
+                    <p><b>[자료 가]</b> "조선국이 어려운 일이 있을 때에는 일본국 관리가 거중하여 그 편의를 도울 것이다."</p>
+                    <p><b>[자료 나]</b> 신문 기사(1896) "...이 조약으로 일본 상인은 무관세로 조선 항구에 물건을 반입할 수 있게 되었으니..."</p>
+                </div>`,
+                options: ["조·미 수호 통상 조약", "강화도 조약", "제물포 조약", "조·일 통상 장정", "한·일 의정서"],
+                answer: "조·일 통상 장정",
+                explanation: "[자료 나]는 강화도 조약의 부속 조약인 조·일 통상 장정(1876)에서 규정한 '무관세' 조항을 설명하고 있습니다. [자료 가]는 미국과의 조약에 있던 '거중조정' 문구를 교묘하게 바꾼 것으로, 일본의 내정 간섭 의도를 보여주는 가상의 문구일 가능성이 높습니다. 두 자료의 핵심은 개항 초기 일본과의 불평등한 통상 관계이므로, 조·일 통상 장정이 가장 관련 깊습니다."
+            },
+            {
+                question: "8. '거중조정' 조항이 포함된 조약의 체결 배경이 된 국제 정세로 옳은 것은?",
+                options: ["미·일 화친 조약 체결", "톈진조약 이후 청·일 경쟁", "러시아의 연해주 진출 및 남하 정책", "영국의 거문도 점령", "프랑스의 운산 금광 채굴권 획득"],
+                answer: "러시아의 연해주 진출 및 남하 정책",
+                explanation: "거중조정 조항은 조·미 수호 통상 조약(1882)에 포함되었습니다. 당시 조선은 청나라의 알선으로 이 조약을 체결했는데, 그 배경에는 연해주를 차지하고 남하를 시도하는 러시아를 견제하려는 목적이 있었습니다. (조선책략의 '연미방러')"
+            },
+            {
+                question: `9. 다음 그림의 '○○군'에 해당하는 세력과 활동으로 옳은 것은?
+                <div class="text-sm my-2 p-3 bg-gray-50 rounded-md border text-center">
+                    <p>[그림 1] 1894년 6월 전라도 일대<br>○○군의 이동 경로(화살표)</p>
+                    <p class="mt-2">[상상도] 고부 → 황토현 → 황룡촌 → 전주성</p>
+                </div>`,
+                options: ["동학 농민군 - 황룡촌 전투 승리", "동학 농민군 - 우금치 전투 패배", "의병 - 서울 진공 작전", "독립군 - 봉오동 전투", "의열단 - 조선 총독부 폭탄 투척"],
+                answer: "동학 농민군 - 황룡촌 전투 승리",
+                explanation: "제시된 경로는 1894년 동학 농민 운동 1차 봉기 당시 동학 농민군이 전라도 일대에서 정부군을 격파하며 전주성까지 점령했던 과정을 보여줍니다. 황룡촌 전투는 이 과정에서 거둔 중요한 승리 중 하나입니다."
+            },
+             {
+                question: `10. 다음 (보기)의 정책을 추진한 시기의 최고 통치 기구는?
+                <div class="text-sm my-2 p-3 bg-gray-50 rounded-md border">
+                    <b>(보기)</b><br>
+                    - 재정의 탁지아문 일원화<br>
+                    - 은본위 화폐제 도입<br>
+                    - 전국을 23부로 개편
+                </div>`,
+                options: ["군국기무처", "의정부", "교정청", "내각", "원수부"],
+                answer: "군국기무처",
+                explanation: "보기의 정책들은 갑오개혁 시기에 추진되었습니다. 재정 일원화는 1차, 은본위제와 23부제는 2차 개혁의 내용입니다. 갑오개혁, 특히 1차 개혁을 주도했던 핵심 기구는 군국기무처입니다. 비록 2차 개혁 때 폐지되지만 갑오개혁 전체를 상징하는 기구로 볼 수 있습니다."
+            },
+            {
+                question: `11. 다음 자료의 괄호 안에 들어갈 가장 적절한 개념은?
+                 <div class="text-sm my-2 p-3 bg-gray-50 rounded-md border">
+                    <b>[자료 다] 1898년 발표 문서 일부</b><br>
+                    "...외국과의 조약 체결, 재정 운용 등 나라의 중대사는 정부 대신과 ( )가 합의하여 처리하고..."
+                </div>`,
+                options: ["의정부", "중추원", "의회", "원수부", "교정청"],
+                answer: "중추원",
+                explanation: "자료는 독립협회가 관민공동회에서 결의한 '헌의 6조'의 내용입니다. 헌의 6조는 황제의 자문 기구였던 중추원을 서양의 의회와 같이 국민의 대표가 참여하는 기구로 개편하여 국가 중대사를 결정하자는 내용을 담고 있습니다. 따라서 괄호 안에는 '중추원'이 들어가는 것이 가장 정확합니다."
+            },
+            {
+                question: `12. 다음 (가), (나) 상황 이후에 전개된 사실로 올바른 것은?
+                 <div class="text-sm my-2 p-3 bg-gray-50 rounded-md border">
+                    <p><b>(가)</b> 일본 낭인들이 경복궁에 난입하여 국모를 시해하였다.</p>
+                    <p><b>(나)</b> 상투를 자르라는 명령에 유생들과 백성들이 격분하여 의병을 일으켰다.</p>
+                </div>`,
+                options: ["(가) 삼국 간섭 → (나) 을미사변", "(가) 을미사변 → (나) 을미의병", "(가) 갑신정변 → (나) 동학 농민 운동", "(가) 을사늑약 → (나) 정미의병", "(가) 경복궁 점령 → (나) 갑신정변"],
+                answer: "(가) 을미사변 → (나) 을미의병",
+                explanation: "(가)는 명성황후가 시해된 을미사변(1895.10)을, (나)는 을미개혁의 일환인 단발령에 반발하여 일어난 을미의병(1895.11~)을 설명합니다. 따라서 (가) 을미사변이 원인이 되어 (나) 을미의병이 일어나는 것이 올바른 인과 관계입니다."
+            },
+            {
+                question: "13. '구본신참(舊本新參)' 원칙을 내세운 개혁의 내용으로 옳지 않은 것은?",
+                options: ["근대적 토지 소유권 문서인 지계를 발급하였다.", "황제가 군 통수권을 장악하기 위해 원수부를 설치했다.", "신분 차별 없이 인재를 등용하기 위해 과거제를 폐지했다.", "나라의 위상을 높이기 위해 황제 즉위식을 거행했다.", "근대 교육을 위해 한성중학교 등 각종 학교를 설립했다."],
+                answer: "신분 차별 없이 인재를 등용하기 위해 과거제를 폐지했다.",
+                explanation: "'구본신참'은 옛 제도를 근본으로 삼아 새로운 것을 참조한다는 뜻으로, 대한제국 시기 광무개혁의 기본 원칙입니다. 과거제 폐지는 그 이전에 있었던 갑오개혁(1894)의 내용입니다."
+            },
+            {
+                question: "14. 의정서 → 협약 → 늑약 → 7조약으로 이어지는 국권 피탈 과정에서 두 번째 사건의 결과로 옳은 것은?",
+                options: ["통감부 설치", "재정·외교 고문 파견", "간도 협약 체결", "대한국 국제 반포", "한·미 수호 통상 조약 체결"],
+                answer: "재정·외교 고문 파견",
+                explanation: "국권 피탈 과정의 두 번째 단계는 제1차 한일 협약(1904.8)입니다. 이 협약으로 대한제국은 일본이 추천하는 재정 고문(메가타)과 외교 고문(스티븐스)을 두어야 했고, 이로 인해 내정 간섭이 심화되었습니다. 통감부 설치는 세 번째 단계인 을사늑약의 결과입니다."
+            },
+            {
+                question: "15. 다음 두 자료의 공통적인 취지로 가장 적절한 것은?<br><br><b>[자료 라] 갑오 2차 개혁 『홍범 14조』 (발췌)</b><br><b>[자료 마] 독립협회 『헌의 6조』 (발췌)</b>",
+                options: ["신분 타파와 재정 일원화", "왕권 강화를 통한 자주독립", "의회 설립을 통한 입헌 군주제 지향", "토지 개혁과 은본위제 도입", "교육 제도의 근대화"],
+                answer: "의회 설립을 통한 입헌 군주제 지향",
+                explanation: "홍범 14조는 의정부의 권한을 강화하여 왕권을 제한하려 했고, 헌의 6조는 중추원을 의회식으로 개편하여 국정에 참여하려 했습니다. 두 자료 모두 전제 군주제를 지양하고, 의회(또는 의회와 유사한 기구)를 통해 국왕의 권력을 견제하는 입헌 군주제를 지향했다는 공통점이 있습니다."
+            },
+            {
+                question: `16. 다음 주장을 한 인물 A와 B의 정치적 계열을 바르게 연결한 것은?
+                 <div class="text-sm my-2 p-3 bg-gray-50 rounded-md border">
+                    <p><b>A:</b> "동도서기론에 입각하여 서양의 기술은 받아들이되 우리의 제도와 정신은 지켜야 한다."</p>
+                    <p><b>B:</b> "문벌을 폐지하고 인민 평등권을 제정하며, 혜상공국을 혁파하는 등 14개조 개혁을 단행해야 한다."</p>
+                </div>`,
+                options: ["A-온건 개화파 / B-급진 개화파", "A-위정척사파 / B-온건 개화파", "A-급진 개화파 / B-애국계몽운동가", "A-애국계몽운동가 / B-독립운동가", "A-친일파 / B-의병장"],
+                answer: "A-온건 개화파 / B-급진 개화파",
+                explanation: "A는 동도서기론을 주장한 김홍집, 어윤중 등 온건 개화파의 입장입니다. B는 갑신정변 당시 급진 개화파가 발표한 14개조 정강의 내용으로, 김옥균, 박영효 등 급진 개화파의 주장입니다."
+            },
+            {
+                question: `17. 다음은 1907년 대한매일신보에 실린 삽화의 내용입니다. 이와 같은 상황이 나타나게 된 배경과 가장 거리가 먼 것은?
+                 <div class="text-sm my-2 p-3 bg-gray-50 rounded-md border text-center">
+                    <p class="italic">"...일본인 지주에게 높은 소작료를 내고 나면<br>우리 농민은 허리띠를 졸라매야 한다네..."</p>
+                    <p class="mt-2">[상상도] 야윈 농민이 일본인 지주에게 쌀가마를 바치는 모습</p>
+                </div>`,
+                options: ["동양 척식 주식 회사의 설립", "화폐 정리 사업", "토지 조사 사업", "메가타의 재정 장악", "국채 보상 운동"],
+                answer: "국채 보상 운동",
+                explanation: "삽화는 일제의 경제 침탈로 한국 농민의 삶이 피폐해진 상황을 보여줍니다. 동양 척식 주식 회사 설립, 화폐 정리 사업, 메가타의 재정 장악은 모두 일제의 경제 침탈 정책으로 한국 농민과 상공인에게 큰 피해를 주었습니다. 토지 조사 사업(1910년대)도 비슷한 맥락입니다. 반면, 국채 보상 운동은 이러한 경제 예속에 맞서 나라 빚을 갚자는 우리 민족의 경제적 자립 운동이었습니다. (※ 원문에 문제가 없어 임의로 제작함)"
+            },
+            {
+                question: `18. (보기)의 사건들과 가장 밀접한 관련이 있는 국제 조약은?
+                 <div class="text-sm my-2 p-3 bg-gray-50 rounded-md border">
+                    <b>(보기)</b><br>
+                    - 대한제국 칙령 제41호 공포 (1900년)<br>
+                    - 일본 시마네 현 고시 제40호 (1905년)
+                </div>`,
+                options: ["포츠머스 조약", "가쓰라-태프트 밀약", "제2차 영일 동맹", "제1차 영일 동맹", "시모노세키 조약"],
+                answer: "포츠머스 조약",
+                explanation: "보기의 사건들은 모두 '독도'의 영유권에 관한 것입니다. 일본은 러일 전쟁 중 독도의 군사적 가치에 주목하여 1905년 2월 시마네 현 고시로 불법 편입을 시도했습니다. 러일 전쟁을 종결짓고 일본의 한반도 지배권을 국제적으로 인정받게 된 조약이 바로 포츠머스 조약(1905.9)입니다. 따라서 일본의 독도 침탈은 러일전쟁이라는 큰 틀 안에서 이루어졌으며, 포츠머스 조약은 그 결과물이라 할 수 있습니다."
+            },
+             {
+                question: "19. (문제 누락)",
+                options: [],
+                answer: "",
+                explanation: "원본 PDF 파일에 19번 문제가 누락되었습니다."
+            },
+            {
+                question: "20. (문제 누락)",
+                options: [],
+                answer: "",
+                explanation: "원본 PDF 파일에 20번 문제가 누락되었습니다."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = new Array(quizData.length).fill(null);
+
+        const quizContainer = document.getElementById('quiz-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const progressIndicator = document.getElementById('progress-indicator');
+
+        function renderQuestion() {
+            const questionData = quizData[currentQuestionIndex];
+            if (!questionData) return;
+
+            // Fade out
+            quizContainer.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+
+            setTimeout(() => {
+                let optionsHtml = '';
+                if(questionData.options.length > 0) {
+                    questionData.options.forEach((option, index) => {
+                        const isChecked = userAnswers[currentQuestionIndex] === option;
+                        optionsHtml += `
+                            <div>
+                                <label class="quiz-option block border-2 border-gray-300 p-3 rounded-lg mb-3 cursor-pointer hover:bg-gray-100 transition-colors">
+                                    <input type="radio" name="question${currentQuestionIndex}" value="${option}" class="mr-3" ${isChecked ? 'checked' : ''}>
+                                    ${option}
+                                </label>
+                            </div>
+                        `;
+                    });
+                } else {
+                     optionsHtml = `<p class="text-gray-500">이 문제에 대한 선택지가 없습니다.</p>`;
+                }
+
+
+                quizContainer.innerHTML = `
+                    <div id="question-${currentQuestionIndex}">
+                        <h2 class="text-xl font-semibold mb-4 text-gray-900">${questionData.question}</h2>
+                        <div class="options-container">${optionsHtml}</div>
+                        <div class="mt-4 flex space-x-2">
+                             <button class="check-answer-btn bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition-colors">정답 확인</button>
+                        </div>
+                        <div class="explanation-container mt-4 hidden"></div>
+                    </div>
+                `;
+                
+                // Fade in
+                quizContainer.classList.remove('opacity-0');
+                
+                attachEventListeners();
+                updateNavigation();
+
+                if(userAnswers[currentQuestionIndex] !== null) {
+                    showResult(false);
+                }
+
+            }, 300); // Wait for fade out to complete
+        }
+
+        function attachEventListeners() {
+            const currentQuestionElem = document.getElementById(`question-${currentQuestionIndex}`);
+            if (!currentQuestionElem) return;
+
+            const radios = currentQuestionElem.querySelectorAll('input[type="radio"]');
+            radios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    userAnswers[currentQuestionIndex] = e.target.value;
+                });
+            });
+
+            const checkBtn = currentQuestionElem.querySelector('.check-answer-btn');
+            if(checkBtn) {
+                 checkBtn.addEventListener('click', () => showResult(true));
+            }
+        }
+
+        function showResult(isFirstCheck) {
+            const questionData = quizData[currentQuestionIndex];
+            const selectedOptionValue = userAnswers[currentQuestionIndex];
+            const questionElem = document.getElementById(`question-${currentQuestionIndex}`);
+            const options = questionElem.querySelectorAll('.quiz-option');
+            const explanationContainer = questionElem.querySelector('.explanation-container');
+            const checkBtn = questionElem.querySelector('.check-answer-btn');
+
+            if (checkBtn) checkBtn.disabled = true;
+
+            options.forEach(optionLabel => {
+                const radio = optionLabel.querySelector('input');
+                radio.disabled = true;
+                if (radio.value === questionData.answer) {
+                    optionLabel.classList.add('correct');
+                } else if (radio.checked) {
+                    optionLabel.classList.add('incorrect');
+                }
+            });
+
+            explanationContainer.innerHTML = `<div class="explanation"><b>해설:</b> ${questionData.explanation}</div>`;
+            explanationContainer.classList.remove('hidden');
+        }
+
+
+        function updateNavigation() {
+            progressIndicator.textContent = `${currentQuestionIndex + 1} / ${quizData.length}`;
+            prevBtn.disabled = currentQuestionIndex === 0;
+            nextBtn.disabled = currentQuestionIndex === quizData.length - 1;
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestionIndex < quizData.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            }
+        });
+
+        // Initial render
+        renderQuestion();
+    </script>
+</body>
+</html>

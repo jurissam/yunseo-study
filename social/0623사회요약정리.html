@@ -292,10 +292,14 @@
                 </section>
             `;
             
+            // Re-attach event listeners after new HTML is rendered
             contentContainer.querySelectorAll('.quiz-option-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => checkAnswer(e.currentTarget, q));
             });
-            contentContainer.querySelector('#next-question-btn').addEventListener('click', displayQuizQuestion);
+            contentContainer.querySelector('#next-question-btn').addEventListener('click', () => {
+                currentQuestionIndex++; // Increment index for next question
+                displayQuizQuestion();
+            });
         }
 
         function checkAnswer(selectedButton, questionData) {

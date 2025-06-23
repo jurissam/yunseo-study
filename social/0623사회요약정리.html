@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사회 다문화와 문화 상대주의 완전 정복</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Scholarly Blue & Warm Neutrals -->
+    <!-- Application Structure Plan: 핵심 개념인 '문화 이해의 세 가지 시선', '다문화 수용 방식', 그리고 '사례 탐구'와 '최종 퀴즈'를 명확히 구분하는 탭 기반 내비게이션을 설계했습니다. 이 구조는 사용자가 복잡한 사회 개념을 주제별로 나누어 체계적으로 학습하고, 특히 시험에 자주 나오는 비교/대조 포인트를 쉽게 파악하도록 돕습니다. '사례 탐구' 섹션에서는 클릭을 통해 정답과 해설을 확인하는 방식을 도입하여, 단순 정보 전달을 넘어 사용자의 능동적인 사고와 참여를 유도합니다. '최종 퀴즈'는 학습 성과를 즉각적으로 점검하게 하여 시험 대비 효과를 극대화합니다. 이 설계는 원문의 교육적 목표를 달성하기 위해, 정보를 논리적으로 재구성하고 상호작용을 통해 깊이 있는 학습 경험을 제공하는 데 중점을 둡니다. -->
+    <!-- Visualization & Content Choices: 
+        - 정보: 문화 이해 태도(정의, 장단점), 다문화 수용 방식(정의, 비유), 실제 사례 분석. 목표: 개념의 이해, 비교 분석, 사례 적용 능력 함양.
+        - 표현 방식: Chart.js 대신 구조화된 HTML 카드와 Tailwind CSS를 사용. 각 개념을 비교하는 그리드 레이아웃과 장단점을 나타내는 유니코드 아이콘(👍, 👎)을 활용하여 정보를 시각적으로 구조화. '다문화 수용 방식'에서는 각 이론의 비유(용광로, 샐러드 보울, 잔치국수)를 텍스트와 간단한 아이콘으로 표현.
+        - 상호작용:
+            1. 탭 내비게이션: 주제 간 빠른 전환.
+            2. 클릭-투-리빌 카드: '사례 탐구' 섹션에서 사례를 먼저 보고 직접 판단한 뒤, 클릭하여 정답과 해설을 확인하는 능동적 학습 방식.
+            3. 인터랙티브 퀴즈: OX 및 객관식 문제 제공, 선택 즉시 정답/오답 피드백과 해설 제시, 최종 점수 확인.
+        - 정당성: 개념적이고 텍스트 중심인 사회 과목의 특성에 맞춰, 복잡한 시각화보다는 명확한 정보 구조화와 상호작용을 통한 학습자 참여 유도에 집중했습니다. 이는 시험 대비라는 명확한 목표에 가장 효과적인 접근 방식입니다.
+        - 라이브러리/방법: Vanilla JS, Tailwind CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #F8F9FA;
+            color: #343A40;
+        }
+        .nav-btn {
+            transition: all 0.3s ease;
+            border-bottom: 4px solid transparent;
+            white-space: nowrap;
+        }
+        .nav-btn.active {
+            color: #1C7ED6;
+            border-bottom-color: #1C7ED6;
+            font-weight: 700;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card {
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #E9ECEF;
+        }
+        .highlight-teacher {
+            color: #E03131;
+            font-weight: 900;
+        }
+        .case-card-front, .case-card-back {
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            transition: transform 0.6s;
+        }
+        .case-card-back {
+            transform: rotateY(180deg);
+        }
+        .case-card.is-flipped .case-card-front {
+            transform: rotateY(180deg);
+        }
+        .case-card.is-flipped .case-card-back {
+            transform: rotateY(360deg);
+        }
+        .quiz-option-btn:hover:not([disabled]) {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .nav-container {
+            overflow-x: auto;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .nav-container::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-6xl">
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="text-3xl md:text-4xl font-black text-gray-800">★사회 다문화 완전 정복: 기말고사 만점 비법★</h1>
+            <p class="text-lg md:text-xl text-gray-500 mt-2">선생님과 함께 시험에 나오는 핵심만 콕콕!</p>
+        </header>
+
+        <div class="nav-container border-b border-gray-200 mb-8">
+            <nav class="flex justify-start md:justify-center -mb-px">
+                <button class="nav-btn p-4 text-lg" data-target="perspectives">문화 이해의 시선</button>
+                <button class="nav-btn p-4 text-lg" data-target="acceptance-models">다문화 수용 방식</button>
+                <button class="nav-btn p-4 text-lg" data-target="case-studies">사례 탐구</button>
+                <button class="nav-btn p-4 text-lg" data-target="quiz">최종 퀴즈</button>
+            </nav>
+        </div>
+
+        <main id="content-container"></main>
+    </div>
+
+    <script>
+        const appData = {
+            perspectives: {
+                title: '문화 이해의 세 가지 시선 (★★★시험에 반드시 나옵니다!!★★★)',
+                intro: '얘들아~ 다른 문화를 볼 때 우리는 세 가지 안경을 쓸 수 있어. 이 세 가지를 비교하는 건 시험 단골 문제야!',
+                items: [
+                    { name: '자문화 중심주의', desc: '자기 문화를 기준으로 다른 문화를 부정적으로 평가. "우리 것이 최고!"', pros: '문화적 자부심 강화', cons: '편견, 차별, 갈등 발생', example: '서양인들이 젓가락 문화를 야만적이라 여긴 것' },
+                    { name: '문화 사대주의', desc: '다른 문화를 우월하게 여기고 자기 문화를 낮게 평가. "외국 것이 최고!"', pros: '선진 문화의 빠른 수용', cons: '문화적 정체성 상실, 자기 비하', example: '일제 강점기 우리말 금지 정책' },
+                    { name: '문화 상대주의', desc: '문화는 그 사회의 맥락에서 이해해야 한다는 태도. "그럴 수도 있지!"', pros: '문화 다양성 존중, 갈등 감소', cons: '극단적 상대주의 경계 필요 (보편 윤리 위배)', example: '이슬람의 돼지고기 금기 문화 이해' }
+                ]
+            },
+            'acceptance-models': {
+                title: '문화 다양성 수용 방식 (★★이 세 가지! 꼭 비교해서 정리!!!★★)',
+                intro: '다문화 사회에서 다양한 문화를 어떻게 받아들일까? 이 세 가지 비유를 꼭 기억해야 해! 시험 직행이야!!',
+                items: [
+                    { name: '동화주의', metaphor: '용광로 이론 (Melting Pot)', icon: '🔥', desc: '이주민 문화가 주류 문화에 흡수되어 하나가 되어야 한다는 관점.', keywords: '"우리 안에 들어왔으면 우리 문화 따라야 돼!"' },
+                    { name: '다문화주의', metaphor: '샐러드 보울 이론 (Salad Bowl)', icon: '🥗', desc: '다양한 문화가 각자의 정체성을 유지하며 조화롭게 공존한다는 관점.', keywords: '"각자의 색과 맛 유지하면서 함께!"' },
+                    { name: '다문화 공화주의', metaphor: '잔치국수 비유', icon: '🍜', desc: '다양성을 존중하되, 사회 통합을 위한 보편적 가치는 공유해야 한다는 관점.', keywords: '"고명은 다양하지만 국물은 하나야!"' }
+                ]
+            },
+            'case-studies': {
+                title: '사례 탐구 (★★사례+이론 연결형 문제 자주 출제!!★★)',
+                intro: '자, 이제 실제 사례를 보고 어떤 관점인지, 옳은지 그른지 직접 판단해보자! 카드를 클릭하면 정답과 해설이 나와!',
+                cases: [
+                    { case: '스리랑카 사람들은 숟가락 대신 손으로 밥을 먹는다. 비위생적이라고 비난해야 할까?', answer: '문화 상대주의로 이해해야 합니다.', explanation: '그들에게는 손이 숟가락보다 더 위생적일 수 있고, 음식의 맛을 더 잘 느끼게 해주는 소중한 문화입니다.' },
+                    { case: '과거 인도의 일부 지역에서는 남편이 죽으면 아내도 함께 불에 타 죽는 \'사티(Sati)\' 풍습이 있었다.', answer: '문화 상대주의로 존중할 수 없습니다.', explanation: '인간의 생명과 존엄성이라는 보편적 윤리에 어긋나기 때문입니다. 문화 상대주의도 한계가 있다는 것을 보여주는 대표적인 사례입니다. <span class="highlight-teacher">이거 시험 단골!</span>' },
+                    { case: '프랑스는 공공장소에서 이슬람 여성의 부르카 착용을 법으로 금지하고 있다.', answer: '다문화 공화주의 & 논쟁적 사안입니다.', explanation: '프랑스는 개인의 종교적 자유보다 사회 통합과 공공의 가치(성 평등, 공공 안전 등)를 우선시하는 다문화 공화주의 입장을 취합니다. 하지만 이는 문화 상대주의적 관점에서 개인의 문화적 정체성을 억압한다는 비판도 받습니다.' },
+                    { case: '아마존의 한 부족은 옷 대신 복잡한 문신으로 사회적 지위를 나타낸다.', answer: '문화 상대주의로 존중해야 합니다.', explanation: '그들에게 문신은 옷과 같은 사회적 기호이자 정체성의 표현입니다. 억지로 옷을 입히는 것은 그들의 문화를 파괴하는 행위가 될 수 있습니다.' }
+                ]
+            },
+            quiz: {
+                title: '기말고사 만점! 최종 실력 점검 퀴즈!',
+                intro: '자, 이제 진짜 실력 발휘할 시간! 지금까지 배운 거 퀴즈로 확인해 보자! 파이팅!',
+                questions: [
+                    { q: "자기 문화를 최고라고 여기며 다른 문화를 업신여기는 태도는 '문화 사대주의'이다.", type: 'OX', correctAnswer: 'X', explanation: "'자문화 중심주의'에 대한 설명입니다. 문화 사대주의는 반대로 다른 문화를 더 우월하게 여기는 태도입니다." },
+                    { q: "다음 중 '샐러드 보울 이론'과 가장 관련 깊은 다문화 정책은?", options: ['동화주의', '다문화주의', '다문화 공화주의'], correctAnswer: '다문화주의', explanation: "샐러드 보울은 각 재료가 고유의 맛을 유지하며 조화를 이루는 것처럼, 다양한 문화가 정체성을 지키며 공존하는 '다문화주의'를 비유합니다." },
+                    { q: "문화 상대주의는 인간의 존엄성을 침해하는 문화까지 모두 존중해야 한다는 입장이다.", type: 'OX', correctAnswer: 'X', explanation: "아닙니다! 문화 상대주의는 보편적 윤리를 침해하지 않는 범위 내에서 적용되어야 합니다. '사티' 제도가 대표적인 반례입니다. <span class='highlight-teacher'>이게 핵심이야!</span>" },
+                    { q: "일제강점기, 창씨개명과 우리말 사용 금지는 어떤 태도의 극단적인 사례인가?", options: ['자문화 중심주의', '문화 사대주의', '문화 상대주의'], correctAnswer: '자문화 중심주의', explanation: "일본이 자신들의 문화를 기준으로 우리 민족의 문화를 없애려 한 것이므로, 침략국의 '자문화 중심주의'입니다. 동시에, 이에 동조하며 우리 문화를 낮게 본 일부 조선인들의 태도는 '문화 사대주의'로 볼 수 있습니다. 문제는 침략국의 태도를 묻고 있어요!"},
+                    { q: "다음 중 문화 상대주의의 '단점' 또는 '경계해야 할 점'을 가장 잘 나타낸 것은?", options: ['문화적 자부심이 약화될 수 있다.', '다른 문화에 대한 편견이 심해질 수 있다.', '인간의 보편적 가치(자유, 존엄)를 훼손하는 문화도 수용할 위험이 있다.'], correctAnswer: '인간의 보편적 가치(자유, 존엄)를 훼손하는 문화도 수용할 위험이 있다.', explanation: "문화 상대주의는 모든 문화를 존중하지만, 인간의 보편적 가치를 침해하는 것은 무비판적으로 수용해서는 안 됩니다. 이 점이 가장 중요하고 시험에 자주 나옵니다!" },
+                    { q: "파파라떼 문화(남성 육아 참여)는 문화 환경이 사회 구조에 미치는 영향을 보여주는 사례이다.", type: 'OX', correctAnswer: 'O', explanation: "맞습니다! 과거 바이킹 문화처럼, 사회 환경과 필요성이 문화의 변화를 가져온 좋은 예시입니다." },
+                    { q: "한 사회의 공공장소에서 종교적 상징물 착용을 법으로 제한하는 것은 '다문화주의'의 입장이다.", type: 'OX', correctAnswer: 'X', explanation: "아닙니다. 이는 '다문화 공화주의'의 입장으로, 다양한 문화를 인정하면서도 사회 통합을 위한 보편적 가치나 공공 질서를 더 중요하게 여기는 태도입니다." },
+                    { q: "'용광로 이론'은 다양한 문화가 각자의 정체성을 유지하며 공존하는 다문화 정책을 의미한다.", type: 'OX', correctAnswer: 'X', explanation: "아닙니다. 용광로 이론은 다양한 문화가 주류 문화에 '동화되어' 하나의 문화로 녹아드는 '동화주의'를 의미합니다. 각자의 정체성을 유지하는 것은 '샐러드 보울 이론'(다문화주의)입니다." },
+                    { q: "문화 다양성 수용 방식 중, 프랑스의 정책처럼 공동체의 보편적 가치를 중요시하며 '국물은 하나'라고 비유되는 것은 무엇인가?", options: ['동화주의', '다문화주의', '다문화 공화주의'], correctAnswer: '다문화 공화주의', explanation: "잔치국수 비유처럼, 고명은 다양하지만 국물은 하나라는 비유는 '다문화 공화주의'를 가장 잘 나타냅니다." }
+                ]
+            }
+        };
+
+        const contentContainer = document.getElementById('content-container');
+        const navButtons = document.querySelectorAll('.nav-btn');
+
+        function renderPerspectives() {
+            const data = appData.perspectives;
+            let itemsHtml = data.items.map(item => `
+                <div class="card p-6 flex flex-col">
+                    <h3 class="text-xl font-bold text-center mb-4 text-[#1C7ED6]">${item.name}</h3>
+                    <p class="text-center italic text-gray-600 mb-4">"${item.desc}"</p>
+                    <div class="space-y-3 mt-auto">
+                        <p><strong class="font-bold text-green-600">👍 장점:</strong> ${item.pros}</p>
+                        <p><strong class="font-bold text-red-600">👎 단점:</strong> ${item.cons}</p>
+                        <p class="mt-2 pt-2 border-t"><strong class="font-bold">👀 예시:</strong> ${item.name === '문화 사대주의' ? `<span class="highlight-teacher">${item.example}</span>` : item.example}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            contentContainer.innerHTML = `
+                <section id="perspectives" class="content-section active">
+                    <div class="card p-6 mb-6">
+                        <h2 class="text-2xl font-bold mb-2">${data.title}</h2>
+                        <p class="text-gray-600">${data.intro}</p>
+                    </div>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        ${itemsHtml}
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderAcceptanceModels() {
+            const data = appData['acceptance-models'];
+            let itemsHtml = data.items.map(item => `
+                <div class="card p-6 text-center">
+                     <div class="text-5xl mb-4">${item.icon}</div>
+                     <h3 class="text-xl font-bold mb-2">${item.name}</h3>
+                     <p class="font-semibold text-[#1C7ED6] mb-4">${item.metaphor}</p>
+                     <p class="text-gray-700 mb-4">${item.desc}</p>
+                     <p class="mt-auto p-3 bg-gray-100 rounded-lg text-sm font-bold">"${item.keywords}"</p>
+                </div>
+            `).join('');
+
+            contentContainer.innerHTML = `
+                <section id="acceptance-models" class="content-section active">
+                    <div class="card p-6 mb-6">
+                        <h2 class="text-2xl font-bold mb-2">${data.title}</h2>
+                        <p class="text-gray-600">${data.intro}</p>
+                    </div>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        ${itemsHtml}
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderCaseStudies() {
+            const data = appData['case-studies'];
+            let casesHtml = data.cases.map((c, index) => `
+                <div class="case-card-container h-64 [perspective:1000px]">
+                    <div id="case-${index}" class="case-card relative w-full h-full cursor-pointer [transform-style:preserve-3d]">
+                        <div class="case-card-front absolute w-full h-full p-6 flex flex-col justify-center items-center text-center bg-white rounded-lg shadow-md border">
+                            <h4 class="text-lg font-bold">CASE ${index + 1}</h4>
+                            <p class="mt-2">${c.case}</p>
+                            <p class="absolute bottom-4 text-xs text-gray-400 font-bold">카드를 클릭하여 정답 확인</p>
+                        </div>
+                        <div class="case-card-back absolute w-full h-full p-6 flex flex-col justify-center bg-blue-50 border border-blue-200 rounded-lg">
+                            <p class="text-blue-800 font-bold text-lg mb-2">${c.answer}</p>
+                            <p class="text-blue-700 text-sm">${c.explanation}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+             contentContainer.innerHTML = `
+                <section id="case-studies" class="content-section active">
+                    <div class="card p-6 mb-6">
+                        <h2 class="text-2xl font-bold mb-2">${data.title}</h2>
+                        <p class="text-gray-600">${data.intro}</p>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        ${casesHtml}
+                    </div>
+                </section>
+            `;
+
+            document.querySelectorAll('.case-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    card.classList.toggle('is-flipped');
+                });
+            });
+        }
+        
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        function renderQuiz() {
+             currentQuestionIndex = 0;
+             score = 0;
+             displayQuizQuestion();
+        }
+
+        function displayQuizQuestion() {
+            const quizData = appData.quiz;
+            if (currentQuestionIndex >= quizData.questions.length) {
+                showQuizResult(quizData.questions.length);
+                return;
+            }
+
+            const q = quizData.questions[currentQuestionIndex];
+            let optionsHtml = '';
+            if (q.type === 'OX') {
+                optionsHtml = `
+                    <button class="quiz-option-btn w-full text-left p-4 bg-white hover:bg-gray-100 rounded-lg shadow-sm border border-gray-200 mb-2 transition-all" data-answer="O">O (맞다)</button>
+                    <button class="quiz-option-btn w-full text-left p-4 bg-white hover:bg-gray-100 rounded-lg shadow-sm border border-gray-200 mb-2 transition-all" data-answer="X">X (틀리다)</button>
+                `;
+            } else {
+                optionsHtml = q.options.map(opt => `
+                    <button class="quiz-option-btn w-full text-left p-4 bg-white hover:bg-gray-100 rounded-lg shadow-sm border border-gray-200 mb-2 transition-all" data-answer="${opt}">${opt}</button>
+                `).join('');
+            }
+            
+            contentContainer.innerHTML = `
+                <section id="quiz" class="content-section active space-y-6">
+                    <div class="card p-6">
+                        <h2 class="text-2xl font-bold mb-2">${quizData.title}</h2>
+                        <p class="text-gray-600">${quizData.intro}</p>
+                    </div>
+                    <div class="card p-6">
+                        <div class="text-xl font-bold mb-4">
+                            <span>문제 ${currentQuestionIndex + 1}/${quizData.questions.length}</span>
+                        </div>
+                        <p class="text-lg mb-6">${q.q}</p>
+                        <div id="quiz-options-container">${optionsHtml}</div>
+                        <div id="quiz-feedback-container" class="mt-4 transition-all duration-500 max-h-0 overflow-hidden"></div>
+                        <button id="next-question-btn" class="mt-6 w-full py-3 bg-[#1C7ED6] text-white font-bold rounded-lg shadow-md hover:bg-opacity-90 transition-colors" style="display: none;">다음 문제</button>
+                    </div>
+                </section>
+            `;
+            
+            contentContainer.querySelectorAll('.quiz-option-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => checkAnswer(e.currentTarget, q));
+            });
+            contentContainer.querySelector('#next-question-btn').addEventListener('click', displayQuizQuestion);
+        }
+
+        function checkAnswer(selectedButton, questionData) {
+            const selectedAnswer = selectedButton.dataset.answer;
+            const feedbackContainer = document.getElementById('quiz-feedback-container');
+            
+            let feedbackHtml;
+            if (selectedAnswer === questionData.correctAnswer) {
+                score++;
+                selectedButton.classList.add('bg-green-100', 'border-green-400');
+                feedbackHtml = `<div class="p-4 bg-green-50 border-l-4 border-green-500 rounded-r-lg">
+                    <p class="font-bold text-green-800">✨ 정답입니다!</p>
+                    <p class="mt-2 text-green-700">${questionData.explanation}</p>
+                </div>`;
+            } else {
+                selectedButton.classList.add('bg-red-100', 'border-red-400');
+                feedbackHtml = `<div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
+                    <p class="font-bold text-red-800">😅 아쉽네요, 오답입니다.</p>
+                     <p class="mt-2 text-red-700"><strong>해설:</strong> ${questionData.explanation}</p>
+                </div>`;
+            }
+            feedbackContainer.innerHTML = feedbackHtml;
+            feedbackContainer.style.maxHeight = '200px';
+            document.getElementById('next-question-btn').style.display = 'block';
+            contentContainer.querySelectorAll('.quiz-option-btn').forEach(btn => btn.disabled = true);
+        }
+
+        function showQuizResult(totalQuestions) {
+            contentContainer.innerHTML = `
+                <section id="quiz-result" class="content-section active space-y-6">
+                    <div class="card p-8 text-center">
+                        <h2 class="text-3xl font-bold mb-4">🎉 퀴즈 완료! 고생 많았어! 🎉</h2>
+                        <p class="text-xl mb-4">총 ${totalQuestions} 문제 중</p>
+                        <p class="text-6xl font-extrabold text-[#1C7ED6] mb-6">${score}개 정답!</p>
+                        <p class="text-lg text-gray-700">${score === totalQuestions ? '완벽해! 이대로면 기말고사 만점 문제없겠다!' : '조금만 더 복습하면 완벽할 거야! 오답은 꼭 다시 확인해봐!'}</p>
+                        <button id="restart-quiz-btn" class="mt-8 py-3 px-8 bg-[#1C7ED6] text-white font-bold rounded-lg shadow-md hover:bg-opacity-90">퀴즈 다시 풀기</button>
+                    </div>
+                </section>
+            `;
+            document.getElementById('restart-quiz-btn').addEventListener('click', renderQuiz);
+        }
+
+        function renderContent(key) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+
+            switch (key) {
+                case 'perspectives':
+                    renderPerspectives();
+                    break;
+                case 'acceptance-models':
+                    renderAcceptanceModels();
+                    break;
+                case 'case-studies':
+                    renderCaseStudies();
+                    break;
+                case 'quiz':
+                    renderQuiz();
+                    break;
+            }
+             document.querySelector(`#${key}`).classList.add('active');
+        }
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                renderContent(button.dataset.target);
+            });
+        });
+
+        document.querySelector('.nav-btn').click();
+    </script>
+</body>
+</html>

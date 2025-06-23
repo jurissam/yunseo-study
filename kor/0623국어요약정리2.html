@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>국어 음운 변동 완전 정복 (기말고사 만점 최종판)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals & Energetic Red -->
+    <!-- Application Structure Plan: 상단에 핵심 개념(형태소와 음운), 주요 음운 변동 규칙들, 그리고 최종 퀴즈를 선택할 수 있는 탭 형식의 내비게이션을 배치했습니다. 사용자가 각 탭을 클릭하면 해당 규칙의 [선생님 인트로], [핵심 개념], [대화형 예시], 그리고 [기말고사 만점 비법]이 담긴 카드가 나타납니다. 이 구조는 복잡한 문법 규칙을 체계적으로 분리하여 사용자가 원하는 부분을 집중적으로 학습하고, 시험에 나올 부분만 골라 복습할 수 있게 돕습니다. '대화형 예시'는 클릭을 통해 정답과 해설을 확인하는 방식으로 능동적인 학습 참여를 유도하며, '만점 비법' 카드는 원문의 강조 사항을 시각적으로 부각하여 학습 효율을 극대화합니다. 이 설계는 원문의 교육적 목표를 달성하기 위해 선형적인 문서 구조를 넘어 비선형적이고 탐색적인 학습 경험을 제공하는 데 최적화되었습니다. -->
+    <!-- Visualization & Content Choices: 
+        - 정보: 음운 변동 및 형태소 규칙(정의, 조건, 예시, 예외, 시험 포인트). 목표: 문법 규칙의 이해, 암기 및 시험 대비.
+        - 표현 방식: Chart.js 대신 구조화된 HTML 카드와 Tailwind CSS를 사용. 규칙의 변화 과정(예: ㄷ + ㅣ → ㅈ)은 텍스트와 유니코드 화살표(→)를 이용한 다이어그램 형식으로 시각화.
+        - 상호작용:
+            1. 탭 내비게이션: 각 음운 변동 섹션 및 퀴즈 섹션 간의 빠른 전환.
+            2. 클릭-투-리빌(Click-to-Reveal): 예시 단어를 클릭하면 발음과 해설이 나타나, 수동적 읽기가 아닌 능동적 기억 회상 훈련을 유도.
+            3. 퀴즈 인터랙션: 선택지 클릭 시 즉각적인 정답/오답 피드백, 해설 제공 및 최종 점수 표시.
+        - 정당성: 텍스트 기반의 교육 콘텐츠에 가장 적합하며, 선생님의 강조 어투를 살린 디자인과 사용자의 참여를 유도하는 상호작용으로 학습 효과를 높입니다. 복잡한 라이브러리 없이 핵심 개념 전달과 시험 대비에 집중할 수 있습니다.
+        - 라이브러리/방법: Vanilla JS, Tailwind CSS. 
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
+        }
+        .nav-btn {
+            transition: all 0.3s ease;
+            border-bottom: 4px solid transparent;
+            white-space: nowrap;
+        }
+        .nav-btn.active {
+            color: #C18C5D;
+            border-bottom-color: #C18C5D;
+            font-weight: 700;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card {
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #F0EBE3;
+            overflow: hidden;
+        }
+        .example-btn, .quiz-option-btn {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .example-btn:hover, .quiz-option-btn:hover:not([disabled]) {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .example-result {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .example-result.show {
+            max-height: 200px;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .highlight-teacher {
+            color: #D9534F;
+            font-weight: 900;
+        }
+        .sound-change {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            background-color: #F7F7F7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .quiz-feedback {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+        }
+        .quiz-feedback.show {
+            max-height: 200px;
+        }
+        .nav-container {
+            overflow-x: auto;
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+        .nav-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, and Opera */
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="text-3xl md:text-4xl font-black text-[#4A4A4A]">★기말고사 만점 비법: 음운 변동 최종 정리★</h1>
+            <p class="text-lg md:text-xl text-gray-500 mt-2">선생님과 함께 시험에 나오는 핵심만 콕콕!</p>
+        </header>
+
+        <div class="nav-container border-b border-gray-200 mb-8">
+            <nav class="flex justify-start md:justify-center -mb-px">
+                <button class="nav-btn p-4 text-lg" data-target="morpheme-phoneme">형태소와 음운</button>
+                <button class="nav-btn p-4 text-lg" data-target="gu-gae-eum-hwa">구개음화</button>
+                <button class="nav-btn p-4 text-lg" data-target="doen-so-ri">된소리되기</button>
+                <button class="nav-btn p-4 text-lg" data-target="bi-eum-hwa">비음화</button>
+                <button class="nav-btn p-4 text-lg" data-target="yu-eum-hwa">유음화</button>
+                <button class="nav-btn p-4 text-lg" data-target="tal-lak">탈락/축약</button>
+                <button class="nav-btn p-4 text-lg" data-target="quiz">최종 퀴즈</button>
+            </nav>
+        </div>
+
+        <main id="content-container"></main>
+    </div>
+
+    <script>
+        const appData = {
+            'morpheme-phoneme': {
+                title: '형태소와 음운 (기본 중의 기본!)',
+                intro: '얘들아~ 기말고사 만점 받으려면 이 기본 개념부터 잡아야 해! 형태소가 뭐라고? 뜻을 가진 가장 작은 단위! 음운은? 소리 단위! 이 차이가 모든 음운 변동의 시작이야!',
+                definition: [
+                    { term: '음운(Phoneme)', desc: '의미를 구별해 주는 가장 작은 <span class="highlight-teacher">소리</span> 단위. (예: \'말\'과 \'발\'의 \'ㅁ\' vs \'ㅂ\')' },
+                    { term: '형태소(Morpheme)', desc: '뜻을 가진 가장 작은 단위. (예: \'나무\', \'들\', \'이\')' }
+                ],
+                subsections: [
+                    {
+                        title: '형태소의 종류',
+                        content: `
+                            <p class="mb-2"><strong class="text-lg text-[#C18C5D]">실질 형태소:</strong> ★의미가 있는 핵심 부분!★ (예: '하늘', '먹다'의 '먹-')</p>
+                            <p><strong class="text-lg text-[#C18C5D]">형식 형태소:</strong> ★문법적인 기능만!★ (예: 조사 '이/가', 어미 '-다', 접사 '-개')</p>
+                        `
+                    }
+                ],
+                examPoint: '<span class="highlight-teacher">★★시험에 반드시 나옵니다!!★★</span> 왜 이걸 구분해야 하냐고? 바로 이 <span class="highlight-teacher">형식 형태소가 음운 변동을 유발하는 아주 중요한 열쇠</span>가 되기 때문이야! 앞 단어 끝소리와 만나서 소리 변화가 일어나는 경우가 정말 많거든! <span class="highlight-teacher">이거! 시험!!</span>'
+            },
+            'gu-gae-eum-hwa': {
+                title: '구개음화 (口蓋音化)',
+                intro: '자, 구개음화! 받침 ‘ㄷ, ㅌ’이 모음 ‘ㅣ’를 만나서 착한 ‘ㅈ, ㅊ’ 소리로 바뀌는 현상이야. 이거 모르면 간첩이야, 간첩!',
+                definition: "받침 'ㄷ, ㅌ'이 모음 'ㅣ'나 반모음 'ㅣ'로 시작하는 <span class='highlight-teacher'>형식 형태소</span>와 만나면 → 'ㅈ, ㅊ'으로 바뀌는 현상!",
+                examples: [
+                    { q: '같이', a: '[가치]', desc: "ㅌ + 형식 형태소 '-이' → 'ㅊ'으로 변신!" },
+                    { q: '굳이', a: '[구지]', desc: "ㄷ + 형식 형태소 '-이' → 'ㅈ'으로 변신!" }
+                ],
+                examPoint: '<span class="highlight-teacher">★초빈출★★</span> <span class="highlight-teacher">조건이 핵심!</span> 아무 \'ㅣ\'나 만나면 안 돼! <span class="highlight-teacher">형식 형태소가 진짜 핵심이다!</span> (예: \'밭이\' [바치]는 구개음화, 하지만 \'밭이랑\' [반니랑]은 비음화! 여기서 \'이랑\'은 실질 형태소(명사)라서 그래!)'
+            },
+            'doen-so-ri': {
+                title: '된소리되기 (硬音化)',
+                intro: '된소리되기! 예사소리가 된소리로 딱! 하고 강하게 바뀌는 거야. 이건 조건이 여러 개라 헷갈릴 수 있으니 정신 바짝 차리자!',
+                definition: "예사소리(ㄱ, ㄷ, ㅂ, ㅅ, ㅈ)가 된소리(ㄲ, ㄸ, ㅃ, ㅆ, ㅉ)로 바뀌는 현상.",
+                examples: [
+                    { q: '국밥', a: '[국빱]', desc: "받침 ㄱ + ㅂ → [ㅃ]" },
+                    { q: '신고', a: '[신꼬]', desc: "용언 어간 받침 ㄴ + ㄱ → [ㄲ]" },
+                    { q: '갈 사람', a: '[갈싸람]', desc: "관형사형 어미 '-ㄹ' + ㅅ → [ㅆ]" }
+                ],
+                examPoint: '<span class="highlight-teacher">★★반드시 암기★★</span> 특히 <span class="highlight-teacher">용언 어간 뒤</span>랑 <span class="highlight-teacher">관형사형 어미 뒤</span>가 중요해! ★목적격 조사 \'을/를\' 뒤는 된소리 안 나!★ \'밥을 먹다\'랑 \'갈 사람\'은 완전 다른 거야! <span class="highlight-teacher">모양은 같아도 문법적 기능에 따라 발음 달라져요!! 시험에 꼭 나온다!!</span>'
+            },
+            'bi-eum-hwa': {
+                title: '비음화 (鼻音化)',
+                intro: '비음화~ 코로 소리가 나는 비음(ㄴ,ㅁ,ㅇ) 친구들 따라가는 거야. 발음이 부드러워지는 자연스러운 현상이지!',
+                definition: "비음(ㄴ, ㅁ) 앞에서 받침(ㄱ, ㄷ, ㅂ)이 비음(ㅇ, ㄴ, ㅁ)으로 바뀌는 현상.",
+                examples: [
+                    { q: '국물', a: '[궁물]', desc: "ㄱ + ㅁ → [ㅇ]" },
+                    { q: '닫는', a: '[단는]', desc: "ㄷ + ㄴ → [ㄴ]" }
+                ],
+                examPoint: '<span class="highlight-teacher">★시험에 꼭 나옵니다!! 외워요★★</span> 음절의 끝소리 규칙이랑 같이 나올 때가 많아! 받침이 대표음으로 먼저 바뀐 다음에 비음화가 일어나는 과정(예: 앞마당[압마당]→[암마당]), 잊지 마!'
+            },
+            'yu-eum-hwa': {
+                title: '유음화 (流音化)',
+                intro: '유음화! 유음 \'ㄹ\'이 워낙 강력해서 옆에 있는 \'ㄴ\'을 자기랑 똑같은 \'ㄹ\'로 만들어버리는 거야. 친구 따라 강남 가는 거지!',
+                definition: "'ㄴ'과 'ㄹ'이 만나면 둘 다 'ㄹ'로 발음되는 현상.",
+                examples: [
+                    { q: '신라', a: '[실라]', desc: "ㄴ + ㄹ → [ㄹ+ㄹ]" },
+                    { q: '칼날', a: '[칼랄]', desc: "ㄹ + ㄴ → [ㄹ+ㄹ]" }
+                ],
+                examPoint: '<span class="highlight-teacher">★★자주 출제 포인트★★</span> \'ㄴ\'이 \'ㄹ\'의 앞이든 뒤든 상관없이 \'ㄹ\'로 바뀌는 게 포인트야! 꼭 기억해!'
+            },
+            'tal-lak': {
+                title: '탈락과 축약',
+                intro: '이번엔 있던 게 없어지거나(탈락), 둘이 합쳐 하나가 되는(축약) 현상이야. 이것도 헷갈리면 안 돼!',
+                definition: "특정 환경에서 음운이 사라지거나(탈락), 두 음운이 합쳐져 하나의 다른 음운으로 줄어드는(축약) 현상.",
+                subsections: [
+                    {
+                        title: '자음군 단순화 & 자음 탈락',
+                        content: `<p>겹받침 중 하나가 탈락. (예: '읽다' [익따], '값+이' [가비])</p>`,
+                        examPoint: '<span class="highlight-teacher">※★★기출됨★★※</span> \'닭\' [닥], \'몫\' [목] 처럼 겹받침 발음은 필수 암기!'
+                    },
+                    {
+                        title: '모음 탈락 & 모음 축약',
+                        content: `<p><strong>탈락:</strong> 같은 모음이 이어질 때 하나가 탈락. (예: '가아서' → '가서')</p><p><strong>축약:</strong> 두 모음이 하나로 줄어듦. (예: '되어' → '돼', '보+아' → '봐')</p>`,
+                        examPoint: '<span class="highlight-teacher">※★★혼동 주의★★※</span> \'되어\'가 \'돼\'로 줄어드는 건 모음 축약! 반모음화라고도 해! 둘 다 알고 있어야 해!'
+                    }
+                ],
+                examPoint: '표기에 반영되는 변동(예: 가서, 돼)과 반영되지 않는 변동(예: 국밥[국빱])을 구분하는 문제! <span class="highlight-teacher">★진짜 시험에 나와요!!!★</span>'
+            },
+            'quiz': {
+                title: '기말고사 만점! 최종 실력 점검 퀴즈!',
+                intro: '자, 이제 진짜 실력 발휘할 시간! 지금까지 배운 거 퀴즈로 확인해 보자! 파이팅!',
+                questions: [
+                    { q: "'밭이랑 논을 샀다'의 '밭이랑' 발음은 [바치랑]이다.", type: 'OX', correctAnswer: 'X', explanation: "'이랑'이 실질 형태소(명사)이므로 구개음화가 일어나지 않고, 'ㄴ'이 첨가된 후 비음화되어 [반니랑]으로 발음됩니다. 구개음화는 형식 형태소 앞에서만!" },
+                    { q: "'할 것을'의 올바른 발음은?", options: ['[할것을]', '[할꺼슬]', '[할거슬]'], correctAnswer: '[할꺼슬]', explanation: "관형사형 어미 '-(으)ㄹ' 뒤에서는 된소리되기가 일어납니다. 이건 시험 단골이야!" },
+                    { q: "다음 중 '표기'에 반영되는 음운 변동은?", options: ['국밥[국빱]', '가아서→가서', '신라[실라]'], correctAnswer: '가아서→가서', explanation: "모음 탈락은 표기에 반영하지만, 된소리되기나 유음화는 발음만 바뀔 뿐 표기에는 반영하지 않아요." },
+                    { q: "'값+만'의 발음 변화 과정으로 옳은 것은?", options: ['[갑만]→[감만]', '[값만]', '[감만]'], correctAnswer: '[갑만]→[감만]', explanation: "자음군 단순화로 'ㅅ'이 탈락하여 [갑만]이 된 후, 비음화가 일어나 [감만]이 됩니다. 두 가지 변동이 순서대로!" },
+                    { q: "다음 중 적용된 음운 변동이 다른 하나는?", options: ['칼날', '대관령', '광한루'], correctAnswer: '대관령', explanation: "'칼날', '광한루'는 유음화([칼랄], [광할루])이지만, '대관령'은 유음화의 예외로 [대괄령]으로 발음됩니다. 한자어에서 'ㄹ' 받침 뒤에 'ㄴ'이 오더라도 유음화가 일어나지 않는 경우가 있어요." }
+                ]
+            }
+        };
+
+        const contentContainer = document.getElementById('content-container');
+        const navButtons = document.querySelectorAll('.nav-btn');
+
+        function createExampleHTML(example) {
+            return `<div class="mb-3">
+                <button class="example-btn w-full text-left p-4 bg-gray-50 hover:bg-gray-100 rounded-lg shadow-sm border border-gray-200">
+                    <span class="text-lg font-bold">${example.q}</span>
+                    <span class="float-right text-gray-400 font-bold transform transition-transform duration-300">▼</span>
+                </button>
+                <div class="example-result bg-yellow-50 text-yellow-800 border-l-4 border-yellow-400">
+                    <div class="p-4">
+                       <p class="font-bold text-xl mb-2">${example.a}</p>
+                       <p class="text-sm">${example.desc}</p>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function renderContent(key) {
+            if (key === 'quiz') {
+                renderQuiz();
+                return;
+            }
+
+            const data = appData[key];
+            let contentHTML = `
+                <section id="${key}" class="content-section space-y-6">
+                    <div class="card p-6">
+                        <h2 class="text-2xl font-bold mb-2">${data.title}</h2>
+                        <p class="text-gray-600">${data.intro}</p>
+                    </div>`;
+
+            if (data.definition && Array.isArray(data.definition)) {
+                contentHTML += `<div class="card p-6">
+                    <h3 class="text-xl font-bold mb-3 border-b pb-2">핵심 개념 ✏️</h3>
+                    ${data.definition.map(def => `<p class="mb-2"><strong class="text-lg text-[#C18C5D]">${def.term}:</strong> ${def.desc}</p>`).join('')}
+                </div>`;
+            } else if (data.definition) {
+                 contentHTML += `<div class="card p-6">
+                    <h3 class="text-xl font-bold mb-3 border-b pb-2">핵심 개념 ✏️</h3>
+                    <p>${data.definition}</p>
+                </div>`;
+            }
+
+            if(data.subsections){
+                 data.subsections.forEach(sec => {
+                    contentHTML += `<div class="card p-6">
+                        <h3 class="text-xl font-bold mb-3">${sec.title}</h3>
+                        ${sec.content}
+                        ${sec.examPoint ? `<div class="mt-4 p-4 bg-red-50 border-l-4 border-red-400 text-red-800 rounded-r-lg"><p>${sec.examPoint}</p></div>` : ''}
+                    </div>`
+                 });
+            }
+
+            if (data.examples) {
+                contentHTML += `<div class="card p-6">
+                    <h3 class="text-xl font-bold mb-4">예시로 확인하기! (클릭해보세요!)</h3>
+                    ${data.examples.map(createExampleHTML).join('')}
+                </div>`;
+            }
+            
+            if (data.examPoint) {
+                contentHTML += `<div class="card p-6 bg-red-50 border-l-8 border-red-700">
+                    <h3 class="text-xl font-bold mb-3 text-red-800">🚨 기말고사 만점 비법!</h3>
+                    <p class="text-red-900">${data.examPoint}</p>
+                </div>`;
+            }
+
+            contentHTML += `</section>`;
+            contentContainer.innerHTML = contentHTML;
+
+            contentContainer.querySelectorAll('.example-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const result = btn.nextElementSibling;
+                    result.classList.toggle('show');
+                    btn.querySelector('.float-right').classList.toggle('rotate-180');
+                });
+            });
+            
+            document.getElementById(key).classList.add('active');
+        }
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        
+        function renderQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            displayQuizQuestion();
+        }
+
+        function displayQuizQuestion() {
+            const quizData = appData.quiz;
+            if (currentQuestionIndex >= quizData.questions.length) {
+                showQuizResult(quizData.questions.length);
+                return;
+            }
+
+            const q = quizData.questions[currentQuestionIndex];
+            let optionsHtml = '';
+            if (q.type === 'OX') {
+                optionsHtml = `
+                    <button class="quiz-option-btn w-full text-left p-4 bg-gray-50 hover:bg-gray-100 rounded-lg shadow-sm border border-gray-200 mb-2" data-answer="O">O (맞다)</button>
+                    <button class="quiz-option-btn w-full text-left p-4 bg-gray-50 hover:bg-gray-100 rounded-lg shadow-sm border border-gray-200 mb-2" data-answer="X">X (틀리다)</button>
+                `;
+            } else {
+                optionsHtml = q.options.map(opt => `
+                    <button class="quiz-option-btn w-full text-left p-4 bg-gray-50 hover:bg-gray-100 rounded-lg shadow-sm border border-gray-200 mb-2" data-answer="${opt}">${opt}</button>
+                `).join('');
+            }
+
+            contentContainer.innerHTML = `
+                <section id="quiz" class="content-section active space-y-6">
+                    <div class="card p-6">
+                        <h2 class="text-2xl font-bold mb-2">${quizData.title}</h2>
+                    </div>
+                    <div class="card p-6">
+                        <div class="text-xl font-bold mb-4">
+                            <span>문제 ${currentQuestionIndex + 1}/${quizData.questions.length}</span>
+                        </div>
+                        <p class="text-lg mb-6">${q.q}</p>
+                        <div id="quiz-options-container">${optionsHtml}</div>
+                        <div id="quiz-feedback-container" class="quiz-feedback mt-4"></div>
+                        <button id="next-question-btn" class="mt-6 w-full py-3 bg-[#C18C5D] text-white font-bold rounded-lg shadow-md hover:bg-opacity-90 transition-colors" style="display: none;">다음 문제</button>
+                    </div>
+                </section>
+            `;
+
+            contentContainer.querySelectorAll('.quiz-option-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => checkAnswer(e.currentTarget, q));
+            });
+            contentContainer.querySelector('#next-question-btn').addEventListener('click', displayQuizQuestion);
+        }
+
+        function checkAnswer(selectedButton, questionData) {
+            const selectedAnswer = selectedButton.dataset.answer;
+            const feedbackContainer = document.getElementById('quiz-feedback-container');
+            
+            let feedbackHtml;
+            if (selectedAnswer === questionData.correctAnswer) {
+                score++;
+                feedbackHtml = `<div class="p-4 bg-green-50 border-l-4 border-green-500 rounded-r-lg">
+                    <p class="font-bold text-green-800">✨ 정답입니다!</p>
+                    <p class="mt-2 text-green-700">${questionData.explanation}</p>
+                </div>`;
+            } else {
+                feedbackHtml = `<div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
+                    <p class="font-bold text-red-800">😅 아쉽네요, 오답입니다.</p>
+                     <p class="mt-2 text-red-700"><strong>정답:</strong> ${questionData.correctAnswer}<br><strong>해설:</strong> ${questionData.explanation}</p>
+                </div>`;
+            }
+            feedbackContainer.innerHTML = feedbackHtml;
+            feedbackContainer.classList.add('show');
+            document.getElementById('next-question-btn').style.display = 'block';
+            contentContainer.querySelectorAll('.quiz-option-btn').forEach(btn => btn.disabled = true);
+        }
+        
+        function showQuizResult(totalQuestions) {
+            contentContainer.innerHTML = `
+                <section id="quiz-result" class="content-section active space-y-6">
+                    <div class="card p-8 text-center">
+                        <h2 class="text-3xl font-bold mb-4">🎉 퀴즈 완료! 고생 많았어! 🎉</h2>
+                        <p class="text-xl mb-4">총 ${totalQuestions} 문제 중</p>
+                        <p class="text-6xl font-extrabold text-[#C18C5D] mb-6">${score}개 정답!</p>
+                        <p class="text-lg text-gray-700">${score === totalQuestions ? '완벽해! 이대로면 기말고사 만점 문제없겠다!' : '조금만 더 복습하면 완벽할 거야! 오답은 꼭 다시 확인해봐!'}</p>
+                        <button id="restart-quiz-btn" class="mt-8 py-3 px-8 bg-[#C18C5D] text-white font-bold rounded-lg shadow-md hover:bg-opacity-90">퀴즈 다시 풀기</button>
+                    </div>
+                </section>
+            `;
+            document.getElementById('restart-quiz-btn').addEventListener('click', renderQuiz);
+        }
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                renderContent(button.dataset.target);
+            });
+        });
+
+        document.querySelector('.nav-btn').click();
+    </script>
+</body>
+</html>

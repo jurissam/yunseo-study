@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>애국계몽운동 vs 의병운동: 효과성 분석</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutral (배경: #F5F5F4, 강조: #57534E, 하이라이트: #A8A29E) -->
+    <!-- Application Structure Plan: 사용자가 두 운동을 직접적으로 비교하며 탐색할 수 있는 대시보드 구조를 채택했습니다. 중앙의 '비교 관점' 버튼들을 통해 '목표와 방식', '주요 활동', '지속성과 유산' 등 다양한 주제에 따라 양쪽의 정보를 동적으로 변경하며 볼 수 있습니다. 이 구조는 토론의 논리적 흐름을 따라가며 사용자의 능동적인 정보 습득을 유도하여, 왜 애국계몽운동이 더 효과적이었는지 점진적으로 설득하는 데 최적화되어 있습니다. -->
+    <!-- Visualization & Content Choices: 
+        - 비교 구조: (목표: 두 운동의 장단점 명확화) -> (방식: 2단 그리드 텍스트 및 시각적 메타포 비교) -> (상호작용: 주제 버튼 클릭 시 내용 변경) -> (정당성: 직접 비교를 통해 논리적 설득력 강화).
+        - 신문 발행 부수: (목표: 애국계몽운동의 압도적 영향력 시각화) -> (방식: Chart.js 막대그래프) -> (상호작용: 마우스 오버 시 툴팁으로 정확한 수치 제공) -> (정당성: '두 배 이상'이라는 텍스트 주장을 강력한 시각 데이터로 뒷받침).
+        - 핵심 활동 시각화: (목표: 활동 유형의 직관적 구분 및 특성 표현) -> (방식: 유니코드 아이콘(🏫, 📰, 🤝) 및 HTML/CSS 기반의 '산발적 저항' 시각화) -> (상호작용: 없음) -> (정당성: 시각적 구분을 통해 텍스트 정보의 가독성 및 이해도 향상).
+        - 지속성 시각화: (목표: 연속성과 단절의 시각적 표현) -> (방식: HTML/CSS 기반의 선형 흐름 및 끊김 표현) -> (상호작용: 없음) -> (정당성: 추상적인 개념을 직관적으로 이해).
+        - 인물 카드: (목표: 주요 인물 부각) -> (방식: 스타일링된 HTML 카드) -> (상호작용: 없음) -> (정당성: 정보 전달력 강화).
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #F5F5F4; /* stone-100 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 40vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #57534E; /* stone-600 */
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .card-content {
+            transition: opacity 0.5s ease-in-out;
+        }
+        .icon-representation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .fragmented-dots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        .fragmented-dot {
+            width: 12px;
+            height: 12px;
+            background-color: #EF4444; /* red-500 */
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+        .timeline-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+        .timeline-segment {
+            height: 8px;
+            width: 60px;
+            background-color: #A8A29E; /* stone-400 */
+            margin: 0 4px;
+            border-radius: 4px;
+        }
+        .timeline-segment.continuous {
+            background-color: #16A34A; /* green-600 */
+        }
+        .timeline-segment.broken {
+            width: 40px;
+            background-color: #DC2626; /* red-600 */
+            margin: 0 8px;
+        }
+        .timeline-segment.gap {
+            width: 20px;
+            background-color: transparent;
+        }
+        .timeline-arrow {
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-left: 15px solid #16A34A; /* green-600 */
+        }
+        .person-card {
+            background-color: #F8F8F8;
+            border: 1px solid #E5E5E5;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            font-weight: 500;
+            color: #57534E;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        }
+    </style>
+</head>
+<body class="text-stone-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="text-3xl md:text-4xl font-bold text-stone-900 mb-2">총 대신 펜, 분노 대신 실력</h1>
+            <p class="text-lg md:text-xl text-stone-600">애국계몽운동은 왜 더 효과적인 항일운동이었나?</p>
+        </header>
+
+        <main>
+            <section id="interactive-comparison" class="mb-8 md:mb-12">
+                <div class="bg-white rounded-xl shadow-lg p-4 md:p-6">
+                    <h2 class="text-center text-xl font-semibold mb-4 text-stone-700">비교 관점 선택하기</h2>
+                    <div id="navigation" class="flex flex-wrap justify-center gap-2 md:gap-4 mb-6">
+                        <button data-theme="goals" class="nav-button active py-2 px-4 bg-white border border-stone-300 rounded-full shadow-sm text-stone-700 hover:bg-stone-50">목표와 방식</button>
+                        <button data-theme="activities" class="nav-button py-2 px-4 bg-white border border-stone-300 rounded-full shadow-sm text-stone-700 hover:bg-stone-50">주요 활동과 성과</button>
+                        <button data-theme="legacy" class="nav-button py-2 px-4 bg-white border border-stone-300 rounded-full shadow-sm text-stone-700 hover:bg-stone-50">지속성과 유산</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+                        <div id="righteous-army-card" class="bg-stone-50 rounded-lg p-6">
+                            <h3 class="text-2xl font-bold mb-4 text-center text-red-700">의병 운동 (武)</h3>
+                            <div id="righteous-army-content" class="card-content space-y-4"></div>
+                        </div>
+                        <div id="enlightenment-card" class="bg-stone-50 rounded-lg p-6 border-2 border-amber-600/50 shadow-md">
+                            <h3 class="text-2xl font-bold mb-4 text-center text-amber-700">애국계몽운동 (文)</h3>
+                            <div id="enlightenment-content" class="card-content space-y-4"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="conclusion" class="text-center bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold mb-4 text-stone-800">결론: 무엇이 진정한 독립의 기반이었나?</h2>
+                <div class="max-w-3xl mx-auto text-stone-600 space-y-4">
+                    <p>의병운동이 슬픔과 분노가 응축된 '저항의 역사'였다면, 애국계몽운동은 '미래를 준비하고 성장시킨 역사'입니다.</p>
+                    <p class="font-semibold text-stone-700">총 대신 펜을, 분노 대신 실력을 쌓아 후대를 준비한 그 선택이야말로 세대를 이어가는 힘을 만들었고, 오늘날 대한민국의 가장 강력한 유산이 되었습니다.</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        const contentData = {
+            goals: {
+                righteous: `
+                    <div class="icon-representation text-red-600">⚔️💥</div>
+                    <h4 class="font-semibold text-lg text-center">목표: 국권 회복과 일본 축출 (즉각적 저항)</h4>
+                    <p>직접적인 무력 항쟁을 통해 침략자 일본군을 몰아내고, 빼앗긴 나라의 주권을 즉시 되찾는 것을 최우선 목표로 삼았습니다. 당장의 분노와 위협에 맞서 싸우는 것이 핵심이었습니다.</p>
+                    <h4 class="font-semibold text-lg text-center mt-4">방식: 무장 투쟁</h4>
+                    <p>의병 부대를 조직하여 일본군 및 친일 세력과 전투를 벌이는 방식을 택했습니다. 이는 즉각적인 저항 의지를 보여주는 가장 직접적인 표현이었습니다.</p>
+                `,
+                enlightenment: `
+                    <div class="icon-representation text-amber-600">📚⚙️</div>
+                    <h4 class="font-semibold text-lg text-center">목표: 국민 역량 강화와 근대 국가 건설 (장기적 준비)</h4>
+                    <p>당장의 무력 투쟁보다는, 장기적인 관점에서 교육, 언론, 산업을 통해 국민 전체의 실력을 키워 스스로 독립을 쟁취하고 근대적인 국가를 세울 수 있는 토대를 마련하는 것을 목표로 했습니다. 미래를 위한 체계적인 준비에 집중했습니다.</p>
+                    <h4 class="font-semibold text-lg text-center mt-4">방식: 실력 양성 운동</h4>
+                    <p>학교를 세워 인재를 키우고, 신문을 발행해 민중을 계몽하며, 회사를 설립해 경제적 자립을 꾀하는 등 비군사적인 방식을 통해 국력을 기르고자 했습니다.</p>
+                `
+            },
+            activities: {
+                righteous: `
+                    <h4 class="font-semibold text-lg text-center mb-2">주요 활동: 산발적 무력 저항</h4>
+                    <div class="fragmented-dots">
+                        <div class="fragmented-dot"></div><div class="fragmented-dot"></div><div class="fragmented-dot"></div>
+                        <div class="fragmented-dot"></div><div class="fragmented-dot"></div><div class="fragmented-dot"></div>
+                        <div class="fragmented-dot"></div><div class="fragmented-dot"></div><div class="fragmented-dot"></div>
+                    </div>
+                    <p class="text-center text-sm mt-2 text-stone-600">
+                        (각 점은 전국 각지에서 일어난 개별적인 전투를 상징합니다)
+                    </p>
+                    <ul class="list-disc list-inside space-y-2 mt-4">
+                        <li>전국 각지에서 의병 부대 결성</li>
+                        <li>일본군 수비대, 헌병 주재소 등 습격</li>
+                        <li>13도 창의군의 서울 진공 작전 시도</li>
+                    </ul>
+                    <h4 class="font-semibold text-lg text-center mt-4">성과와 한계</h4>
+                    <p>일본에게 직접적인 타격을 주며 항일 의지를 보여주었으나, 무기와 조직력의 열세, 일제의 대대적인 탄압으로 인해 조직적 활동을 오래 지속하기 어려웠습니다.</p>
+                `,
+                enlightenment: `
+                    <h4 class="font-semibold text-lg text-center">주요 활동: 교육, 언론, 산업을 통한 실력 양성</h4>
+                    <ul class="list-disc list-inside space-y-2 mt-4">
+                        <li>🏫 오산학교, 대성학교 등 수천 개 사립학교 설립 (인재 양성)</li>
+                        <li>📰 대한매일신보 등 계몽적 언론 활동 (국민 의식 고취)</li>
+                        <li>🤝 신민회, 흥사단 등 비밀결사 조직 (근대 국가 구상)</li>
+                        <li>🏭 자기회사, 태극서관 등 민족 산업 육성 (경제적 자립)</li>
+                    </ul>
+                    <h4 class="font-semibold text-lg text-center mt-4">성과: 압도적인 사회적 영향력</h4>
+                    <p class="text-center text-sm text-stone-600">아래 차트는 대한매일신보의 발행 부수가 당시 다른 모든 신문의 발행 부수를 합친 것보다 두 배 이상 많았음을 보여줍니다.</p>
+                    <div class="chart-container mt-4">
+                        <canvas id="newspaperChart"></canvas>
+                    </div>
+                `
+            },
+            legacy: {
+                righteous: `
+                    <h4 class="font-semibold text-lg text-center">지속성: 대규모 탄압으로 인한 단절</h4>
+                    <div class="timeline-flow">
+                        <div class="timeline-segment broken"></div>
+                        <div class="timeline-segment gap"></div>
+                        <div class="timeline-segment broken"></div>
+                        <div class="timeline-segment gap"></div>
+                        <div class="timeline-segment broken"></div>
+                    </div>
+                    <p class="text-center text-sm mt-2 text-stone-600">
+                        (일제의 '남한 대토벌 작전' 등으로 국내 조직적 기반 와해)
+                    </p>
+                    <h4 class="font-semibold text-lg text-center mt-4">남긴 유산</h4>
+                    <p>불의에 맞서 싸우는 숭고한 희생정신과 애국심의 상징으로 남아, 이후 모든 독립운동에 정신적인 자극과 영감을 주었습니다.</p>
+                `,
+                enlightenment: `
+                    <h4 class="font-semibold text-lg text-center">지속성: 끊임없는 계승과 발전</h4>
+                    <div class="timeline-flow">
+                        <div class="timeline-segment continuous"></div>
+                        <div class="timeline-segment continuous"></div>
+                        <div class="timeline-segment continuous"></div>
+                        <div class="timeline-arrow"></div>
+                    </div>
+                    <p class="text-center text-sm mt-2 text-stone-600">
+                        (3.1 운동, 임시정부, 광복까지 그 정신과 조직이 이어짐)
+                    </p>
+                    <h4 class="font-semibold text-lg text-center mt-4">남긴 유산: 독립운동의 주역 배출</h4>
+                    <p class="text-center text-stone-600 mb-2">애국계몽운동의 토양 위에서 성장한 인물들이 독립운동의 핵심 지도자로 활약했습니다.</p>
+                    <div class="grid grid-cols-2 gap-2 mt-2">
+                        <div class="person-card">안창호</div>
+                        <div class="person-card">김구</div>
+                        <div class="person-card">이승만</div>
+                        <div class="person-card">이동휘 등</div>
+                    </div>
+                    <p class="mt-4 text-center">이들이 광복의 주역이었다는 사실은 애국계몽운동의 실질적 가치를 증명합니다.</p>
+                `
+            }
+        };
+
+        let newspaperChart = null;
+
+        function renderChart() {
+            if (newspaperChart) {
+                newspaperChart.destroy();
+            }
+            const ctx = document.getElementById('newspaperChart')?.getContext('2d');
+            if (!ctx) return;
+
+            newspaperChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['대한매일신보 (1907년)', '당시 기타 신문 총합 (추정)'],
+                    datasets: [{
+                        label: '일일 발행 부수',
+                        data: [10000, 4500],
+                        backgroundColor: [
+                            'rgba(161, 98, 7, 0.6)', /* amber-700 */
+                            'rgba(168, 162, 158, 0.6)' /* stone-400 */
+                        ],
+                        borderColor: [
+                            'rgba(161, 98, 7, 1)',
+                            'rgba(168, 162, 158, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: '신문 발행 부수 비교',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw.toLocaleString()}부`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return (value / 1000) + 'k';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateContent(theme) {
+            const righteousContentEl = document.getElementById('righteous-army-content');
+            const enlightenmentContentEl = document.getElementById('enlightenment-content');
+
+            righteousContentEl.style.opacity = 0;
+            enlightenmentContentEl.style.opacity = 0;
+
+            setTimeout(() => {
+                righteousContentEl.innerHTML = contentData[theme].righteous;
+                enlightenmentContentEl.innerHTML = contentData[theme].enlightenment;
+
+                righteousContentEl.style.opacity = 1;
+                enlightenmentContentEl.style.opacity = 1;
+                
+                if (theme === 'activities') {
+                    setTimeout(renderChart, 50);
+                } else {
+                    if (newspaperChart) {
+                        newspaperChart.destroy();
+                        newspaperChart = null;
+                    }
+                }
+            }, 300);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const navButtons = document.querySelectorAll('.nav-button');
+            
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    const theme = button.dataset.theme;
+                    updateContent(theme);
+                });
+            });
+
+            updateContent('goals');
+        });
+
+    </script>
+</body>
+</html>

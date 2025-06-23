@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>유전자와 단백질 합성 완전 정복!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Slate/Amber/Sky) -->
+    <!-- Application Structure Plan: 이 SPA는 복잡한 생물학적 과정을 학습자 친화적인 모듈로 분해하여 설계되었습니다. 사용자는 '생명 중심 원리'라는 핵심 다이어그램을 중심으로 각 개념(DNA, RNA, 단백질)을 탐색합니다. 이후 '전사와 번역' 과정은 단계별 텍스트 설명으로, '코돈의 비밀'은 사용자가 직접 조작하는 쌍방향 차트로 제공하여 능동적인 학습을 유도합니다. 마지막으로 '유전자 이상' 사례와 '핵심 퀴즈'를 통해 학습 내용을 점검하고 정리할 수 있습니다. 이 구조는 선형적인 정보 나열을 넘어, 사용자가 개념 간의 관계를 직관적으로 파악하고, 핵심 원리를 깊이 있게 이해하도록 돕기 위해 선택되었습니다. -->
+    <!-- Visualization & Content Choices: 
+        - 생명 중심 원리: Goal-Organize/Inform. Method-Interactive Diagram (HTML/CSS/JS). Interaction-각 요소를 클릭하면 상세 설명이 나타남. Justification-전체 학습 과정의 로드맵을 제공하여 사용자가 큰 그림을 이해하게 함.
+        - DNA vs RNA 비교: Goal-Compare. Method-Side-by-side table (HTML). Interaction-중요 차이점(염기 U, 구조)에 하이라이트 효과. Justification-두 핵심 분자의 차이를 명확하고 빠르게 비교할 수 있음.
+        - 전사/번역 과정: Goal-Change/Organize. Method-Step-by-step text display (HTML/CSS/JS). Interaction-버튼 클릭으로 각 단계를 순차적으로 진행. Justification-오류 발생 전으로 안정성을 우선시하여 텍스트 기반 순차 설명으로 회귀함.
+        - 코돈 조합 계산: Goal-Inform/Relationships. Method-Bar Chart (Chart.js). Interaction-버튼 클릭으로 염기 조합(2개 vs 3개)에 따른 아미노산 지정 가능 개수를 시각적으로 비교. Justification-추상적인 수학적 개념(4^2 vs 4^3)을 구체적이고 설득력 있는 시각 자료로 변환함.
+        - 핵심 퀴즈: Goal-Inform. Method-Accordion (HTML/JS). Interaction-질문을 클릭하면 답변이 나타남. Justification-학습자가 스스로 지식을 점검하고 중요한 내용을 다시 각인시키는 데 도움을 줌.
+        - Library-Chart.js for codon visualization.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+        .teacher-highlight { color: #ef4444; font-weight: 900; }
+        .teacher-star { color: #f59e0b; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .tab-btn.active { background-color: #0284c7; color: white; }
+        .step-item { opacity: 0.3; transition: opacity 0.5s; }
+        .step-item.visible { opacity: 1; }
+        .quiz-question { cursor: pointer; }
+        .quiz-answer { display: none; max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-black text-slate-800 mb-2">🧬 유전자와 단백질 합성 완전 정복!</h1>
+            <p class="text-lg text-slate-600">선생님이 강조한 <span class="teacher-highlight">시험 포인트</span>만 모아 interactive하게 완전 정복해봐요!</p>
+        </header>
+
+        <main>
+            <!-- Navigation Tabs -->
+            <nav class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
+                <button data-target="central-dogma" class="tab-btn active font-bold py-2 px-4 rounded-full bg-white shadow hover:bg-sky-100 transition">🌟 생명 중심 원리</button>
+                <button data-target="players" class="tab-btn font-bold py-2 px-4 rounded-full bg-white shadow hover:bg-sky-100 transition">🔄 DNA vs RNA</button>
+                <button data-target="process" class="tab-btn font-bold py-2 px-4 rounded-full bg-white shadow hover:bg-sky-100 transition">🔬 전사 & 번역 과정</button>
+                <button data-target="codon-secret" class="tab-btn font-bold py-2 px-4 rounded-full bg-white shadow hover:bg-sky-100 transition">🔑 코돈의 비밀</button>
+                <button data-target="final-quiz" class="tab-btn font-bold py-2 px-4 rounded-full bg-white shadow hover:bg-sky-100 transition">🔥 최종 시험 대비 퀴즈</button>
+            </nav>
+
+            <!-- Content Sections -->
+            <div id="content-container" class="bg-white p-6 rounded-2xl shadow-lg">
+                
+                <!-- 1. 생명 중심 원리 -->
+                <section id="central-dogma" class="content-section active">
+                    <h2 class="text-3xl font-bold mb-4 text-sky-700">🌟 생명 중심 원리 (Central Dogma)</h2>
+                    <p class="mb-6 text-slate-600">모든 유전 정보가 흐르는 핵심 순서! 이걸 모르면 시작도 못 해요! 아래 다이어그램의 각 요소를 클릭해서 핵심 개념을 파악해보세요. <span class="teacher-highlight">시험에 100% 나옵니다!</span></p>
+                    
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-4 text-center font-bold text-2xl my-8">
+                        <div id="dogma-dna" class="dogma-item p-6 rounded-xl bg-blue-100 shadow-md cursor-pointer hover:scale-105 hover:shadow-xl transition w-full md:w-auto">DNA</div>
+                        <div id="arrow-to-rna" class="text-4xl text-sky-500 font-sans mx-2">→</div>
+                        <div id="dogma-rna" class="dogma-item p-6 rounded-xl bg-green-100 shadow-md cursor-pointer hover:scale-105 hover:shadow-xl transition w-full md:w-auto">RNA</div>
+                        <div id="arrow-to-protein" class="text-4xl text-sky-500 font-sans mx-2">→</div>
+                        <div id="dogma-protein" class="dogma-item p-6 rounded-xl bg-purple-100 shadow-md cursor-pointer hover:scale-105 hover:shadow-xl transition w-full md:w-auto">단백질</div>
+                    </div>
+
+                    <div id="dogma-details" class="mt-6 p-6 bg-slate-100 rounded-lg min-h-[150px] transition">
+                        <p class="text-slate-700">이곳에 각 요소에 대한 설명이 표시됩니다. 위 다이어그램을 클릭해보세요!</p>
+                    </div>
+                </section>
+
+                <!-- 2. DNA vs RNA 비교 -->
+                <section id="players" class="content-section">
+                    <h2 class="text-3xl font-bold mb-4 text-sky-700">🔄 핵심 선수 비교: DNA vs RNA</h2>
+                    <p class="mb-6 text-slate-600">생명 중심 원리의 두 주인공, DNA와 RNA! 둘의 차이점을 모르면 <span class="teacher-highlight">아웃!</span> T대신 U! 이거 꼭 기억하세요!</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-100">
+                                    <th class="p-4 border-b-2 border-slate-200 font-bold">구분</th>
+                                    <th class="p-4 border-b-2 border-slate-200 font-bold">DNA</th>
+                                    <th class="p-4 border-b-2 border-slate-200 font-bold">RNA</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="p-4 border-b border-slate-200 font-semibold">역할</td>
+                                    <td class="p-4 border-b border-slate-200">유전 정보 <span class="font-bold">저장</span> (정보의 본체)</td>
+                                    <td class="p-4 border-b border-slate-200">유전 정보 <span class="font-bold">전달 및 번역</span> (택배원)</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 border-b border-slate-200 font-semibold">구조</td>
+                                    <td class="p-4 border-b border-slate-200"><span class="font-bold">이중 나선</span> 구조</td>
+                                    <td class="p-4 border-b border-slate-200"><span class="font-bold">단일 가닥</span> 구조</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 border-b border-slate-200 font-semibold">염기</td>
+                                    <td class="p-4 border-b border-slate-200">A, G, C, <span class="font-bold text-red-600 text-lg">T</span> (티민)</td>
+                                    <td class="p-4 border-b border-slate-200">A, G, C, <span class="font-bold text-red-600 text-lg">U</span> (유라실) <span class="teacher-star">★</span></td>
+                                </tr>
+                                 <tr>
+                                    <td class="p-4 border-b border-slate-200 font-semibold">장소</td>
+                                    <td class="p-4 border-b border-slate-200">주로 <span class="font-bold">핵 속</span></td>
+                                    <td class="p-4 border-b border-slate-200">핵과 <span class="font-bold">세포질</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- 3. 전사 & 번역 과정 (기존 텍스트 단계 표시로 롤백) -->
+                <section id="process" class="content-section">
+                    <h2 class="text-3xl font-bold mb-4 text-sky-700">🔬 전사와 번역: 생명의 공장 가동!</h2>
+                    <p class="mb-6 text-slate-600">DNA 정보가 어떻게 단백질이 될까요? '과정 시작!' 버튼을 눌러 한 단계씩 따라가보세요. <span class="teacher-highlight">전사는 핵 속, 번역은 세포질! 장소 구분은 시험 단골!</span></p>
+                    <div class="text-center mb-6">
+                        <button id="start-process-btn" class="bg-sky-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-sky-700 transition shadow-lg">과정 시작!</button>
+                    </div>
+                    <div id="process-steps" class="space-y-6">
+                        <!-- Steps text will be dynamically inserted here -->
+                    </div>
+                </section>
+
+                <!-- 4. 코돈의 비밀 -->
+                <section id="codon-secret" class="content-section">
+                     <h2 class="text-3xl font-bold mb-4 text-sky-700">🔑 코돈의 비밀: 왜 3개씩 묶을까?</h2>
+                    <p class="mb-6 text-slate-600">아미노산은 20종류인데, 왜 염기는 3개씩 묶어서 하나의 암호(코돈)로 사용할까요? 아래 버튼을 눌러보며 그 이유를 직접 확인해보세요! <span class="teacher-highlight">이유 설명형 문제 출제 가능성 100%!</span></p>
+                    <div class="flex justify-center gap-4 mb-6">
+                        <button id="codon-2-btn" class="bg-amber-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-amber-600 transition">염기 2개씩 묶기</button>
+                        <button id="codon-3-btn" class="bg-sky-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-sky-700 transition">염기 3개씩 묶기</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="codonChart"></canvas>
+                    </div>
+                     <div id="codon-explanation" class="mt-6 p-4 bg-slate-100 rounded-lg text-center font-semibold text-lg">
+                        버튼을 눌러 결과를 확인해보세요.
+                    </div>
+                </section>
+
+                <!-- 5. 최종 퀴즈 -->
+                <section id="final-quiz" class="content-section">
+                    <h2 class="text-3xl font-bold mb-4 text-sky-700">🔥 최종 시험 대비 퀴즈</h2>
+                    <p class="mb-6 text-slate-600">마지막으로 실력을 점검해봅시다! 질문을 클릭하면 선생님의 명쾌한 답변이 나옵니다. 모두 맞힐 수 있도록 복습 또 복습!</p>
+                    <div id="quiz-container" class="space-y-4">
+                        <div class="bg-slate-100 rounded-lg">
+                            <h3 class="quiz-question p-4 font-bold text-lg">1. DNA의 유전 정보가 RNA로 복사되는 과정과 그 장소는? <span class="teacher-star">★</span></h3>
+                            <div class="quiz-answer px-4 pb-4 text-slate-700">
+                                <p><span class="teacher-highlight">전사</span> 과정이며, <span class="teacher-highlight">핵 속</span>에서 일어납니다! DNA는 소중하니까요!</p>
+                            </div>
+                        </div>
+                        <div class="bg-slate-100 rounded-lg">
+                            <h3 class="quiz-question p-4 font-bold text-lg">2. RNA의 염기 서열에 따라 단백질이 합성되는 과정과 그 장소는? <span class="teacher-star">★</span></h3>
+                            <div class="quiz-answer px-4 pb-4 text-slate-700">
+                                <p><span class="teacher-highlight">번역</span> 과정이며, <span class="teacher-highlight">세포질의 리보솜</span>에서 일어납니다! 정보가 진짜 물건이 되는 공장이죠!</p>
+                            </div>
+                        </div>
+                         <div class="bg-slate-100 rounded-lg">
+                            <h3 class="quiz-question p-4 font-bold text-lg">3. RNA에서 아미노산 하나를 지정하는 염기 3개의 조합을 무엇이라고 하나요?</h3>
+                            <div class="quiz-answer px-4 pb-4 text-slate-700">
+                                <p>바로 <span class="teacher-highlight">코돈(Codon)</span>입니다! DNA에서는 삼염기 조합이라고 불러요.</p>
+                            </div>
+                        </div>
+                         <div class="bg-slate-100 rounded-lg">
+                            <h3 class="quiz-question p-4 font-bold text-lg">4. 아미노산들을 연결시켜 단백질을 만드는 결합의 이름은?</h3>
+                            <div class="quiz-answer px-4 pb-4 text-slate-700">
+                                <p><span class="teacher-highlight">펩타이드 결합</span>입니다. 이 결합으로 아미노산들이 기차처럼 길게 연결돼요.</p>
+                            </p>
+                        </div>
+                        <div class="bg-slate-100 rounded-lg">
+                            <h3 class="quiz-question p-4 font-bold text-lg">5. 유전자에 이상이 생겨 발생하는 병의 예시 한 가지는?</h3>
+                            <div class="quiz-answer px-4 pb-4 text-slate-700">
+                                <p><span class="teacher-highlight">백색증</span>이 대표적입니다! 멜라닌 색소 합성 단백질에 문제가 생기는 거죠.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+        
+        <footer class="text-center mt-12 text-slate-500 text-sm">
+            <p>&copy; 2025 기말고사 대박 기원 학습자료. All rights reserved.</p>
+        </footer>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // Tab Navigation
+    const tabs = document.querySelectorAll('.tab-btn');
+    const contentSections = document.querySelectorAll('.content-section');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = document.getElementById(tab.dataset.target);
+
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            contentSections.forEach(section => section.classList.remove('active'));
+            target.classList.add('active');
+        });
+    });
+
+    // 1. Central Dogma interaction
+    const dogmaItems = {
+        'dogma-dna': {
+            title: '🧬 DNA (정보의 본체)',
+            text: '우리 몸의 모든 유전 정보를 저장하는 이중 나선 구조의 설계도입니다. 핵 안에 소중하게 보관되어 있어요.'
+        },
+        'dogma-rna': {
+            title: '📝 RNA (정보의 전달자)',
+            text: 'DNA의 유전 정보를 복사(전사)하여 핵 밖의 세포질로 전달하는 단일 가닥 구조의 메신저입니다.'
+        },
+        'dogma-protein': {
+            title: '💪 단백질 (기능의 실행자)',
+            text: 'RNA 정보에 따라(번역) 합성되어, 우리 몸의 구조를 만들고 다양한 생명 활동을 조절하는 최종 산물입니다. 단백질이 바로 형질을 결정하죠!'
+        }
+    };
+    const detailsContainer = document.getElementById('dogma-details');
+    document.querySelectorAll('.dogma-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const dogmaData = dogmaItems[item.id];
+            detailsContainer.innerHTML = `<h3 class="text-xl font-bold mb-2">${dogmaData.title}</h3><p>${dogmaData.text}</p>`;
+        });
+    });
+
+    // 3. Process animation (Rolled back to simple text steps)
+    const startProcessBtn = document.getElementById('start-process-btn');
+    const processStepsContainer = document.getElementById('process-steps');
+    let currentStep = 0;
+    const steps = [
+        {
+            title: '1단계: 전사 시작 (핵 속)',
+            text: 'DNA의 이중 나선이 풀리고, 필요한 유전자 정보가 RNA로 복사되기 시작합니다.',
+            icon: '📜'
+        },
+        {
+            title: '2단계: RNA 합성 (핵 속)',
+            text: 'DNA 가닥을 주형으로 상보적인 RNA 가닥이 합성됩니다. (A는 U와, G는 C와 결합!)',
+            icon: '✨'
+        },
+        {
+            title: '3단계: RNA, 핵 밖으로 이동',
+            text: '완성된 RNA는 핵공을 통해 핵 밖, 세포질로 이동합니다.',
+            icon: '➡️'
+        },
+        {
+            title: '4단계: 번역 시작 (세포질, 리보솜)',
+            text: '세포질의 리보솜이 RNA와 결합하여 번역을 시작할 준비를 합니다.',
+            icon: '🏭'
+        },
+        {
+            title: '5단계: 단백질 합성 (세포질, 리보솜)',
+            text: '리보솜이 RNA의 코돈을 읽고, 그에 맞는 아미노산을 펩타이드 결합으로 연결하여 단백질을 만듭니다.',
+            icon: '🔗'
+        },
+        {
+            title: '6단계: 형질 발현!',
+            text: '완성된 단백질이 고유의 기능을 수행하며 눈동자 색, 효소 작용 등 특정한 형질을 나타냅니다.', // Removed undefined icon issue
+            icon: '👀' // Explicitly set icon for step 6
+        }
+    ];
+
+    startProcessBtn.addEventListener('click', () => {
+        if (currentStep === 0 && startProcessBtn.textContent === '과정 시작!') {
+            processStepsContainer.innerHTML = '';
+            showNextStep();
+            startProcessBtn.textContent = '다음 단계 보기';
+        } else if (currentStep < steps.length) {
+            showNextStep();
+            if(currentStep === steps.length) {
+                startProcessBtn.textContent = '과정 다시보기';
+            }
+        } else {
+            currentStep = 0;
+            processStepsContainer.innerHTML = '';
+            startProcessBtn.textContent = '과정 시작!';
+        }
+    });
+
+    function showNextStep() {
+        if (currentStep < steps.length) {
+            const stepData = steps[currentStep];
+            const stepElement = document.createElement('div');
+            stepElement.className = 'step-item p-4 bg-slate-50 rounded-lg flex items-center gap-4';
+            stepElement.innerHTML = `
+                <div class="text-4xl">${stepData.icon}</div>
+                <div>
+                    <h4 class="font-bold text-lg">${stepData.title}</h4>
+                    <p class="text-slate-600">${stepData.text}</p>
+                </div>
+            `;
+            processStepsContainer.appendChild(stepElement);
+            setTimeout(() => stepElement.classList.add('visible'), 50);
+            currentStep++;
+        }
+    }
+
+    // 4. Codon Chart
+    const ctx = document.getElementById('codonChart').getContext('2d');
+    const codonExplanation = document.getElementById('codon-explanation');
+    let codonChart;
+
+    const chartConfig = {
+        type: 'bar',
+        data: {
+            labels: ['필요한 아미노산 수', '만들 수 있는 조합 수'],
+            datasets: [{
+                label: '조합 수',
+                data: [20, 0],
+                backgroundColor: [
+                    'rgba(251, 146, 60, 0.6)',
+                    'rgba(59, 130, 246, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(251, 146, 60, 1)',
+                    'rgba(59, 130, 246, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 70
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: '아미노산 지정에 필요한 조합 수 비교',
+                    font: {
+                        size: 16
+                    }
+                }
+            }
+        }
+    };
+    
+    codonChart = new Chart(ctx, chartConfig);
+
+    document.getElementById('codon-2-btn').addEventListener('click', () => {
+        codonChart.data.datasets[0].data = [20, 16]; // 4^2 = 16
+        codonChart.update();
+        codonExplanation.innerHTML = '<span class="teacher-highlight">16개</span>의 조합으로는 20가지 아미노산을 모두 지정할 수 없어요! (❌ 부족!)';
+    });
+    
+    document.getElementById('codon-3-btn').addEventListener('click', () => {
+        codonChart.data.datasets[0].data = [20, 64]; // 4^3 = 64
+        codonChart.update();
+        codonExplanation.innerHTML = '<span class="teacher-highlight">64개</span>의 조합으로는 20가지 아미노산을 지정하고도 남아요! (✅ 충분!)';
+    });
+
+    // 5. Quiz interaction
+    const quizItems = document.querySelectorAll('.quiz-question');
+    quizItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const answer = item.nextElementSibling;
+            const isVisible = answer.style.display === 'block';
+            
+            // Close all answers
+            document.querySelectorAll('.quiz-answer').forEach(ans => {
+                ans.style.maxHeight = '0';
+                ans.style.display = 'none';
+            });
+            
+            // Open the clicked one if it was closed
+            if (!isVisible) {
+                answer.style.display = 'block';
+                answer.style.maxHeight = answer.scrollHeight + "px";
+            }
+        });
+    });
+
+});
+</script>
+
+</body>
+</html>

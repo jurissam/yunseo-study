@@ -12,9 +12,9 @@
     <!-- Chosen Palette: Calm Harmony (Slate, Stone, Sky, Amber) -->
     <!-- Application Structure Plan: A single-page application with a sticky top navigation for three core grammar topics: 의문 변동, 문장 성분, 높임 표현. This tab-like structure allows focused studying on one topic at a time. Each section uses interactive cards, diagrams, and mini-quizzes for active recall, which is more effective for exam preparation than passively reading a document. The flow guides the user from understanding the rules to applying them in quizzes. -->
     <!-- Visualization & Content Choices:
-    - 의문 변동: Goal(Inform/Organize/Apply) -> Method(Interactive rule cards with show/hide examples, new multiple-choice quiz) -> Interaction(Click to reveal, click to check answer) -> Justification(Active recall helps memorization of complex rules and exceptions, quiz reinforces understanding) -> Library(Vanilla JS).
-    - 문장 성분: Goal(Organize/Compare/Apply) -> Method(HTML/CSS diagram of sentence structure, clickable cards for details, new sentence analysis quiz) -> Interaction(Click to expand/collapse, click to check answer) -> Justification(Visually represents hierarchical relationships, making them easier to grasp than text alone; quiz applies knowledge to sentences) -> Library(Vanilla JS).
-    - 높임 표현: Goal(Compare/Apply) -> Method(Donut Chart for overview, summary table, 'Fix the Sentence' quiz) -> Interaction(Chart visualization, interactive quiz with feedback) -> Justification(Chart provides a quick visual summary; quiz forces application of knowledge, targeting common errors mentioned in the class) -> Library(Chart.js for Donut chart, Vanilla JS for quiz).
+    - 의문 변동: Goal(Inform/Organize/Apply) -> Method(Interactive rule cards with show/hide examples, new multiple-choice quiz) -> Interaction(Click to reveal, click to check answer, new '다시 풀기' button to re-attempt) -> Justification(Active recall helps memorization of complex rules and exceptions, quiz reinforces understanding, re-attempt allows iterative learning) -> Library(Vanilla JS).
+    - 문장 성분: Goal(Organize/Compare/Apply) -> Method(HTML/CSS diagram of sentence structure, clickable cards for details, new sentence analysis quiz) -> Interaction(Click to expand/collapse, click to check answer, new '다시 풀기' button to re-attempt) -> Justification(Visually represents hierarchical relationships, making them easier to grasp than text alone; quiz applies knowledge to sentences, re-attempt supports mastery) -> Library(Vanilla JS).
+    - 높임 표현: Goal(Compare/Apply) -> Method(Donut Chart for overview, summary table, 'Fix the Sentence' quiz) -> Interaction(Chart visualization, interactive quiz with feedback, new '다시 풀기' button to re-attempt) -> Justification(Chart provides a quick visual summary; quiz forces application of knowledge, targeting common errors mentioned in the class, re-attempt enhances practice) -> Library(Chart.js for Donut chart, Vanilla JS for quiz).
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
@@ -31,7 +31,7 @@
             opacity: 0;
         }
         .quiz-feedback.show {
-            max-height: 200px;
+            max-height: 200px; /* Increased max-height for longer feedback */
             margin-top: 0.75rem;
             padding: 0.75rem;
             opacity: 1;
@@ -62,7 +62,7 @@
             <!-- 의문 변동 섹션 -->
             <section id="phonology" class="content-section space-y-8">
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h2 class="text-2xl font-bold mb-4 text-sky-800">  의문 변동: 첨가 현상</h2>
+                    <h2 class="text-2xl font-bold mb-4 text-sky-800">🚀 의문 변동: 첨가 현상</h2>
                     <p class="text-slate-600 mb-6">두 음운이 만날 때, 없던 소리가 새로 생겨나는 현상을 '첨가'라고 해! 강의에서 선생님이 **"없었던 질문이 새로 생겨나서 발현되는 현상!"** 이라고 강조하셨지? 바로 그게 첨가야. 여기서는 '니은 첨가'와 '반모음 첨가'를 집중적으로 파헤쳐 보자.</p>
                 
                     <div class="space-y-6">
@@ -88,7 +88,7 @@
                                 </div>
                             </div>
                             <div class="mt-4 bg-amber-50 border border-amber-200 p-4 rounded-lg">
-                               <p class="text-amber-800"><span class="font-bold">선생님 말씀:</span> "우리 6.25라고 해요. 6 25라고 해. <span class="font-bold text-red-600">니은서가 6미요 이렇게 하지 않습니다.</span> 알겠죠? 항상 일어나는 건 아니다!"</p>
+                               <p class="text-amber-800"><span class="font-bold">선생님 말씀:</span> "우리 <span class="font-bold text-blue-600">[유기오]</span>라고 해요. <span class="font-bold text-red-600">니은 첨가가 일어나지 않아요!</span> [육이오]나 [육미요]처럼 발음하지 않습니다. 알겠죠? 항상 일어나는 건 아니다!"</p>
                             </div>
                         </div>
 
@@ -104,8 +104,8 @@
 
                     <div class="mt-8 bg-slate-100 p-5 rounded-xl shadow-sm border border-slate-200">
                         <h3 class="text-xl font-bold mb-4 text-sky-700">✨ 의문 변동 퀴즈!</h3>
-                        <div id="phonology-quiz-container" class="space-y-4">
-                            <div class="bg-white p-4 rounded-lg border border-slate-200">
+                        <div class="space-y-4">
+                            <div class="quiz-item bg-white p-4 rounded-lg border border-slate-200">
                                 <p class="font-semibold">문제 1: 다음 중 <span class="font-bold">니은 첨가가 일어나지 않는</span> 단어는 무엇일까요?</p>
                                 <div class="mt-2 space-y-2">
                                     <label class="block"><input type="radio" name="phonology-q1" value="a" class="mr-2"> 콩잎</label>
@@ -114,13 +114,9 @@
                                     <label class="block"><input type="radio" name="phonology-q1" value="d" class="mr-2"> 한여름</label>
                                 </div>
                                 <button class="quiz-btn mt-4 text-sm bg-sky-600 text-white py-1 px-3 rounded-full hover:bg-sky-700 transition-colors" data-quiz="phonology-q1" data-answer="c">정답 확인</button>
-                                <div class="quiz-feedback p-3 bg-green-50 text-green-800 rounded-b-lg">
-                                    <p><span class="font-bold">정답:</span> 깨어</p>
-                                    <p class="text-xs mt-1"><b>이유:</b> '깨어'는 앞말이 모음 'ㅐ'로 끝나서 니은 첨가 조건에 해당하지 않습니다.</p>
-                                </div>
+                                <div class="quiz-feedback"></div>
                             </div>
-
-                            <div class="bg-white p-4 rounded-lg border border-slate-200">
+                            <div class="quiz-item bg-white p-4 rounded-lg border border-slate-200">
                                 <p class="font-semibold">문제 2: 다음 중 <span class="font-bold">반모음 첨가가 일어나는</span> 단어는 무엇일까요?</p>
                                 <div class="mt-2 space-y-2">
                                     <label class="block"><input type="radio" name="phonology-q2" value="a" class="mr-2"> 보이다</label>
@@ -129,10 +125,7 @@
                                     <label class="block"><input type="radio" name="phonology-q2" value="d" class="mr-2"> 뛰다</label>
                                 </div>
                                 <button class="quiz-btn mt-4 text-sm bg-sky-600 text-white py-1 px-3 rounded-full hover:bg-sky-700 transition-colors" data-quiz="phonology-q2" data-answer="c">정답 확인</button>
-                                <div class="quiz-feedback p-3 bg-green-50 text-green-800 rounded-b-lg">
-                                    <p><span class="font-bold">정답:</span> 되어</p>
-                                    <p class="text-xs mt-1"><b>이유:</b> '되어'는 '되- + -어' 형태로, '되여'로도 발음될 수 있어 반모음 첨가가 일어납니다. '피어'와 함께 표준 발음으로 인정되는 대표적인 예시입니다.</p>
-                                </div>
+                                <div class="quiz-feedback"></div>
                             </div>
                         </div>
                     </div>
@@ -199,8 +192,8 @@
 
                     <div class="mt-8 bg-slate-100 p-5 rounded-xl shadow-sm border border-slate-200">
                         <h3 class="text-xl font-bold mb-4 text-sky-700">✨ 문장 성분 퀴즈!</h3>
-                        <div id="sentence-quiz-container" class="space-y-4">
-                            <div class="bg-white p-4 rounded-lg border border-slate-200">
+                        <div class="space-y-4">
+                             <div class="quiz-item bg-white p-4 rounded-lg border border-slate-200">
                                 <p class="font-semibold">문제 1: "철수는 <span class="font-bold">매우</span> 빠르게 달렸다."에서 밑줄 친 '매우'의 문장 성분은 무엇일까요?</p>
                                 <div class="mt-2 space-y-2">
                                     <label class="block"><input type="radio" name="sentence-q1" value="a" class="mr-2"> 주어</label>
@@ -209,13 +202,9 @@
                                     <label class="block"><input type="radio" name="sentence-q1" value="d" class="mr-2"> 부사어</label>
                                 </div>
                                 <button class="quiz-btn mt-4 text-sm bg-sky-600 text-white py-1 px-3 rounded-full hover:bg-sky-700 transition-colors" data-quiz="sentence-q1" data-answer="d">정답 확인</button>
-                                <div class="quiz-feedback p-3 bg-green-50 text-green-800 rounded-b-lg">
-                                    <p><span class="font-bold">정답:</span> 부사어</p>
-                                    <p class="text-xs mt-1"><b>이유:</b> '매우'는 뒤에 오는 부사어 '빠르게'를 꾸며주어 문장 전체를 수식하는 부사어입니다.</p>
-                                </div>
+                                <div class="quiz-feedback"></div>
                             </div>
-
-                            <div class="bg-white p-4 rounded-lg border border-slate-200">
+                            <div class="quiz-item bg-white p-4 rounded-lg border border-slate-200">
                                 <p class="font-semibold">문제 2: "선영이는 <span class="font-bold">중학생이</span> 되었다."에서 밑줄 친 '중학생이'의 문장 성분은 무엇일까요?</p>
                                 <div class="mt-2 space-y-2">
                                     <label class="block"><input type="radio" name="sentence-q2" value="a" class="mr-2"> 주어</label>
@@ -224,10 +213,7 @@
                                     <label class="block"><input type="radio" name="sentence-q2" value="d" class="mr-2"> 서술어</label>
                                 </div>
                                 <button class="quiz-btn mt-4 text-sm bg-sky-600 text-white py-1 px-3 rounded-full hover:bg-sky-700 transition-colors" data-quiz="sentence-q2" data-answer="c">정답 확인</button>
-                                <div class="quiz-feedback p-3 bg-green-50 text-green-800 rounded-b-lg">
-                                    <p><span class="font-bold">정답:</span> 보어</p>
-                                    <p class="text-xs mt-1"><b>이유:</b> '되다' 앞에서 주어를 보충하는 문장 성분은 보어입니다.</p>
-                                </div>
+                                <div class="quiz-feedback"></div>
                             </div>
                         </div>
                     </div>
@@ -241,7 +227,7 @@
                     <p class="text-slate-600 mb-6">우리말의 꽃, 높임 표현이야! 누구를 높이느냐에 따라 주체, 객체, 상대로 나뉘지. 높임 표현을 잘 사용하면 상대방에게 예의를 갖추고 존중하는 마음을 표현할 수 있어. 각 높임법이 어떻게 다른지, 언제 사용해야 하는지 확실히 알아보자!</p>
 
                     <div class="grid md:grid-cols-2 gap-8 items-center">
-                        <div class="chart-container h-64 md:h-80 w-full max-w-sm mx-auto">
+                        <div class="h-64 md:h-80 w-full max-w-sm mx-auto">
                             <canvas id="honorificsChart"></canvas>
                         </div>
                         <div class="text-sm space-y-3">
@@ -255,39 +241,26 @@
                         <h3 class="text-xl font-bold mb-4 text-sky-700">🚨 시험 단골: 간접 높임 & 잘못된 표현</h3>
                         <p class="mt-2 mb-4 text-sm text-slate-600">주체를 직접 높이는 게 아니라, 주체와 관련된 신체, 소유물 등을 높이는 '간접 높임'은 시험에 정말 자주 나와! 잘못된 표현과 비교하면서 확실히 익혀두자.</p>
                         
-                        <div id="honorifics-quiz-container" class="space-y-4">
-                            <!-- 퀴즈 아이템 1 -->
-                            <div class="bg-white p-4 rounded-lg border border-slate-200">
+                        <div class="space-y-4">
+                            <div class="quiz-item bg-white p-4 rounded-lg border border-slate-200">
                                 <p class="font-semibold">문제 1: 다음 문장을 바르게 고쳐보세요.</p>
                                 <p class="mt-1 text-lg font-mono p-2 bg-red-50 text-red-700 rounded">"아쉽지만 행사는 벌써 마감되셨어요."</p>
-                                <button class="quiz-btn mt-2 text-sm bg-sky-600 text-white py-1 px-3 rounded-full hover:bg-sky-700 transition-colors" data-quiz="honorifics-q1" data-answer="corrected1">정답 확인</button>
-                                <div class="quiz-feedback p-3 bg-green-50 text-green-800 rounded-b-lg">
-                                    <p><span class="font-bold">정답:</span> 마감되었어요.</p>
-                                    <p class="text-xs mt-1"><b>이유:</b> 행사는 사람이 아니므로 높임의 대상이 아님!</p>
-                                </div>
+                                <button class="quiz-btn mt-2 text-sm bg-sky-600 text-white py-1 px-3 rounded-full hover:bg-sky-700 transition-colors" data-quiz="honorifics-q1" data-answer="마감되었어요.">정답 확인</button>
+                                <div class="quiz-feedback"></div>
                             </div>
-                             <!-- 퀴즈 아이템 2 -->
-                            <div class="bg-white p-4 rounded-lg border border-slate-200">
+                            <div class="quiz-item bg-white p-4 rounded-lg border border-slate-200">
                                 <p class="font-semibold">문제 2: 다음 문장을 바르게 고쳐보세요.</p>
                                 <p class="mt-1 text-lg font-mono p-2 bg-red-50 text-red-700 rounded">"할머니께서 다리가 아프다."</p>
-                                <button class="quiz-btn mt-2 text-sm bg-sky-600 text-white py-1 px-3 rounded-full hover:bg-sky-700 transition-colors" data-quiz="honorifics-q2" data-answer="corrected2">정답 확인</button>
-                                <div class="quiz-feedback p-3 bg-green-50 text-green-800 rounded-b-lg">
-                                    <p><span class="font-bold">정답:</span> 다리가 아프시다.</p>
-                                    <p class="text-xs mt-1"><b>이유:</b> '아프시다'를 써서 주체(할머니)의 신체(다리)를 간접적으로 높여야 함.</p>
-                                </div>
+                                <button class="quiz-btn mt-2 text-sm bg-sky-600 text-white py-1 px-3 rounded-full hover:bg-sky-700 transition-colors" data-quiz="honorifics-q2" data-answer="다리가 아프시다.">정답 확인</button>
+                                <div class="quiz-feedback"></div>
                             </div>
-
-                            <div class="bg-white p-4 rounded-lg border border-slate-200">
+                            <div class="quiz-item bg-white p-4 rounded-lg border border-slate-200">
                                 <p class="font-semibold">문제 3: 다음 문장에서 잘못된 높임 표현을 찾아 바르게 고쳐보세요.</p>
                                 <p class="mt-1 text-lg font-mono p-2 bg-red-50 text-red-700 rounded">"선생님, 제가 여쭤볼 것이 계십니다."</p>
-                                <button class="quiz-btn mt-2 text-sm bg-sky-600 text-white py-1 px-3 rounded-full hover:bg-sky-700 transition-colors" data-quiz="honorifics-q3" data-answer="corrected3">정답 확인</button>
-                                <div class="quiz-feedback p-3 bg-green-50 text-green-800 rounded-b-lg">
-                                    <p><span class="font-bold">정답:</span> 선생님, 제가 여쭤볼 것이 <span class="font-bold">있습니다.</span></p>
-                                    <p class="text-xs mt-1"><b>이유:</b> '계시다'는 주체를 높이는 동사로, 높임의 대상이 '여쭤볼 것'이 아니라 '저(화자)'에게 있기 때문에 잘못된 표현입니다. '있습니다'로 바꾸는 것이 적절합니다.</p>
-                                </div>
+                                <button class="quiz-btn mt-2 text-sm bg-sky-600 text-white py-1 px-3 rounded-full hover:bg-sky-700 transition-colors" data-quiz="honorifics-q3" data-answer="있습니다.">정답 확인</button>
+                                <div class="quiz-feedback"></div>
                             </div>
-
-                            <div class="bg-white p-4 rounded-lg border border-slate-200">
+                            <div class="quiz-item bg-white p-4 rounded-lg border border-slate-200">
                                 <p class="font-semibold">문제 4: 다음 중 '객체 높임'이 사용된 문장은?</p>
                                 <div class="mt-2 space-y-2">
                                     <label class="block"><input type="radio" name="honorifics-q4" value="a" class="mr-2"> 할아버지께서 주무신다.</label>
@@ -296,10 +269,7 @@
                                     <label class="block"><input type="radio" name="honorifics-q4" value="d" class="mr-2"> 어서 오십시오.</label>
                                 </div>
                                 <button class="quiz-btn mt-4 text-sm bg-sky-600 text-white py-1 px-3 rounded-full hover:bg-sky-700 transition-colors" data-quiz="honorifics-q4" data-answer="c">정답 확인</button>
-                                <div class="quiz-feedback p-3 bg-green-50 text-green-800 rounded-b-lg">
-                                    <p><span class="font-bold">정답:</span> 나는 어머니께 여쭈어 보았다.</p>
-                                    <p class="text-xs mt-1"><b>이유:</b> '어머니께(부사어)'와 '여쭈어 보았다(특수 어휘)'를 통해 객체인 어머니를 높이고 있습니다.</p>
-                                </div>
+                                <div class="quiz-feedback"></div>
                             </div>
                         </div>
                     </div>
@@ -316,84 +286,102 @@
             const componentDetails = document.querySelectorAll('#component-details > div');
             const quizButtons = document.querySelectorAll('.quiz-btn');
 
+            const quizAnswers = {
+                'phonology-q1': { answer: 'c', reason: "'깨어'는 앞말이 모음 'ㅐ'로 끝나서 니은 첨가 조건에 해당하지 않습니다." },
+                'phonology-q2': { answer: 'c', reason: "'되어'는 '되- + -어' 형태로, '되여'로도 발음될 수 있어 반모음 첨가가 일어납니다. '피어'와 함께 표준 발음으로 인정되는 대표적인 예시입니다." },
+                'sentence-q1': { answer: 'd', reason: "'매우'는 뒤에 오는 부사어 '빠르게'를 꾸며주어 문장 전체를 수식하는 부사어입니다." },
+                'sentence-q2': { answer: 'c', reason: "'되다' 앞에서 주어를 보충하는 문장 성분은 보어입니다." },
+                'honorifics-q1': { answer: '마감되었어요.', reason: "행사는 사람이 아니므로 높임의 대상이 아님!" },
+                'honorifics-q2': { answer: '다리가 아프시다.', reason: "'아프시다'를 써서 주체(할머니)의 신체(다리)를 간접적으로 높여야 함." },
+                'honorifics-q3': { answer: '있습니다.', reason: "'계시다'는 주체를 높이는 동사로, 높임의 대상이 '여쭤볼 것'이 아니라 '저(화자)'에게 있기 때문에 잘못된 표현입니다. '있습니다'로 바꾸는 것이 적절합니다." },
+                'honorifics-q4': { answer: 'c', reason: "'어머니께(부사어)'와 '여쭈어 보았다(특수 어휘)'를 통해 객체인 어머니를 높이고 있습니다." }
+            };
+            
             function showSection(targetId) {
-                navButtons.forEach(btn => {
-                    btn.classList.toggle('active', btn.dataset.target === targetId);
-                });
-                contentSections.forEach(section => {
-                    section.classList.toggle('active', section.id === targetId);
-                });
+                navButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.target === targetId));
+                contentSections.forEach(section => section.classList.toggle('active', section.id === targetId));
             }
 
             navButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    showSection(button.dataset.target);
-                });
+                button.addEventListener('click', () => showSection(button.dataset.target));
             });
 
             componentCards.forEach(card => {
                 card.addEventListener('click', () => {
                     const targetId = card.dataset.component + '-detail';
                     const targetDetail = document.getElementById(targetId);
-                    
                     const isOpening = targetDetail.classList.contains('hidden');
-
                     componentDetails.forEach(detail => detail.classList.add('hidden'));
-
-                    if (isOpening) {
-                        targetDetail.classList.remove('hidden');
-                    }
+                    if (isOpening) targetDetail.classList.remove('hidden');
                 });
             });
 
-            quizButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const quizContainer = button.closest('[id$="-quiz-container"]');
-                    const quizId = button.dataset.quiz;
-                    const correctAnswer = button.dataset.answer;
-                    const selectedOption = quizContainer.querySelector(`input[name="${quizId}"]:checked`);
-                    const feedback = button.nextElementSibling;
-                    
-                    // Reset feedback appearance before showing
-                    feedback.classList.remove('bg-green-50', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-amber-100', 'text-amber-800');
-                    
-                    if (selectedOption) {
-                        // For questions with specific text answers, compare directly
-                        if (['honorifics-q1', 'honorifics-q2', 'honorifics-q3'].includes(quizId)) {
-                             // Correct answers for these text-based questions are hardcoded in the HTML
-                            const isCorrect = (quizId === 'honorifics-q1' && selectedOption.value === 'corrected1') ||
-                                              (quizId === 'honorifics-q2' && selectedOption.value === 'corrected2') ||
-                                              (quizId === 'honorifics-q3' && selectedOption.value === 'corrected3');
-                            if (isCorrect) {
-                                feedback.innerHTML = '<p><span class="font-bold">정답!</span> 잘했어요!</p>' + (quizId === 'honorifics-q1' ? '<p class="text-xs mt-1"><b>정답:</b> 마감되었어요.</p>' : '') + (quizId === 'honorifics-q2' ? '<p class="text-xs mt-1"><b>정답:</b> 다리가 아프시다.</p>' : '') + (quizId === 'honorifics-q3' ? '<p class="text-xs mt-1"><b>정답:</b> 선생님, 제가 여쭤볼 것이 <span class="font-bold">있습니다.</span></p>' : '');
-                                feedback.classList.add('bg-green-50', 'text-green-800');
-                            } else {
-                                feedback.innerHTML = `<p><span class="font-bold">오답!</span> 다시 생각해봐!</p><p class="text-xs mt-1"><b>정답은:</b> ${
-                                    quizId === 'honorifics-q1' ? '마감되었어요.' :
-                                    quizId === 'honorifics-q2' ? '다리가 아프시다.' :
-                                    quizId === 'honorifics-q3' ? '선생님, 제가 여쭤볼 것이 있습니다.' : ''
-                                }</p>`;
-                                feedback.classList.add('bg-red-100', 'text-red-800');
-                            }
-                        } else if (selectedOption.value === correctAnswer) { // For multiple-choice questions
-                            feedback.innerHTML = '<p><span class="font-bold">정답!</span> 잘했어요!</p>';
-                            feedback.classList.add('bg-green-50', 'text-green-800');
-                        } else {
-                            feedback.innerHTML = `<p><span class="font-bold">오답!</span> 다시 생각해봐!</p><p class="text-xs mt-1"><b>정답은:</b> ${
-                                quizId === 'phonology-q1' ? '깨어' : 
-                                quizId === 'phonology-q2' ? '되어' :
-                                quizId === 'sentence-q1' ? '부사어' : 
-                                quizId === 'sentence-q2' ? '보어' :
-                                quizId === 'honorifics-q4' ? '나는 어머니께 여쭈어 보았다.' : '' // This should be for selectedOption.value === correctAnswer only. The default feedback is for wrong answers.
-                            }</p>`;
-                            feedback.classList.add('bg-red-100', 'text-red-800');
-                        }
+            function handleQuizSubmit(button) {
+                const quizItemDiv = button.closest('.quiz-item');
+                const quizId = button.dataset.quiz;
+                const correctAnswer = quizAnswers[quizId].answer;
+                const reason = quizAnswers[quizId].reason;
+                const selectedOption = quizItemDiv.querySelector(`input[name="${quizId}"]:checked`);
+                const feedbackDiv = quizItemDiv.querySelector('.quiz-feedback');
+                
+                // Clear previous state of feedback div and hide it
+                feedbackDiv.classList.remove('show', 'bg-green-50', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-amber-100', 'text-amber-800');
+                feedbackDiv.innerHTML = ''; // Clear text content
+
+                // Determine if it's a multiple-choice question
+                const isMultipleChoiceQuiz = quizItemDiv.querySelector(`input[type="radio"]`) !== null;
+
+                if (isMultipleChoiceQuiz && !selectedOption) {
+                    feedbackDiv.innerHTML = `<p><span class="font-bold">⚠️</span> 보기를 선택해주세요!</p>`;
+                    feedbackDiv.classList.add('bg-amber-100', 'text-amber-800', 'show');
+                    return;
+                }
+
+                // Disable radio buttons (if present) and submit button
+                quizItemDiv.querySelectorAll(`input[name="${quizId}"]`).forEach(input => input.disabled = true);
+                button.disabled = true;
+
+                // Generate and show feedback
+                if (isMultipleChoiceQuiz) { // Handle multiple choice
+                    if (selectedOption.value === correctAnswer) {
+                        feedbackDiv.innerHTML = `<p><span class="font-bold">정답!</span> 잘했어요!</p><p class="text-xs mt-1"><b>이유:</b> ${reason}</p><button class="retry-quiz-btn mt-2 text-xs bg-gray-300 text-gray-700 py-1 px-2 rounded-full hover:bg-gray-400 transition-colors" data-quiz="${quizId}">다시 풀기</button>`;
+                        feedbackDiv.classList.add('bg-green-50', 'text-green-800');
                     } else {
-                        feedback.innerHTML = '<p><span class="font-bold">⚠️</span> 보기를 선택해주세요!</p>';
-                        feedback.classList.add('bg-amber-100', 'text-amber-800');
+                        feedbackDiv.innerHTML = `<p><span class="font-bold">오답!</span> 다시 생각해봐!</p><p class="text-xs mt-1"><b>정답:</b> ${correctAnswer}</p><p class="text-xs mt-1"><b>이유:</b> ${reason}</p><button class="retry-quiz-btn mt-2 text-xs bg-gray-300 text-gray-700 py-1 px-2 rounded-full hover:bg-gray-400 transition-colors" data-quiz="${quizId}">다시 풀기</button>`;
+                        feedbackDiv.classList.add('bg-red-100', 'text-red-800');
                     }
-                    feedback.classList.add('show');
-                });
+                } else { // Handle correction quizzes (no radio buttons)
+                    feedbackDiv.innerHTML = `<p><span class="font-bold">정답:</span> ${correctAnswer}</p><p class="text-xs mt-1"><b>이유:</b> ${reason}</p><button class="retry-quiz-btn mt-2 text-xs bg-gray-300 text-gray-700 py-1 px-2 rounded-full hover:bg-gray-400 transition-colors" data-quiz="${quizId}">다시 풀기</button>`;
+                    feedbackDiv.classList.add('bg-green-50', 'text-green-800');
+                }
+                feedbackDiv.classList.add('show');
+
+                // Attach retry event listener
+                const retryBtn = feedbackDiv.querySelector('.retry-quiz-btn');
+                if (retryBtn) {
+                    retryBtn.addEventListener('click', (e) => {
+                        const quizToRetryId = e.target.dataset.quiz;
+                        const itemToRetry = e.target.closest('.quiz-item');
+                        
+                        // Only reset radio buttons if it's a multiple choice quiz
+                        if (itemToRetry.querySelector(`input[type="radio"]`)) {
+                            itemToRetry.querySelectorAll(`input[name="${quizToRetryId}"]`).forEach(input => {
+                                input.checked = false;
+                                input.disabled = false;
+                            });
+                        }
+                        itemToRetry.querySelector('.quiz-btn').disabled = false;
+                        
+                        // Hide and clear feedback
+                        const feedbackToClear = itemToRetry.querySelector('.quiz-feedback');
+                        feedbackToClear.classList.remove('show', 'bg-green-50', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-amber-100', 'text-amber-800');
+                        feedbackToClear.innerHTML = '';
+                    });
+                }
+            }
+
+            quizButtons.forEach(button => {
+                button.addEventListener('click', () => handleQuizSubmit(button));
             });
 
             showSection('phonology');
@@ -406,30 +394,15 @@
                     datasets: [{
                         label: '높임 표현의 종류',
                         data: [1, 1, 1],
-                        backgroundColor: [
-                            'rgba(59, 130, 246, 0.7)',  /* blue */
-                            'rgba(16, 185, 129, 0.7)', /* green */
-                            'rgba(245, 158, 11, 0.7)'  /* amber */
-                        ],
-                        borderColor: [
-                            'rgba(59, 130, 246, 1)',
-                            'rgba(16, 185, 129, 1)',
-                            'rgba(245, 158, 11, 1)'
-                        ],
+                        backgroundColor: ['rgba(59, 130, 246, 0.7)', 'rgba(16, 185, 129, 0.7)', 'rgba(245, 158, 11, 0.7)'],
+                        borderColor: ['#3B82F6', '#10B981', '#F59E0B'],
                         borderWidth: 1
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            enabled: true
-                        }
-                    }
+                    plugins: { legend: { display: false }, tooltip: { enabled: true } }
                 }
             });
         });
@@ -437,4 +410,3 @@
 
 </body>
 </html>
- 

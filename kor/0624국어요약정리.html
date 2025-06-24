@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Calm Harmony (Slate, Stone, Sky, Amber) -->
     <!-- Application Structure Plan: A single-page application with a sticky top navigation for three core grammar topics: 의문 변동, 문장 성분, 높임 표현. This tab-like structure allows focused studying on one topic at a time. Each section uses interactive cards, diagrams, and mini-quizzes for active recall, which is more effective for exam preparation than passively reading a document. The flow guides the user from understanding the rules to applying them in quizzes. -->
-    <!-- Visualization & Content Choices: 
+    <!-- Visualization & Content Choices:
     - 의문 변동: Goal(Inform/Organize/Apply) -> Method(Interactive rule cards with show/hide examples, new multiple-choice quiz) -> Interaction(Click to reveal, click to check answer) -> Justification(Active recall helps memorization of complex rules and exceptions, quiz reinforces understanding) -> Library(Vanilla JS).
     - 문장 성분: Goal(Organize/Compare/Apply) -> Method(HTML/CSS diagram of sentence structure, clickable cards for details, new sentence analysis quiz) -> Interaction(Click to expand/collapse, click to check answer) -> Justification(Visually represents hierarchical relationships, making them easier to grasp than text alone; quiz applies knowledge to sentences) -> Library(Vanilla JS).
     - 높임 표현: Goal(Compare/Apply) -> Method(Donut Chart for overview, summary table, 'Fix the Sentence' quiz) -> Interaction(Chart visualization, interactive quiz with feedback) -> Justification(Chart provides a quick visual summary; quiz forces application of knowledge, targeting common errors mentioned in the class) -> Library(Chart.js for Donut chart, Vanilla JS for quiz).
@@ -26,12 +26,15 @@
             transition: all 0.3s ease-in-out;
             overflow: hidden;
             max-height: 0;
+            padding: 0;
+            margin-top: 0;
+            opacity: 0;
         }
         .quiz-feedback.show {
-            max-height: 200px; /* Increased max-height for longer feedback */
+            max-height: 200px;
             margin-top: 0.75rem;
-            padding-top: 0.75rem;
-            padding-bottom: 0.75rem;
+            padding: 0.75rem;
+            opacity: 1;
         }
         .component-card.group:hover .click-hint {
             opacity: 1;
@@ -59,12 +62,12 @@
             <!-- 의문 변동 섹션 -->
             <section id="phonology" class="content-section space-y-8">
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h2 class="text-2xl font-bold mb-4 text-sky-800">🚀 의문 변동: 첨가 현상</h2>
+                    <h2 class="text-2xl font-bold mb-4 text-sky-800">  의문 변동: 첨가 현상</h2>
                     <p class="text-slate-600 mb-6">두 음운이 만날 때, 없던 소리가 새로 생겨나는 현상을 '첨가'라고 해! 강의에서 선생님이 **"없었던 질문이 새로 생겨나서 발현되는 현상!"** 이라고 강조하셨지? 바로 그게 첨가야. 여기서는 '니은 첨가'와 '반모음 첨가'를 집중적으로 파헤쳐 보자.</p>
                 
                     <div class="space-y-6">
                         <div class="bg-slate-50 p-5 rounded-lg border border-slate-200">
-                            <h3 class="font-bold text-lg text-slate-800">  니은 첨가</h3>
+                            <h3 class="font-bold text-lg text-slate-800">👂 니은 첨가</h3>
                             <p class="mt-2 mb-4 text-sm text-slate-600">합성어나 파생어에서 앞말이 자음으로 끝나고, 뒷말이 '이, 야, 여, 요, 유'로 시작하면 'ㄴ'이 덧생겨!</p>
                             <div class="grid md:grid-cols-2 gap-4">
                                 <div class="bg-green-50 border-l-4 border-green-500 p-3 rounded">
@@ -114,6 +117,21 @@
                                 <div class="quiz-feedback p-3 bg-green-50 text-green-800 rounded-b-lg">
                                     <p><span class="font-bold">정답:</span> 깨어</p>
                                     <p class="text-xs mt-1"><b>이유:</b> '깨어'는 앞말이 모음 'ㅐ'로 끝나서 니은 첨가 조건에 해당하지 않습니다.</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-lg border border-slate-200">
+                                <p class="font-semibold">문제 2: 다음 중 <span class="font-bold">반모음 첨가가 일어나는</span> 단어는 무엇일까요?</p>
+                                <div class="mt-2 space-y-2">
+                                    <label class="block"><input type="radio" name="phonology-q2" value="a" class="mr-2"> 보이다</label>
+                                    <label class="block"><input type="radio" name="phonology-q2" value="b" class="mr-2"> 가다</label>
+                                    <label class="block"><input type="radio" name="phonology-q2" value="c" class="mr-2"> 되어</label>
+                                    <label class="block"><input type="radio" name="phonology-q2" value="d" class="mr-2"> 뛰다</label>
+                                </div>
+                                <button class="quiz-btn mt-4 text-sm bg-sky-600 text-white py-1 px-3 rounded-full hover:bg-sky-700 transition-colors" data-quiz="phonology-q2" data-answer="c">정답 확인</button>
+                                <div class="quiz-feedback p-3 bg-green-50 text-green-800 rounded-b-lg">
+                                    <p><span class="font-bold">정답:</span> 되어</p>
+                                    <p class="text-xs mt-1"><b>이유:</b> '되어'는 '되- + -어' 형태로, '되여'로도 발음될 수 있어 반모음 첨가가 일어납니다. '피어'와 함께 표준 발음으로 인정되는 대표적인 예시입니다.</p>
                                 </div>
                             </div>
                         </div>
@@ -196,6 +214,21 @@
                                     <p class="text-xs mt-1"><b>이유:</b> '매우'는 뒤에 오는 부사어 '빠르게'를 꾸며주어 문장 전체를 수식하는 부사어입니다.</p>
                                 </div>
                             </div>
+
+                            <div class="bg-white p-4 rounded-lg border border-slate-200">
+                                <p class="font-semibold">문제 2: "선영이는 <span class="font-bold">중학생이</span> 되었다."에서 밑줄 친 '중학생이'의 문장 성분은 무엇일까요?</p>
+                                <div class="mt-2 space-y-2">
+                                    <label class="block"><input type="radio" name="sentence-q2" value="a" class="mr-2"> 주어</label>
+                                    <label class="block"><input type="radio" name="sentence-q2" value="b" class="mr-2"> 목적어</label>
+                                    <label class="block"><input type="radio" name="sentence-q2" value="c" class="mr-2"> 보어</label>
+                                    <label class="block"><input type="radio" name="sentence-q2" value="d" class="mr-2"> 서술어</label>
+                                </div>
+                                <button class="quiz-btn mt-4 text-sm bg-sky-600 text-white py-1 px-3 rounded-full hover:bg-sky-700 transition-colors" data-quiz="sentence-q2" data-answer="c">정답 확인</button>
+                                <div class="quiz-feedback p-3 bg-green-50 text-green-800 rounded-b-lg">
+                                    <p><span class="font-bold">정답:</span> 보어</p>
+                                    <p class="text-xs mt-1"><b>이유:</b> '되다' 앞에서 주어를 보충하는 문장 성분은 보어입니다.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -241,6 +274,31 @@
                                 <div class="quiz-feedback p-3 bg-green-50 text-green-800 rounded-b-lg">
                                     <p><span class="font-bold">정답:</span> 다리가 아프시다.</p>
                                     <p class="text-xs mt-1"><b>이유:</b> '아프시다'를 써서 주체(할머니)의 신체(다리)를 간접적으로 높여야 함.</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-lg border border-slate-200">
+                                <p class="font-semibold">문제 3: 다음 문장에서 잘못된 높임 표현을 찾아 바르게 고쳐보세요.</p>
+                                <p class="mt-1 text-lg font-mono p-2 bg-red-50 text-red-700 rounded">"선생님, 제가 여쭤볼 것이 계십니다."</p>
+                                <button class="quiz-btn mt-2 text-sm bg-sky-600 text-white py-1 px-3 rounded-full hover:bg-sky-700 transition-colors" data-quiz="honorifics-q3" data-answer="corrected3">정답 확인</button>
+                                <div class="quiz-feedback p-3 bg-green-50 text-green-800 rounded-b-lg">
+                                    <p><span class="font-bold">정답:</span> 선생님, 제가 여쭤볼 것이 <span class="font-bold">있습니다.</span></p>
+                                    <p class="text-xs mt-1"><b>이유:</b> '계시다'는 주체를 높이는 동사로, 높임의 대상이 '여쭤볼 것'이 아니라 '저(화자)'에게 있기 때문에 잘못된 표현입니다. '있습니다'로 바꾸는 것이 적절합니다.</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-white p-4 rounded-lg border border-slate-200">
+                                <p class="font-semibold">문제 4: 다음 중 '객체 높임'이 사용된 문장은?</p>
+                                <div class="mt-2 space-y-2">
+                                    <label class="block"><input type="radio" name="honorifics-q4" value="a" class="mr-2"> 할아버지께서 주무신다.</label>
+                                    <label class="block"><input type="radio" name="honorifics-q4" value="b" class="mr-2"> 동생이 책을 읽는다.</label>
+                                    <label class="block"><input type="radio" name="honorifics-q4" value="c" class="mr-2"> 나는 어머니께 여쭈어 보았다.</label>
+                                    <label class="block"><input type="radio" name="honorifics-q4" value="d" class="mr-2"> 어서 오십시오.</label>
+                                </div>
+                                <button class="quiz-btn mt-4 text-sm bg-sky-600 text-white py-1 px-3 rounded-full hover:bg-sky-700 transition-colors" data-quiz="honorifics-q4" data-answer="c">정답 확인</button>
+                                <div class="quiz-feedback p-3 bg-green-50 text-green-800 rounded-b-lg">
+                                    <p><span class="font-bold">정답:</span> 나는 어머니께 여쭈어 보았다.</p>
+                                    <p class="text-xs mt-1"><b>이유:</b> '어머니께(부사어)'와 '여쭈어 보았다(특수 어휘)'를 통해 객체인 어머니를 높이고 있습니다.</p>
                                 </div>
                             </div>
                         </div>
@@ -296,24 +354,42 @@
                     const selectedOption = quizContainer.querySelector(`input[name="${quizId}"]:checked`);
                     const feedback = button.nextElementSibling;
                     
+                    // Reset feedback appearance before showing
+                    feedback.classList.remove('bg-green-50', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-amber-100', 'text-amber-800');
+                    
                     if (selectedOption) {
-                        if (selectedOption.value === correctAnswer) {
+                        // For questions with specific text answers, compare directly
+                        if (['honorifics-q1', 'honorifics-q2', 'honorifics-q3'].includes(quizId)) {
+                             // Correct answers for these text-based questions are hardcoded in the HTML
+                            const isCorrect = (quizId === 'honorifics-q1' && selectedOption.value === 'corrected1') ||
+                                              (quizId === 'honorifics-q2' && selectedOption.value === 'corrected2') ||
+                                              (quizId === 'honorifics-q3' && selectedOption.value === 'corrected3');
+                            if (isCorrect) {
+                                feedback.innerHTML = '<p><span class="font-bold">정답!</span> 잘했어요!</p>' + (quizId === 'honorifics-q1' ? '<p class="text-xs mt-1"><b>정답:</b> 마감되었어요.</p>' : '') + (quizId === 'honorifics-q2' ? '<p class="text-xs mt-1"><b>정답:</b> 다리가 아프시다.</p>' : '') + (quizId === 'honorifics-q3' ? '<p class="text-xs mt-1"><b>정답:</b> 선생님, 제가 여쭤볼 것이 <span class="font-bold">있습니다.</span></p>' : '');
+                                feedback.classList.add('bg-green-50', 'text-green-800');
+                            } else {
+                                feedback.innerHTML = `<p><span class="font-bold">오답!</span> 다시 생각해봐!</p><p class="text-xs mt-1"><b>정답은:</b> ${
+                                    quizId === 'honorifics-q1' ? '마감되었어요.' :
+                                    quizId === 'honorifics-q2' ? '다리가 아프시다.' :
+                                    quizId === 'honorifics-q3' ? '선생님, 제가 여쭤볼 것이 있습니다.' : ''
+                                }</p>`;
+                                feedback.classList.add('bg-red-100', 'text-red-800');
+                            }
+                        } else if (selectedOption.value === correctAnswer) { // For multiple-choice questions
                             feedback.innerHTML = '<p><span class="font-bold">정답!</span> 잘했어요!</p>';
-                            feedback.classList.remove('bg-red-100', 'text-red-800');
                             feedback.classList.add('bg-green-50', 'text-green-800');
                         } else {
                             feedback.innerHTML = `<p><span class="font-bold">오답!</span> 다시 생각해봐!</p><p class="text-xs mt-1"><b>정답은:</b> ${
                                 quizId === 'phonology-q1' ? '깨어' : 
+                                quizId === 'phonology-q2' ? '되어' :
                                 quizId === 'sentence-q1' ? '부사어' : 
-                                quizId === 'honorifics-q1' ? '마감되었어요.' :
-                                quizId === 'honorifics-q2' ? '다리가 아프시다.' : ''
+                                quizId === 'sentence-q2' ? '보어' :
+                                quizId === 'honorifics-q4' ? '나는 어머니께 여쭈어 보았다.' : '' // This should be for selectedOption.value === correctAnswer only. The default feedback is for wrong answers.
                             }</p>`;
-                            feedback.classList.remove('bg-green-50', 'text-green-800');
                             feedback.classList.add('bg-red-100', 'text-red-800');
                         }
                     } else {
                         feedback.innerHTML = '<p><span class="font-bold">⚠️</span> 보기를 선택해주세요!</p>';
-                        feedback.classList.remove('bg-green-50', 'text-green-800');
                         feedback.classList.add('bg-amber-100', 'text-amber-800');
                     }
                     feedback.classList.add('show');

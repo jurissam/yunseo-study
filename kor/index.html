@@ -8,12 +8,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Warm and inviting tones (bg-orange-50, text-red-700, bg-amber-50 for highlights, general text/borders in gray/red) -->
-    <!-- Application Structure Plan: A clean, centered card-like container provides a main header. Content is organized into two distinct columns (HTML notes and PDF notes) using a responsive grid layout. This structure enhances scannability and allows users to quickly differentiate and access various forms of study materials, mirroring the clear categorization of the previous Korean summary index but in the aesthetic style of the provided science index. Recent notes are highlighted for quick identification. -->
+    <!-- Chosen Palette: Warm and inviting tones (bg-orange-50, text-red-700, general text/borders in gray/red, no specific highlight color) -->
+    <!-- Application Structure Plan: A clean, centered card-like container provides a main header. Content is organized into two distinct columns (HTML notes and PDF notes) using a responsive grid layout. This structure enhances scannability and allows users to quickly differentiate and access various forms of study materials, mirroring the clear categorization of the previous Korean summary index but in the aesthetic style of the provided science index. All notes now have a consistent styling. -->
     <!-- Visualization & Content Choices:
     - Lists of study materials: Goal(Inform/Organize) -> Method(HTML list-like div elements with `a` tags for links) -> Interaction(Clickable links to access notes) -> Justification(Provides clear, categorized navigation for various study notes with direct access to files) -> Library(None, pure HTML/Tailwind).
     - Header and Section Titles: Goal(Inform) -> Method(HTML text with Unicode icons) -> Justification(Clear indication of page purpose and content categories, visually engaging).
-    - Highlighted recent notes: Goal(Inform) -> Method(Distinct background color for recent items) -> Justification(Visually prioritizes the newest content for the user).
+    - Consistent note styling: Goal(Aesthetics) -> Method(Uniform background and text colors for all list items) -> Justification(Aligns with user's request for no special emphasis and matches existing science page style).
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
@@ -47,31 +47,31 @@
                     <span class="mr-2">📄</span> HTML 요약 노트
                 </h2>
                 <ul class="space-y-3 text-lg">
-                    <li><a href="korean_notes/0605_korean_summary.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0605 국어 요약 정리</a></li>
-                    <li><a href="korean_notes/0610_korean_summary.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0610 국어 요약 정리</a></li>
-                    <li><a href="korean_notes/0611_korean_summary.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0611 국어 요약 정리</a></li>
-                    <li><a href="korean_notes/0612_korean_summary.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0612 국어 요약 정리</a></li>
-                    <li><a href="korean_notes/0619_korean_summary.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0619 국어 요약 정리</a></li>
-                    <li class="p-3 bg-amber-50 rounded-lg shadow-sm border border-amber-200 text-amber-800 hover:bg-amber-100 transition-colors cursor-pointer study-link">0623 국어 요약 정리1</li>
-                    <li class="p-3 bg-amber-50 rounded-lg shadow-sm border border-amber-200 text-amber-800 hover:bg-amber-100 transition-colors cursor-pointer study-link">0623 국어 요약 정리2</li>
-                    <li class="p-3 bg-amber-50 rounded-lg shadow-sm border border-amber-200 text-amber-800 hover:bg-amber-100 transition-colors cursor-pointer study-link">0624 국어 요약 정리</li>
+                    <li><a href="0605국어요약정리.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0605 국어 요약 정리</a></li>
+                    <li><a href="0610국어요약정리.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0610 국어 요약 정리</a></li>
+                    <li><a href="0611국어요약정리.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0611 국어 요약 정리</a></li>
+                    <li><a href="0612국어요약정리.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0612 국어 요약 정리</a></li>
+                    <li><a href="0619국어요약정리.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0619 국어 요약 정리</a></li>
+                    <li><a href="0623국어원본1.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0623 국어 요약 정리1</a></li>
+                    <li><a href="0623국어원본2.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0623 국어 요약 정리2</a></li>
+                    <li><a href="0624국어요약정리.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0624 국어 요약 정리</a></li>
                 </ul>
             </div>
 
             <!-- PDF 정리본 섹션 -->
             <div>
-                <h2 class="text-2xl font-bold text-gray-700 mb-4 pb-2 border-b-2 border-red-300 flex items-center">
+                <h2 class="text-2xl font-bold text-gray-700 mb-4 border-b-2 pb-2 border-red-300 flex items-center">
                     <span class="mr-2">📃</span> PDF 정리본
                 </h2>
                 <ul class="space-y-3 text-lg">
-                    <li><a href="korean_pdfs/0605_korean_summary.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0605 국어 요약 정리</a></li>
-                    <li><a href="korean_pdfs/0610_korean_summary.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0610 국어 요약 정리</a></li>
-                    <li><a href="korean_pdfs/0611_korean_summary.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0611 국어 요약 정리</a></li>
-                    <li><a href="korean_pdfs/0612_korean_summary.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0612 국어 요약 정리</a></li>
-                    <li><a href="korean_pdfs/0619_korean_summary.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0619 국어 요약 정리</a></li>
-                    <li class="p-3 bg-amber-50 rounded-lg shadow-sm border border-amber-200 text-amber-800 hover:bg-amber-100 transition-colors cursor-pointer study-link">0623 국어 요약 정리1</li>
-                    <li class="p-3 bg-amber-50 rounded-lg shadow-sm border border-amber-200 text-amber-800 hover:bg-amber-100 transition-colors cursor-pointer study-link">0623 국어 요약 정리2</li>
-                    <li class="p-3 bg-amber-50 rounded-lg shadow-sm border border-amber-200 text-amber-800 hover:bg-amber-100 transition-colors cursor-pointer study-link">0624 국어 요약 정리</li>
+                    <li><a href="0605국어요약정리.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0605 국어 요약 정리</a></li>
+                    <li><a href="0610국어요약정리.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0610 국어 요약 정리</a></li>
+                    <li><a href="0611국어요약정리.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0611 국어 요약 정리</a></li>
+                    <li><a href="0612국어요약정리.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0612 국어 요약 정리</a></li>
+                    <li><a href="0619국어요약정리.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0619 국어 요약 정리</a></li>
+                    <li><a href="0623국어원본1.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0623 국어 요약 정리1</a></li>
+                    <li><a href="0623국어원본2.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0623 국어 요약 정리2</a></li>
+                    <li><a href="0624국어요약정리.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0624 국어 요약 정리</a></li>
                 </ul>
             </div>
         </div>

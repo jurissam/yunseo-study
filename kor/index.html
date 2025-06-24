@@ -1,80 +1,89 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📖 국어 요약 자료 정리</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Warm and inviting tones (bg-orange-50, text-red-700, general text/borders in gray/red, no specific highlight color) -->
-    <!-- Application Structure Plan: A clean, centered card-like container provides a main header. Content is organized into two distinct columns (HTML notes and PDF notes) using a responsive grid layout. This structure enhances scannability and allows users to quickly differentiate and access various forms of study materials, mirroring the clear categorization of the previous Korean summary index but in the aesthetic style of the provided science index. All notes now have a consistent styling. -->
-    <!-- Visualization & Content Choices:
-    - Lists of study materials: Goal(Inform/Organize) -> Method(HTML list-like div elements with `a` tags for links) -> Interaction(Clickable links to access notes) -> Justification(Provides clear, categorized navigation for various study notes with direct access to files) -> Library(None, pure HTML/Tailwind).
-    - Header and Section Titles: Goal(Inform) -> Method(HTML text with Unicode icons) -> Justification(Clear indication of page purpose and content categories, visually engaging).
-    - Consistent note styling: Goal(Aesthetics) -> Method(Uniform background and text colors for all list items) -> Justification(Aligns with user's request for no special emphasis and matches existing science page style).
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-    <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-        }
-        /* Custom styles for smooth transitions for links */
-        .study-link {
-            transition: all 0.2s ease-in-out;
-        }
-        .study-link:hover {
-            transform: translateX(5px); /* Small slide effect on hover */
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>국어 요약 자료 정리</title>
+  <style>
+    body {
+      background: #fff5f2;
+      font-family: 'Pretendard', sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+    .container {
+      background: white;
+      border-radius: 16px;
+      padding: 30px 40px;
+      max-width: 720px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    h1 {
+      text-align: center;
+      font-size: 24px;
+      color: #b30000;
+      margin-bottom: 20px;
+    }
+    .section {
+      display: flex;
+      justify-content: space-between;
+      gap: 40px;
+    }
+    .section div {
+      flex: 1;
+    }
+    h3 {
+      font-size: 16px;
+      border-bottom: 2px solid #faa;
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: #ffe6e6;
+      margin-bottom: 6px;
+      padding: 8px 12px;
+      border-radius: 8px;
+    }
+    .pdf li {
+      background: #fff0dc;
+    }
+  </style>
 </head>
-<body class="bg-orange-50 flex items-center justify-center min-h-screen p-4">
-    <div class="bg-white rounded-xl shadow-lg p-6 md:p-10 w-full max-w-2xl border border-red-100">
-        <!-- Main Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-extrabold text-red-700 flex items-center justify-center space-x-3">
-                <span class="text-4xl md:text-5xl animate-pulse">📖</span>
-                <span>국어 요약 자료 정리</span>
-            </h1>
-        </div>
-
-        <!-- Content Sections (Responsive Grid Layout) -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- HTML 요약 노트 섹션 -->
-            <div>
-                <h2 class="text-2xl font-bold text-gray-700 mb-4 border-b-2 pb-2 border-red-300 flex items-center">
-                    <span class="mr-2">📄</span> HTML 요약 노트
-                </h2>
-                <ul class="space-y-3 text-lg">
-                    <li><a href="0605국어요약정리.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0605 국어 요약 정리</a></li>
-                    <li><a href="0610국어요약정리.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0610 국어 요약 정리</a></li>
-                    <li><a href="0611국어요약정리.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0611 국어 요약 정리</a></li>
-                    <li><a href="0612국어요약정리.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0612 국어 요약 정리</a></li>
-                    <li><a href="0619국어요약정리.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0619 국어 요약 정리</a></li>
-                    <li><a href="0623국어원본1.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0623 국어 요약 정리1</a></li>
-                    <li><a href="0623국어원본2.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0623 국어 요약 정리2</a></li>
-                    <li><a href="0624국어요약정리.html" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0624 국어 요약 정리</a></li>
-                </ul>
-            </div>
-
-            <!-- PDF 정리본 섹션 -->
-            <div>
-                <h2 class="text-2xl font-bold text-gray-700 mb-4 border-b-2 pb-2 border-red-300 flex items-center">
-                    <span class="mr-2">📃</span> PDF 정리본
-                </h2>
-                <ul class="space-y-3 text-lg">
-                    <li><a href="0605국어요약정리.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0605 국어 요약 정리</a></li>
-                    <li><a href="0610국어요약정리.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0610 국어 요약 정리</a></li>
-                    <li><a href="0611국어요약정리.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0611 국어 요약 정리</a></li>
-                    <li><a href="0612국어요약정리.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0612 국어 요약 정리</a></li>
-                    <li><a href="0619국어요약정리.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0619 국어 요약 정리</a></li>
-                    <li><a href="0623국어원본1.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0623 국어 요약 정리1</a></li>
-                    <li><a href="0623국어원본2.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0623 국어 요약 정리2</a></li>
-                    <li><a href="0624국어요약정리.pdf" target="_blank" class="study-link block p-3 rounded-lg bg-white hover:bg-red-50 text-gray-800 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-105">0624 국어 요약 정리</a></li>
-                </ul>
-            </div>
-        </div>
+<body>
+  <div class="container">
+    <h1>📖 국어 요약 자료 정리</h1>
+    <div class="section">
+      <div>
+        <h3>📝 HTML 요약 노트</h3>
+        <ul>
+          <li>0605 국어 요약 정리</li>
+          <li>0610 국어 요약 정리</li>
+          <li>0611 국어 요약 정리</li>
+          <li>0612 국어 요약 정리</li>
+          <li>0619 국어 요약 정리</li>
+          <li>0623 국어 요약 정리1</li>
+          <li>0623 국어 요약 정리2</li>
+          <li>0624 국어 요약 정리</li>
+        </ul>
+      </div>
+      <div>
+        <h3>📄 PDF 정리본</h3>
+        <ul class="pdf">
+          <li>0605 국어 요약 정리</li>
+          <li>0610 국어 요약 정리</li>
+          <li>0611 국어 요약 정리</li>
+          <li>0612 국어 요약 정리</li>
+          <li>0619 국어 요약 정리</li>
+          <li>0623 국어 요약 정리1</li>
+          <li>0623 국어 요약 정리2</li>
+          <li>0624 국어 요약 정리</li>
+        </ul>
+      </div>
     </div>
+  </div>
 </body>
 </html>

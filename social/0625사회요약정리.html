@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대화형 사회 수업 핵심 정리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony Neutrals -->
+    <!-- Application Structure Plan: The application is structured into four thematic sections navigated by top-level buttons: 'Attitudes for Understanding Culture', 'Types of Cultural Change', 'Changes in Our Society', and 'Teacher's Special Emphasis'. This non-linear, thematic structure was chosen over a linear one because the source material is conversational and jumps between concepts. This design allows users to freely explore core topics, compare related ideas (like cultural attitudes) side-by-side, and focus on the teacher's high-priority notes. The user flow encourages active exploration through clickable cards and interactive diagrams, making learning more engaging and effective than passively reading a summary. -->
+    <!-- Visualization & Content Choices: 1. Cultural Attitudes (Relativism, Ethnocentrism, Flunkeyism): Goal=Compare/Inform -> Method=Interactive HTML cards in a grid -> Interaction=Click to reveal details/examples -> Justification=Facilitates direct comparison and active learning -> Library=Vanilla JS, Tailwind. 2. Types of Cultural Change (Coexistence, etc.): Goal=Organize/Clarify -> Method=Flowchart-style diagram -> Interaction=Click to see details -> Justification=Visually structures the relationships between concepts -> Library=HTML/CSS, JS. 3. Multicultural Society Drivers: Goal=Inform/Visualize -> Method=Simple Bar Chart -> Interaction=Tooltips on hover -> Justification=More engaging than text for simple proportional data -> Library=Chart.js/Canvas. 4. Teacher's Notes: Goal=Highlight -> Method=Styled callout box -> Interaction=None (visual emphasis) -> Justification=Draws immediate user attention to exam-critical points. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #FDFBF6;
+            color: #5D4037;
+        }
+        .card {
+            background-color: #fff;
+            border: 1px solid #F5F0E8;
+            cursor: pointer;
+        }
+        .card .details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+        .card.active .details {
+            max-height: 500px;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .nav-button.active {
+            background-color: #A1887F;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto px-4 py-8 md:py-12">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-black text-[#4E342E] mb-2">오늘의 사회 수업 핵심 정리</h1>
+            <p class="text-lg text-gray-600">선생님의 강조 포인트를 클릭하며 완벽하게 복습해봐요!</p>
+        </header>
+
+        <nav class="flex flex-wrap justify-center gap-2 md:gap-4 mb-12">
+            <button onclick="scrollToSection('section1')" class="nav-button text-sm md:text-base font-bold py-2 px-4 rounded-full shadow-md bg-white hover:bg-gray-100 transition-all duration-300"># 문화 이해의 태도</button>
+            <button onclick="scrollToSection('section2')" class="nav-button text-sm md:text-base font-bold py-2 px-4 rounded-full shadow-md bg-white hover:bg-gray-100 transition-all duration-300"># 다양한 문화 변동</button>
+            <button onclick="scrollToSection('section3')" class="nav-button text-sm md:text-base font-bold py-2 px-4 rounded-full shadow-md bg-white hover:bg-gray-100 transition-all duration-300"># 우리 사회의 변화</button>
+            <button onclick="scrollToSection('section4')" class="nav-button text-sm md:text-base font-bold py-2 px-4 rounded-full shadow-md bg-white hover:bg-gray-100 transition-all duration-300"># 선생님의 ★최종 강조★</button>
+        </nav>
+
+        <main class="space-y-16">
+            <section id="section1">
+                <h2 class="text-2xl md:text-3xl font-bold text-center mb-8">1. 문화 이해의 태도 🤔 (카드를 클릭해보세요!)</h2>
+                <p class="text-center max-w-3xl mx-auto mb-10 text-gray-700">
+                    다양한 문화를 어떤 시선으로 바라봐야 할까요? 각 태도의 의미와 선생님의 예시를 통해 확실히 알아봅시다. 특히, 각 태도의 문제점을 잘 파악하는 것이 중요해요!
+                </p>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="card rounded-xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1" onclick="toggleCard(this)">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">자문화 중심주의</h3>
+                            <p class="text-gray-500">자기 문화가 최고라고 믿는 태도</p>
+                            <div class="details">
+                                <hr class="my-4">
+                                <p class="font-bold mt-4">👩‍🏫 선생님의 한 마디:</p>
+                                <p class="mt-1 italic">"우리 문화가 다른 문화보다 우월하다고 생각하는 거예요!"</p>
+                                <p class="font-bold mt-4 text-red-700">🚨 주의점:</p>
+                                <p class="mt-1">다른 문화를 무시하거나 낮게 평가하여 문화 간의 갈등을 일으킬 수 있어요.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card rounded-xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1" onclick="toggleCard(this)">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-2">문화 사대주의</h3>
+                            <p class="text-gray-500">다른 문화가 더 우월하다고 믿는 태도</p>
+                             <div class="details">
+                                <hr class="my-4">
+                                <p class="font-bold mt-4">👩‍🏫 선생님의 한 마디:</p>
+                                <p class="mt-1 italic">"이건 자기 문화를 업신여기면서 다른 나라 문화만 무작정 따르려는 거예요. '다문화 중심주의' 같은 헷갈리는 말에 속으면 안 돼요!"</p>
+                                <p class="font-bold mt-4 text-red-700">🚨 주의점:</p>
+                                <p class="mt-1">우리 문화의 가치를 잃어버리고 주체성을 상실할 위험이 있어요.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card rounded-xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1" onclick="toggleCard(this)">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-teal-700">문화 상대주의 (바람직!✨)</h3>
+                            <p class="text-gray-500">문화를 그 사회의 맥락에서 이해하는 태도</p>
+                             <div class="details">
+                                <hr class="my-4">
+                                <p class="font-bold mt-4">👩‍🏫 선생님의 한 마디:</p>
+                                <p class="mt-1 italic">"다문화 사회를 이해하려면 꼭 필요한 태도예요. 문화에는 우열이 없다는 걸 인정하는 거죠."</p>
+                                <p class="font-bold mt-4 text-orange-600">🔥 하지만 극단은 금물!</p>
+                                <p class="mt-1">"자~ 얘들아! 정복한 다음에 겁주려고 손발 껍데기를 벗기는 것도 문화라고 인정해야 할까? 아니잖아~ 그쵸? 인류의 보편적 가치를 해치는 것까지 존중해선 안돼요. 이게 바로 <span class="font-bold">극단적 문화 상대주의</span>의 함정이에요!"</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section2">
+                <h2 class="text-2xl md:text-3xl font-bold text-center mb-8">2. 문화가 만나면? 다양한 문화 변동의 모습 🤝</h2>
+                <p class="text-center max-w-3xl mx-auto mb-10 text-gray-700">
+                    서로 다른 문화가 만나면 어떤 모습이 나타날까요? 선생님이 강조하신 세 가지 핵심 개념을 구분해 봅시다. 아래 개념 카드를 눌러보세요!
+                </p>
+                <div class="grid md:grid-cols-3 gap-6 text-center">
+                    <div class="card p-6 rounded-xl shadow-lg" onclick="showModal('공존')">
+                        <div class="text-4xl mb-4">🤝</div>
+                        <h3 class="text-xl font-bold">문화 공존</h3>
+                        <p class="text-gray-500 mt-2">여러 문화가 정체성을 유지하며 함께 존재</p>
+                    </div>
+                    <div class="card p-6 rounded-xl shadow-lg" onclick="showModal('융합')">
+                        <div class="text-4xl mb-4">🤝+🤝=✨</div>
+                        <h3 class="text-xl font-bold">문화 융합</h3>
+                        <p class="text-gray-500 mt-2">서로 다른 문화가 합쳐져 새로운 문화 탄생</p>
+                    </div>
+                    <div class="card p-6 rounded-xl shadow-lg" onclick="showModal('동화')">
+                        <div class="text-4xl mb-4">➡️🤝</div>
+                        <h3 class="text-xl font-bold">문화 동화</h3>
+                        <p class="text-gray-500 mt-2">한 문화가 다른 문화에 흡수되어 사라짐</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="section3">
+                <h2 class="text-2xl md:text-3xl font-bold text-center mb-8">3. 우리 사회의 변화와 문화의 힘 🇰🇷</h2>
+                <p class="text-center max-w-3xl mx-auto mb-10 text-gray-700">
+                    우리 사회는 왜 다문화 사회로 변하고 있을까요? 그리고 우리 전통문화는 어떤 강력한 힘을 가지고 있을까요? 차트와 핵심 목록을 통해 알아봅시다.
+                </p>
+                <div class="grid lg:grid-cols-2 gap-10 items-center">
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="font-bold text-xl mb-4 text-center">우리나라가 다문화 사회로 진입한 이유</h3>
+                        <div class="chart-container">
+                            <canvas id="multiculturalChart"></canvas>
+                        </div>
+                         <p class="text-center text-sm text-gray-500 mt-2">외국인 근로자와 결혼 이주민의 증가가 주요 원인이에요.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="font-bold text-xl mb-4">💥 전통문화의 강력한 경쟁력</h3>
+                        <ul class="space-y-3 list-disc list-inside text-gray-800">
+                            <li>국가 이미지를 높여줘요.</li>
+                            <li>문화 산업 육성에 크게 이바지해요.</li>
+                            <li>'가장 한국적인 것'이 세계적인 경쟁력을 가져요!</li>
+                        </ul>
+                        <hr class="my-6">
+                        <h3 class="font-bold text-xl mb-4">📡 문화 전파 방식</h3>
+                        <p>인쇄물, 인터넷 등 매체를 통해 이루어지는 문화 전파는 <span class="font-bold text-teal-600 text-lg">간접 전파</span>예요!</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section4">
+                <h2 class="text-2xl md:text-3xl font-bold text-center mb-8">4. 선생님의 ★최종 강조★ 놓치면 안 돼!</h2>
+                 <p class="text-center max-w-3xl mx-auto mb-10 text-gray-700">
+                    수업 마지막에 선생님이 특히 중요하다고 다시 한번 짚어주신 내용이에요. 이 부분은 시험에 나올 확률이 아주 높으니 꼭 기억해두세요!
+                </p>
+                <div class="bg-amber-100 border-l-4 border-amber-500 text-amber-800 p-6 rounded-lg shadow-lg max-w-3xl mx-auto">
+                    <p class="text-2xl font-black mb-4">★★ 시험에 나온다! ★★</p>
+                    <ul class="space-y-3">
+                        <li>
+                            <p class="text-lg">☝️ <span class="font-bold">문화 상대주의, 자문화 중심주의, 문화 사대주의</span> 개념을 <span class="font-extrabold text-red-600">정확하게 구분</span>하세요! 특히 극단적 문화 상대주의의 문제점을 꼭 알아두세요.</p>
+                        </li>
+                         <li>
+                            <p class="text-lg">✌️ <span class="font-bold">문화 공존, 융합, 동화</span>의 차이점을 예시와 함께 완벽하게 이해해야 해요. 말레이시아 예시 기억나죠? (문화 공존!)</p>
+                        </li>
+                        <li>
+                            <p class="text-lg">🌐 <span class="font-bold">"지도를 잘 알아야 한다!"</span>고 하셨어요. 다른 지역의 문화(건조기후의 오아시스 농업 등)가 문제에 함께 나올 수 있다는 신호예요!</p>
+                        </li>
+                    </ul>
+                </div>ㅁ
+            </section>
+        </main>
+    </div>
+
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+            <h3 id="modal-title" class="text-2xl font-bold mb-4"></h3>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        function toggleCard(element) {
+            element.classList.toggle('active');
+        }
+
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        const modalData = {
+            '공존': {
+                title: '🤝 문화 공존',
+                content: `
+                    <p class="mb-2">여러 문화가 각각의 고유한 특성을 잃지 않고 한 사회 안에서 함께 존재하는 현상이에요.</p>
+                    <p class="font-bold mt-4">👩‍🏫 선생님의 예시:</p>
+                    <ul class="list-disc list-inside mt-2">
+                        <li>다양한 종교 기념일과 경관이 함께 나타나는 <strong>말레이시아</strong></li>
+                        <li>한국에 살면서 한국 생활 양식도 따르지만, 고유의 문화를 유지하는 <strong>중국인 이주민</strong></li>
+                    </ul>
+                `
+            },
+            '융합': {
+                title: '✨ 문화 융합 (문화 접변)',
+                content: `
+                    <p class="mb-2">서로 다른 문화 요소들이 합쳐져 기존에 없던 완전히 새로운 문화를 만들어내는 현상이에요.</p>
+                    <p class="font-bold mt-4">💡 쉬운 예시:</p>
+                    <ul class="list-disc list-inside mt-2">
+                        <li>불고기 + 피자 = <strong>불고기 피자</strong></li>
+                        <li>한국의 주거 문화 + 서양의 건축 기술 = <strong>아파트</strong></li>
+                    </ul>
+                `
+            },
+            '동화': {
+                title: '➡️ 문화 동화',
+                content: `
+                    <p class="mb-2">한 문화가 다른 주류 문화에 완전히 흡수되어 자신의 정체성을 잃어버리는 현상이에요.</p>
+                    <p class="font-bold mt-4">💡 쉬운 예시:</p>
+                    <ul class="list-disc list-inside mt-2">
+                        <li>과거 아메리카 원주민들이 유럽 이주민들의 문화를 강제로 받아들이면서 자신들의 언어와 전통을 잃어버린 경우</li>
+                    </ul>
+                `
+            }
+        };
+
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalContent = document.getElementById('modal-content');
+
+        function showModal(type) {
+            const data = modalData[type];
+            if (data) {
+                modalTitle.textContent = data.title;
+                modalContent.innerHTML = data.content;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('multiculturalChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['외국인 근로자 증가', '결혼 이주민 증가'],
+                    datasets: [{
+                        label: '다문화 사회 주요 원인',
+                        data: [70, 55],
+                        backgroundColor: [
+                            'rgba(213, 179, 149, 0.6)',
+                            'rgba(161, 136, 127, 0.6)',
+                        ],
+                        borderColor: [
+                            'rgba(213, 179, 149, 1)',
+                            'rgba(161, 136, 127, 1)',
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.formattedValue + '% 기여 (예시)';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

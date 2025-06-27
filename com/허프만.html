@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대화형 허프만 압축 학습</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Energetic Tech (Background: gray-900, Text: gray-200, Accent: emerald-400/sky-400) -->
+    <!-- Application Structure Plan: A task-oriented, single-page application that walks the user through the Huffman coding process in three distinct, interactive stages: 1) Tree Construction, 2) Encoding/Decoding, and 3) Efficiency Analysis. This step-by-step structure is optimal for learning a complex algorithm, as it breaks the process down into manageable, interactive parts, reinforcing each concept before moving to the next. -->
+    <!-- Visualization & Content Choices: 1. Tree Construction: Goal is to organize/show hierarchy. A dynamic, structured HTML/CSS representation of the Huffman tree will be used, updating with each step (NO SVG). This provides a clearer, more interactive learning experience than a static image. 2. Encoding/Decoding: Goal is to inform and allow interaction. Text inputs and dynamic outputs will show the direct result of applying the generated codes. 3. Efficiency Analysis: Goal is to compare. A simple bar chart (Chart.js) will visually compare the 'before' and 'after' data sizes, making the benefit of compression immediately obvious. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+     <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #111827; color: #e5e7eb; }
+        .interactive-section { background-color: #1f2937; border: 1px solid #374151; border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 2rem; }
+        .tab-button { padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; background-color: #374151; transition: background-color 0.3s; }
+        .tab-button.active { background-color: #10b981; color: #111827; font-weight: 700; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .huffman-node { background-color: #374151; border: 1px solid #4b5563; border-radius: 0.5rem; padding: 0.5rem; text-align: center; min-width: 60px; transition: all 0.3s; }
+        .huffman-node .char { font-weight: bold; font-size: 1.25rem; color: #a7f3d0; }
+        .huffman-node .freq { font-size: 0.875rem; color: #9ca3af; }
+        .huffman-tree-container { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+        .huffman-level { display: flex; justify-content: center; align-items: flex-end; gap: 1rem; flex-wrap: wrap; }
+        .code-block { background-color: #0f172a; color: #e2e8f0; padding: 1rem; border-radius: 0.5rem; font-family: monospace; }
+        .output-block { background-color: #374151; color: #e5e7eb; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem; min-height: 40px; }
+        .chart-container { position: relative; width: 100%; max-width: 500px; margin-left: auto; margin-right: auto; height: 250px; max-height: 300px; }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-emerald-400">대화형 허프만 압축 학습기</h1>
+            <p class="text-lg text-gray-400 mt-2">입력한 텍스트로 허프만 트리를 만들고, 압축 원리를 직접 체험해보세요.</p>
+        </header>
+
+        <div class="interactive-section">
+            <h2 class="text-2xl font-bold mb-4 text-sky-400">1단계: 텍스트 입력 및 빈도 분석</h2>
+            <p class="mb-4 text-gray-300">압축할 문자열을 입력하세요. 각 문자의 빈도수가 자동으로 계산됩니다.</p>
+            <textarea id="text-input" class="w-full h-24 p-2 rounded-lg bg-gray-800 border border-gray-600 focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="여기에 압축할 텍스트를 입력하세요. (예: hello information)"></textarea>
+            <button id="freq-btn" class="mt-4 bg-emerald-500 text-white font-bold px-6 py-2 rounded-lg hover:bg-emerald-600 transition-colors">빈도 분석하기</button>
+            <div id="freq-table-container" class="mt-4"></div>
+        </div>
+
+        <div id="huffman-main" class="hidden">
+            <div class="interactive-section">
+                <h2 class="text-2xl font-bold mb-4 text-sky-400">2단계: 허프만 트리 구성</h2>
+                 <p class="mb-4 text-gray-300">'다음 단계' 버튼을 눌러 빈도가 가장 낮은 노드들이 합쳐지는 과정을 단계별로 확인하세요.</p>
+                <div class="flex items-center gap-4 mb-4">
+                    <button id="huffman-step-btn" class="bg-sky-500 text-white font-bold px-6 py-2 rounded-lg hover:bg-sky-600 transition-colors">다음 단계</button>
+                    <button id="huffman-reset-btn" class="bg-gray-500 text-white font-bold px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">초기화</button>
+                </div>
+                <div id="huffman-tree-display" class="p-4 bg-gray-900 rounded-lg min-h-[200px] overflow-x-auto">
+                    <div id="huffman-tree-container" class="huffman-tree-container"></div>
+                </div>
+            </div>
+
+            <div class="interactive-section">
+                <h2 class="text-2xl font-bold mb-4 text-sky-400">3단계: 코드 생성 및 압축 효율 분석</h2>
+                <div id="tabs" class="flex gap-2 mb-4">
+                    <button class="tab-button active" data-tab="encoding">코드 테이블 & 인코딩</button>
+                    <button class="tab-button" data-tab="decoding">디코딩</button>
+                    <button class="tab-button" data-tab="efficiency">압축 효율</button>
+                </div>
+                
+                <div id="encoding" class="tab-content active">
+                    <h3 class="text-xl font-semibold mb-2">허프만 코드 테이블</h3>
+                    <div id="huffman-code-table" class="code-block mb-6"></div>
+                    <h3 class="text-xl font-semibold mb-2">인코딩 결과</h3>
+                    <div id="encoded-output" class="output-block break-all"></div>
+                </div>
+
+                <div id="decoding" class="tab-content">
+                    <h3 class="text-xl font-semibold mb-2">디코딩 테스트</h3>
+                    <p class="mb-4 text-gray-300">위에서 생성된 코드로 암호화된 이진 코드를 입력하고, 원래 텍스트로 변환해보세요.</p>
+                    <input type="text" id="decode-input" class="w-full p-2 rounded-lg bg-gray-800 border border-gray-600" placeholder="디코딩할 이진 코드 입력">
+                    <button id="decode-btn" class="mt-4 bg-emerald-500 text-white font-bold px-6 py-2 rounded-lg hover:bg-emerald-600">디코딩 실행</button>
+                    <div id="decoded-output" class="output-block"></div>
+                </div>
+                
+                <div id="efficiency" class="tab-content">
+                     <h3 class="text-xl font-semibold mb-2">압축 효율 비교</h3>
+                     <p class="mb-4 text-gray-300">허프만 압축 전후의 데이터 크기를 비교하여 압축 효율을 확인합니다.</p>
+                     <div class="chart-container">
+                        <canvas id="efficiency-chart"></canvas>
+                     </div>
+                     <div id="efficiency-text" class="mt-4 text-center text-lg"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    class HuffmanNode {
+        constructor(char, freq, left = null, right = null) {
+            this.char = char;
+            this.freq = freq;
+            this.left = left;
+            this.right = right;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const textInput = document.getElementById('text-input');
+        const freqBtn = document.getElementById('freq-btn');
+        const freqTableContainer = document.getElementById('freq-table-container');
+        const huffmanMain = document.getElementById('huffman-main');
+        
+        const huffmanStepBtn = document.getElementById('huffman-step-btn');
+        const huffmanResetBtn = document.getElementById('huffman-reset-btn');
+        const huffmanTreeContainer = document.getElementById('huffman-tree-container');
+
+        const huffmanCodeTable = document.getElementById('huffman-code-table');
+        const encodedOutput = document.getElementById('encoded-output');
+        const decodeInput = document.getElementById('decode-input');
+        const decodeBtn = document.getElementById('decode-btn');
+        const decodedOutput = document.getElementById('decoded-output');
+
+        const efficiencyChartCanvas = document.getElementById('efficiency-chart');
+        const efficiencyText = document.getElementById('efficiency-text');
+        
+        const tabs = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        let originalText = '';
+        let frequencies = {};
+        let nodeQueue = [];
+        let huffmanCodes = {};
+        let efficiencyChart;
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                tabContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(tab.dataset.tab).classList.add('active');
+
+                if(tab.dataset.tab === 'efficiency' && originalText) {
+                    calculateAndDrawEfficiency();
+                }
+            });
+        });
+
+        freqBtn.addEventListener('click', () => {
+            originalText = textInput.value;
+            if (originalText.length < 2) {
+                alert('최소 2글자 이상 입력해주세요.');
+                return;
+            }
+            calculateFrequencies();
+            renderFrequencyTable();
+            initializeHuffman();
+            huffmanMain.classList.remove('hidden');
+        });
+
+        function calculateFrequencies() {
+            frequencies = {};
+            for (const char of originalText) {
+                frequencies[char] = (frequencies[char] || 0) + 1;
+            }
+        }
+
+        function renderFrequencyTable() {
+            let tableHTML = '<table class="w-full text-left table-auto"><thead class="bg-gray-700"><tr><th class="p-2">문자</th><th class="p-2">빈도수</th></tr></thead><tbody>';
+            const sortedFreq = Object.entries(frequencies).sort((a, b) => b[1] - a[1]);
+            for (const [char, freq] of sortedFreq) {
+                const displayChar = char === ' ' ? "' '(공백)" : char;
+                tableHTML += `<tr class="border-b border-gray-700"><td class="p-2">${displayChar}</td><td class="p-2">${freq}</td></tr>`;
+            }
+            tableHTML += '</tbody></table>';
+            freqTableContainer.innerHTML = tableHTML;
+        }
+
+        function initializeHuffman() {
+            nodeQueue = Object.entries(frequencies)
+                .map(([char, freq]) => new HuffmanNode(char, freq))
+                .sort((a, b) => a.freq - b.freq);
+            renderTree();
+            huffmanStepBtn.disabled = false;
+        }
+
+        huffmanResetBtn.addEventListener('click', initializeHuffman);
+
+        huffmanStepBtn.addEventListener('click', () => {
+            if (nodeQueue.length > 1) {
+                nodeQueue.sort((a, b) => a.freq - b.freq);
+                const left = nodeQueue.shift();
+                const right = nodeQueue.shift();
+                const parent = new HuffmanNode(null, left.freq + right.freq, left, right);
+                nodeQueue.push(parent);
+                renderTree();
+            }
+            if (nodeQueue.length <= 1) {
+                huffmanStepBtn.disabled = true;
+                generateCodes();
+                renderCodeTable();
+                encodeText();
+                calculateAndDrawEfficiency();
+            }
+        });
+        
+        function renderTree() {
+            huffmanTreeContainer.innerHTML = '';
+            const levelDiv = document.createElement('div');
+            levelDiv.className = 'huffman-level';
+            nodeQueue.forEach(node => {
+                levelDiv.appendChild(createNodeElement(node));
+            });
+            huffmanTreeContainer.appendChild(levelDiv);
+        }
+
+        function createNodeElement(node) {
+            const nodeDiv = document.createElement('div');
+            if(node.char !== null){
+                nodeDiv.innerHTML = `<div class="huffman-node"><div class="char">${node.char === ' ' ? "' '" : node.char}</div><div class="freq">${node.freq}</div></div>`;
+            } else {
+                const container = document.createElement('div');
+                container.style.display = 'flex';
+                container.style.flexDirection = 'column';
+                container.style.alignItems = 'center';
+
+                const parentNode = document.createElement('div');
+                parentNode.innerHTML = `<div class="huffman-node" style="background-color: #059669;"><div class="char text-white">${node.freq}</div></div>`;
+                
+                const childrenContainer = document.createElement('div');
+                childrenContainer.style.display = 'flex';
+                childrenContainer.style.gap = '1rem';
+                childrenContainer.style.marginTop = '1rem';
+                
+                if(node.left) childrenContainer.appendChild(createNodeElement(node.left));
+                if(node.right) childrenContainer.appendChild(createNodeElement(node.right));
+
+                container.appendChild(parentNode);
+                container.appendChild(childrenContainer);
+                return container;
+            }
+            return nodeDiv;
+        }
+
+        function generateCodes() {
+            huffmanCodes = {};
+            if (nodeQueue.length > 0) {
+                const root = nodeQueue[0];
+                traverseTree(root, '');
+            }
+        }
+
+        function traverseTree(node, code) {
+            if (node.char !== null) {
+                huffmanCodes[node.char] = code || '0';
+                return;
+            }
+            if (node.left) traverseTree(node.left, code + '0');
+            if (node.right) traverseTree(node.right, code + '1');
+        }
+
+        function renderCodeTable() {
+            let tableHTML = '';
+            for (const char in huffmanCodes) {
+                const displayChar = char === ' ' ? "' '(공백)" : char;
+                tableHTML += `<div><span class="text-sky-400">"${displayChar}"</span>: <span class="text-yellow-400">${huffmanCodes[char]}</span></div>`;
+            }
+            huffmanCodeTable.innerHTML = tableHTML;
+        }
+
+        function encodeText() {
+            let encodedString = '';
+            for (const char of originalText) {
+                encodedString += huffmanCodes[char] + ' ';
+            }
+            encodedOutput.textContent = encodedString.trim();
+        }
+
+        decodeBtn.addEventListener('click', () => {
+            const codeToDecode = decodeInput.value.replace(/\s/g, '');
+            let decodedString = '';
+            let currentCode = '';
+            const reversedCodes = Object.fromEntries(Object.entries(huffmanCodes).map(a => a.reverse()));
+            
+            for(const bit of codeToDecode) {
+                currentCode += bit;
+                if(reversedCodes[currentCode]){
+                    decodedString += reversedCodes[currentCode];
+                    currentCode = '';
+                }
+            }
+            decodedOutput.textContent = decodedString || '디코딩 실패: 유효한 코드가 아닙니다.';
+        });
+        
+        function calculateAndDrawEfficiency() {
+            const originalSize = originalText.length * 8;
+            let compressedSize = 0;
+            for (const char of originalText) {
+                if(huffmanCodes[char]) {
+                    compressedSize += huffmanCodes[char].length;
+                }
+            }
+            const compressionRate = originalSize > 0 ? (1 - (compressedSize / originalSize)) * 100 : 0;
+
+            efficiencyText.innerHTML = `원본 크기: ${originalSize} 비트 <br> 압축 후 크기: ${compressedSize} 비트 <br> <span class="font-bold text-emerald-400">압축률: ${compressionRate.toFixed(2)}%</span>`;
+
+            if (efficiencyChart) efficiencyChart.destroy();
+            const ctx = efficiencyChartCanvas.getContext('2d');
+            efficiencyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['원본 (ASCII)', '허프만 압축'],
+                    datasets: [{
+                        label: '크기 (비트)',
+                        data: [originalSize, compressedSize],
+                        backgroundColor: ['#374151', '#10b981'],
+                        borderColor: ['#4b5563', '#059669'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { color: '#9ca3af' } }, x: { ticks: { color: '#9ca3af' } } }
+                }
+            });
+        }
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대화형 오렌지(Orange) 가이드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Earthy Neutral -->
+    <!-- Application Structure Plan: A thematic, single-page application designed for interactive learning. The structure prioritizes user engagement over mirroring the original document's linear flow. It starts with a general introduction (Hero), moves to interactive exploration of core concepts (UI elements), features a central workflow simulator (the core interactive element for both basic and bioinformatics examples, now expanded with more advanced ones), provides an organized overview of widgets (Accordion), showcases applications (Card layout), and ends with clear calls to action. This structure was chosen to guide the user from basic understanding to hands-on simulation, which is a more effective teaching method for a visual tool like Orange than static text. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Orange Core Concepts (Canvas, Widgets, Links). Goal: Inform/Organize. Viz/Method: Interactive diagram using HTML/CSS/JS. An info card appears on click. Justification: More engaging and less overwhelming than a block of text.
+        - Report Info: Basic & Bioinformatics Workflows. Goal: Teach a process. Viz/Method: A guided, interactive workflow simulator built with HTML/CSS/JS. Users click buttons to add styled divs (representing widgets) to a canvas area. JS manages state and displays contextual information. Justification: Simulates the actual software's user experience, promoting learning through action.
+        - Report Info: Scatter Plot & Heatmap visualizations. Goal: Compare/Show Relationships. Viz/Method: Chart.js (Canvas) rendered inside a modal triggered from the simulator. Justification: Provides a concrete visual output for the simulated workflow steps.
+        - Report Info: Regression Plot & Cluster Plot. Goal: Show prediction and grouping. Viz/Method: Chart.js (Canvas) rendered inside a modal. Justification: Offers visual results for advanced modeling and clustering examples.
+        - Report Info: Widget Categories. Goal: Organize/Inform. Viz/Method: HTML/JS accordion. Justification: Neatly organizes a large amount of information, allowing users to explore it without being overwhelmed.
+        - Report Info: Application Areas. Goal: Inform. Viz/Method: HTML/CSS card grid with icons (Unicode). Justification: A visually appealing and scannable way to present diverse applications.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 60vh;
+            max-height: 500px;
+        }
+        .widget {
+            transition: all 0.3s ease-in-out;
+        }
+        .widget:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .nav-link {
+            transition: color 0.2s;
+        }
+        .nav-link:hover {
+            color: #f97316; /* Orange-600 */
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+        }
+        .arrow-right {
+            display: inline-block;
+            transition: transform 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-40 border-b border-stone-200">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-orange-600">Orange Interactive Guide</h1>
+            <div class="hidden md:flex space-x-6">
+                <a href="#concepts" class="nav-link text-stone-600 font-medium">핵심 개념</a>
+                <a href="#simulation" class="nav-link text-stone-600 font-medium">워크플로우 체험</a>
+                <a href="#widgets" class="nav-link text-stone-600 font-medium">위젯 둘러보기</a>
+                <a href="#applications" class="nav-link text-stone-600 font-medium">활용 분야</a>
+            </div>
+            <a href="https://orange.biolab.si/" target="_blank" class="hidden md:block bg-orange-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors">다운로드</a>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-6">
+
+        <section id="hero" class="text-center py-16">
+            <h2 class="text-5xl font-bold mb-4 text-stone-900">코딩 없이 시작하는 데이터 분석</h2>
+            <p class="text-xl text-stone-600 max-w-3xl mx-auto">
+                오렌지(Orange)는 복잡한 데이터 분석과 기계 학습을 위한 강력한 시각적 프로그래밍 도구입니다.<br>
+                드래그 앤 드롭 방식으로 위젯을 연결하며 누구나 데이터 전문가가 될 수 있습니다.
+            </p>
+        </section>
+
+        <section id="concepts" class="py-16">
+            <h3 class="text-3xl font-bold text-center mb-12">오렌지의 핵심 개념</h3>
+            <p class="text-lg text-stone-600 text-center max-w-2xl mx-auto mb-12">
+                오렌지는 세 가지 핵심 요소로 구성됩니다. 아래 다이어그램의 각 요소를 클릭하여 자세한 설명을 확인해보세요. 이 요소들이 어떻게 상호작용하며 강력한 분석 워크플로우를 만드는지 이해하는 것이 첫걸음입니다.
+            </p>
+            <div class="bg-white p-8 rounded-xl shadow-lg border border-stone-200">
+                <div class="relative flex flex-col md:flex-row gap-8 items-center justify-center">
+                    <div id="concept-widgets" class="concept-item cursor-pointer text-center p-4 border-2 border-dashed border-stone-300 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-all">
+                        <span class="text-5xl">🧩</span>
+                        <p class="font-bold mt-2">위젯 패널</p>
+                    </div>
+                    <div class="text-orange-500 font-bold text-4xl hidden md:block">&rarr;</div>
+                     <div class="text-orange-500 font-bold text-4xl md:hidden">&darr;</div>
+                    <div id="concept-canvas" class="concept-item cursor-pointer text-center p-4 border-2 border-dashed border-stone-300 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-all">
+                        <span class="text-5xl">🖼️</span>
+                        <p class="font-bold mt-2">캔버스</p>
+                    </div>
+                    <div class="text-orange-500 font-bold text-4xl hidden md:block">&rarr;</div>
+                    <div class="text-orange-500 font-bold text-4xl md:hidden">&darr;</div>
+                    <div id="concept-links" class="concept-item cursor-pointer text-center p-4 border-2 border-dashed border-stone-300 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-all">
+                        <span class="text-5xl">🔗</span>
+                        <p class="font-bold mt-2">연결선</p>
+                    </div>
+                </div>
+                <div id="concept-info" class="mt-8 p-6 bg-stone-100 rounded-lg min-h-[120px] flex items-center justify-center transition-opacity duration-300">
+                    <p class="text-stone-700 text-center">각 요소를 클릭하여 설명을 확인하세요.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="simulation" class="py-16">
+            <h3 class="text-3xl font-bold text-center mb-4">워크플로우 체험하기</h3>
+            <p class="text-lg text-stone-600 text-center max-w-3xl mx-auto mb-12">
+                이제 직접 오렌지의 워크플로우를 만들어 봅시다. 아래에서 체험할 워크플로우를 선택한 후, 왼쪽 위젯 패널에서 안내에 따라 위젯을 클릭하여 캔버스에 추가하고 연결해보세요. 각 위젯이 어떻게 데이터를 처리하고 시각화하는지 직접 확인할 수 있습니다.
+            </p>
+
+            <div class="flex flex-wrap justify-center mb-8 gap-4">
+                <button id="set-basic-workflow" class="px-6 py-2 rounded-lg font-semibold bg-orange-500 text-white shadow hover:bg-orange-600 transition-colors">기본 워크플로우</button>
+                <button id="set-bio-workflow" class="px-6 py-2 rounded-lg font-semibold bg-teal-600 text-white shadow hover:bg-teal-700 transition-colors">생물정보학 워크플로우</button>
+                <button id="set-reg-workflow" class="px-6 py-2 rounded-lg font-semibold bg-blue-600 text-white shadow hover:bg-blue-700 transition-colors">회귀 모델 워크플로우</button>
+                <button id="set-cluster-workflow" class="px-6 py-2 rounded-lg font-semibold bg-purple-600 text-white shadow hover:bg-purple-700 transition-colors">군집 분석 워크플로우</button>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-lg border border-stone-200 p-4 md:p-8 flex flex-col md:flex-row gap-8">
+                <div class="w-full md:w-1/4">
+                    <h4 id="simulation-title" class="text-xl font-bold mb-4 border-b pb-2">기본: 붓꽃 분류</h4>
+                    <p id="simulation-desc" class="text-sm text-stone-600 mb-6">붓꽃(iris) 데이터를 불러와 데이터 테이블로 확인하고, 산점도(Scatter Plot)로 시각화하는 기본적인 과정입니다.</p>
+                    <div id="widget-panel" class="space-y-3">
+                        <!-- Widget buttons will be injected here by JS -->
+                    </div>
+                </div>
+
+                <div class="w-full md:w-3/4 bg-stone-100 rounded-lg p-4 min-h-[400px]">
+                    <h4 class="text-lg font-semibold mb-4">캔버스</h4>
+                    <div id="canvas" class="relative flex flex-wrap gap-8 items-center">
+                        <p id="canvas-placeholder" class="text-stone-500">왼쪽 패널에서 위젯을 클릭하여 워크플로우를 시작하세요.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="widgets" class="py-16">
+            <h3 class="text-3xl font-bold text-center mb-12">주요 위젯 둘러보기</h3>
+            <p class="text-lg text-stone-600 text-center max-w-2xl mx-auto mb-12">
+                오렌지는 다양한 기능을 가진 위젯들을 제공합니다. 주요 카테고리별로 어떤 위젯들이 있는지 살펴보세요. 각 카테고리를 클릭하면 해당 위젯들의 목록과 간단한 설명이 나타납니다.
+            </p>
+            <div class="max-w-4xl mx-auto space-y-4">
+                <!-- Accordion items will be injected here by JS -->
+            </div>
+        </section>
+        
+        <section id="applications" class="py-16">
+            <h3 class="text-3xl font-bold text-center mb-12">다양한 활용 분야</h3>
+             <p class="text-lg text-stone-600 text-center max-w-2xl mx-auto mb-12">
+                오렌지는 교육과 연구는 물론, 다양한 산업 현장에서 데이터를 기반으로 한 의사결정을 돕는 데 활용됩니다. 코딩 없이도 복잡한 분석이 가능하여 비전문가도 쉽게 데이터의 가치를 발견할 수 있습니다.
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow border border-stone-200 text-center">
+                    <span class="text-4xl">🎓</span>
+                    <h4 class="text-xl font-bold mt-4 mb-2">교육 및 연구</h4>
+                    <p class="text-stone-600">데이터 과학 및 기계 학습 개념을 가르치고 배우는 데 이상적인 도구로, 학술 연구의 데이터 탐색 및 가설 검증에 사용됩니다.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow border border-stone-200 text-center">
+                    <span class="text-4xl">📈</span>
+                    <h4 class="text-xl font-bold mt-4 mb-2">마케팅 및 금융</h4>
+                    <p class="text-stone-600">고객을 그룹으로 나누고 구매 패턴을 예측하거나, 신용 사기 탐지 및 금융 시장 리스크를 평가하는 데 활용됩니다.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow border border-stone-200 text-center">
+                    <span class="text-4xl">🧬</span>
+                    <h4 class="text-xl font-bold mt-4 mb-2">의료 및 생물정보학</h4>
+                    <p class="text-stone-600">질병 진단을 예측하고, 방대한 유전자 데이터를 분석하여 신약 개발 및 맞춤형 의료 연구의 효율성을 높입니다.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-4xl transform transition-all duration-300 scale-95 opacity-0">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 id="modal-title" class="text-xl font-bold">Modal Title</h3>
+                <button id="close-modal" class="text-stone-500 hover:text-stone-800">&times;</button>
+            </div>
+            <div id="modal-body" class="p-6">
+                <!-- Modal content goes here -->
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Core Concepts
+            const concepts = {
+                widgets: {
+                    title: '🧩 위젯 패널 (Widgets Panel)',
+                    desc: '왼쪽에 위치하며, 데이터 입력, 시각화, 모델링 등 다양한 기능을 수행하는 블록(위젯)들의 모음입니다. 원하는 위젯을 캔버스로 드래그하여 워크플로우를 시작합니다.'
+                },
+                canvas: {
+                    title: '🖼️ 캔버스 (Canvas)',
+                    desc: '중앙의 넓은 작업 공간으로, 위젯을 배치하고 연결하여 실제 데이터 분석 파이프라인을 구축하는 곳입니다. 이곳에서 아이디어를 시각적으로 구현할 수 있습니다.'
+                },
+                links: {
+                    title: '🔗 연결선 (Links)',
+                    desc: '위젯과 위젯을 연결하여 데이터나 신호를 전달하는 선입니다. 연결선을 통해 데이터가 한 위젯에서 다음 위젯으로 흘러가며 분석이 진행됩니다.'
+                }
+            };
+            const conceptItems = document.querySelectorAll('.concept-item');
+            const conceptInfo = document.getElementById('concept-info');
+            conceptItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const conceptId = item.id.split('-')[1];
+                    conceptInfo.innerHTML = `
+                        <div class="text-left">
+                            <h4 class="font-bold text-lg mb-2">${concepts[conceptId].title}</h4>
+                            <p>${concepts[conceptId].desc}</p>
+                        </div>
+                    `;
+                });
+            });
+
+            // Navigation
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+            
+            // Workflow Simulation
+            const workflows = {
+                basic: {
+                    title: '기본: 붓꽃 분류',
+                    description: '붓꽃(iris) 데이터를 불러와 데이터 테이블로 확인하고, 산점도(Scatter Plot)로 시각화하는 기본적인 과정입니다.',
+                    widgets: [
+                        { id: 'file', name: 'File', icon: '📁', desc: '데이터 파일을 불러옵니다.' },
+                        { id: 'datatable', name: 'Data Table', icon: '📊', desc: '데이터를 표 형태로 봅니다.' },
+                        { id: 'scatterplot', name: 'Scatter Plot', icon: '📈', desc: '데이터를 산점도로 시각화합니다.' }
+                    ]
+                },
+                bio: {
+                    title: '생물정보학: 유전자 발현 분석',
+                    description: '유전자 발현량 데이터를 불러와 전처리하고, 계층적 군집 분석을 통해 유사한 패턴을 보이는 유전자 그룹을 찾습니다.',
+                    widgets: [
+                        { id: 'loaddata', name: 'Load Data', icon: '🧬', desc: '유전자 발현 데이터를 불러옵니다.' },
+                        { id: 'normalize', name: 'Normalize', icon: '⚖️', desc: '데이터를 정규화하여 보정합니다.' },
+                        { id: 'hclust', name: 'Hierarchical Clustering', icon: '🎨', desc: '계층적 군집 분석을 수행합니다.' }
+                    ]
+                },
+                reg: {
+                    title: '회귀 모델: 주택 가격 예측',
+                    description: '주택 관련 데이터를 불러와 선형 회귀 모델을 훈련하고, 예측 결과를 시각적으로 확인합니다.',
+                    widgets: [
+                        { id: 'reg_file', name: 'File', icon: '🏠', desc: '주택 데이터를 불러옵니다.' },
+                        { id: 'selectcolumns', name: 'Select Columns', icon: '📋', desc: '예측에 사용할 변수를 선택합니다.' },
+                        { id: 'linearreg', name: 'Linear Regression', icon: '📉', desc: '선형 회귀 모델을 훈련합니다.' },
+                        { id: 'predictions', name: 'Predictions', icon: '🔮', desc: '모델 예측값을 확인합니다.' },
+                        { id: 'testandscore_reg', name: 'Test and Score', icon: '✅', desc: '모델의 성능을 평가합니다.' }
+                    ]
+                },
+                cluster: {
+                    title: '군집 분석: 고객 세분화',
+                    description: '고객 데이터를 PCA로 차원 축소하고, K-Means로 군집화하여 고객 그룹을 시각화합니다.',
+                    widgets: [
+                        { id: 'customer_file', name: 'File', icon: '👨‍👩‍👧‍👦', desc: '고객 데이터를 불러옵니다.' },
+                        { id: 'pca', name: 'PCA', icon: '🔬', desc: '데이터 차원을 축소합니다.' },
+                        { id: 'kmeans', name: 'K-Means', icon: '👥', desc: '고객을 군집화합니다.' },
+                        { id: 'scatterplot_cluster', name: 'Scatter Plot', icon: '🗺️', desc: '군집 결과를 시각화합니다.' }
+                    ]
+                }
+            };
+
+            let currentWorkflow = 'basic';
+            let activeWidgets = [];
+
+            const widgetPanel = document.getElementById('widget-panel');
+            const canvas = document.getElementById('canvas');
+            const canvasPlaceholder = document.getElementById('canvas-placeholder');
+            const simulationTitle = document.getElementById('simulation-title');
+            const simulationDesc = document.getElementById('simulation-desc');
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const closeModalBtn = document.getElementById('close-modal');
+
+            function setupWorkflow(type) {
+                currentWorkflow = type;
+                activeWidgets = [];
+                updateUI();
+            }
+            
+            function updateUI() {
+                const wf = workflows[currentWorkflow];
+                simulationTitle.textContent = wf.title;
+                simulationDesc.textContent = wf.description;
+
+                // Update widget panel
+                widgetPanel.innerHTML = '';
+                wf.widgets.forEach((widget, index) => {
+                    const isNext = index === activeWidgets.length;
+                    const button = document.createElement('button');
+                    button.id = `widget-btn-${widget.id}`;
+                    button.className = `w-full text-left p-3 rounded-lg flex items-center gap-3 widget ${isNext ? 'bg-orange-100 border border-orange-400 cursor-pointer' : 'bg-stone-200 text-stone-500 cursor-not-allowed'}`;
+                    button.disabled = !isNext;
+                    button.innerHTML = `
+                        <span class="text-2xl">${widget.icon}</span>
+                        <div>
+                            <p class="font-semibold">${widget.name}</p>
+                            <p class="text-xs">${widget.desc}</p>
+                        </div>
+                    `;
+                    button.addEventListener('click', () => addWidget(widget));
+                    widgetPanel.appendChild(button);
+                });
+
+                // Update canvas
+                canvas.innerHTML = '';
+                if (activeWidgets.length === 0) {
+                    canvas.appendChild(canvasPlaceholder);
+                    canvasPlaceholder.style.display = 'block';
+                } else {
+                     canvasPlaceholder.style.display = 'none';
+                    activeWidgets.forEach((widget, index) => {
+                        const widgetEl = document.createElement('div');
+                        widgetEl.className = 'flex items-center';
+
+                        if (index > 0) {
+                            const arrow = document.createElement('div');
+                            arrow.className = 'text-orange-500 font-bold text-4xl mx-4 hidden md:block';
+                            arrow.innerHTML = '&rarr;';
+                            canvas.appendChild(arrow);
+                            const arrowDown = document.createElement('div');
+                            arrowDown.className = 'w-full text-center text-orange-500 font-bold text-4xl my-4 md:hidden';
+                            arrowDown.innerHTML = '&darr;';
+                            canvas.appendChild(arrowDown);
+                        }
+
+                        const widgetDiv = document.createElement('div');
+                        widgetDiv.className = 'bg-white p-4 rounded-lg shadow-md border text-center cursor-pointer widget';
+                        widgetDiv.innerHTML = `
+                            <span class="text-4xl">${widget.icon}</span>
+                            <p class="font-semibold mt-2">${widget.name}</p>
+                        `;
+                        widgetDiv.addEventListener('click', () => showWidgetPreview(widget));
+                        
+                        widgetEl.appendChild(widgetDiv);
+                        canvas.appendChild(widgetDiv);
+                    });
+                }
+            }
+
+            function addWidget(widget) {
+                activeWidgets.push(widget);
+                updateUI();
+            }
+
+            function showWidgetPreview(widget) {
+                modalTitle.textContent = `${widget.name} 위젯 미리보기`;
+                modalBody.innerHTML = ''; 
+                
+                if (widget.id === 'scatterplot') {
+                    modalBody.innerHTML = '<div class="chart-container"><canvas id="scatterChart"></canvas></div>';
+                    const ctx = document.getElementById('scatterChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'scatter',
+                        data: {
+                            datasets: [{
+                                label: 'Setosa',
+                                data: Array.from({length: 20}, () => ({ x: Math.random() * 2 + 4, y: Math.random() * 2 + 2 })),
+                                backgroundColor: 'rgba(255, 99, 132, 0.8)'
+                            }, {
+                                label: 'Versicolor',
+                                data: Array.from({length: 20}, () => ({ x: Math.random() * 2 + 5.5, y: Math.random() * 1.5 + 2 })),
+                                backgroundColor: 'rgba(54, 162, 235, 0.8)'
+                            }, {
+                                label: 'Virginica',
+                                data: Array.from({length: 20}, () => ({ x: Math.random() * 2 + 6.5, y: Math.random() * 2 + 2.5 })),
+                                backgroundColor: 'rgba(75, 192, 192, 0.8)'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                title: { display: true, text: '붓꽃(Iris) 데이터 산점도' }
+                            },
+                            scales: {
+                                x: { title: { display: true, text: '꽃받침 길이 (Sepal Length)' }},
+                                y: { title: { display: true, text: '꽃잎 너비 (Petal Width)' }}
+                            }
+                        }
+                    });
+                } else if (widget.id === 'hclust') {
+                     modalBody.innerHTML = '<div class="chart-container"><canvas id="heatmapChart"></canvas></div><p class="text-center text-sm mt-2 text-stone-600">유사한 발현 패턴을 보이는 유전자(행)와 샘플(열)들이 함께 그룹화됩니다.</p>';
+                    const ctx = document.getElementById('heatmapChart').getContext('2d');
+                    
+                    const data = {
+                        labels: ['환자1', '환자2', '환자3', '대조군1', '대조군2', '대조군3'],
+                        datasets: []
+                    };
+                    const genes = ['Gene A', 'Gene B', 'Gene C', 'Gene D', 'Gene E'];
+                    const colors = [
+                        [217, 83, 79], [240, 173, 78], [92, 184, 92], [91, 192, 222], [66, 139, 202] 
+                    ];
+                    
+                    for (let i = 0; i < 5; i++) {
+                        data.datasets.push({
+                            label: genes[i],
+                            data: Array.from({length: 6}, (v, k) => k < 3 ? Math.random() * 50 + (i*10) : Math.random() * 50 + (4-i)*10),
+                            backgroundColor: (c) => `rgba(${colors[i][0]}, ${colors[i][1]}, ${colors[i][2]}, ${c.raw / (100-i*5)})`,
+                            borderWidth: 1,
+                            width: '100%',
+                            height: '100%'
+                        });
+                    }
+                    
+                    new Chart(ctx, {
+                        type: 'matrix',
+                        data: data,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                             plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        title: function() { return ''; },
+                                        label: function(context) {
+                                            const v = context.dataset.data[context.dataIndex];
+                                            const g = context.dataset.label;
+                                            const s = context.chart.data.labels[context.dataIndex];
+                                            return `${s} - ${g}: ${v.toFixed(2)}`;
+                                        }
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: '유전자 발현량 히트맵 (Hierarchical Clustering 결과 예시)'
+                                }
+                            },
+                            scales: {
+                                x: { type: 'category', labels: data.labels, grid: { display: false } },
+                                y: { type: 'category', labels: genes, grid: { display: false }, offset: true }
+                            },
+                        }
+                    });
+
+                } else if (widget.id === 'linearreg') {
+                    modalBody.innerHTML = '<div class="chart-container"><canvas id="regressionChart"></canvas></div><p class="text-center text-sm mt-2 text-stone-600">훈련된 선형 회귀 모델의 예측값과 실제값 비교입니다. 점들이 선에 가까울수록 예측 정확도가 높습니다.</p>';
+                    const ctx = document.getElementById('regressionChart').getContext('2d');
+                    
+                    const actualData = [];
+                    const predictedData = [];
+                    for (let i = 0; i < 50; i++) {
+                        const x = Math.random() * 100 + 50; // Feature value
+                        const actualY = x * 0.8 + 20 + (Math.random() - 0.5) * 40; // Actual price with noise
+                        const predictedY = x * 0.8 + 20; // Predicted price (linear relationship)
+                        actualData.push({ x: x, y: actualY });
+                        predictedData.push({ x: x, y: predictedY });
+                    }
+                    // Sort both by x to draw line correctly
+                    actualData.sort((a,b) => a.x - b.x);
+                    predictedData.sort((a,b) => a.x - b.x);
+
+
+                    new Chart(ctx, {
+                        type: 'scatter',
+                        data: {
+                            datasets: [{
+                                label: '실제 가격',
+                                data: actualData,
+                                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                                pointRadius: 5,
+                            }, {
+                                type: 'line',
+                                label: '예측 모델',
+                                data: predictedData,
+                                borderColor: 'rgb(255, 99, 132)',
+                                borderWidth: 2,
+                                fill: false,
+                                showLine: true,
+                                pointRadius: 0,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                title: { display: true, text: '주택 가격 예측 (선형 회귀)' }
+                            },
+                            scales: {
+                                x: { title: { display: true, text: '평수 (sq ft)' }},
+                                y: { title: { display: true, text: '가격 (천원)' }}
+                            }
+                        }
+                    });
+                } else if (widget.id === 'kmeans' || widget.id === 'scatterplot_cluster') {
+                     modalBody.innerHTML = '<div class="chart-container"><canvas id="clusterChart"></canvas></div><p class="text-center text-sm mt-2 text-stone-600">K-Means 군집 분석 결과입니다. 유사한 특징을 가진 고객들이 같은 색상으로 그룹화됩니다.</p>';
+                    const ctx = document.getElementById('clusterChart').getContext('2d');
+                    
+                    const clusterColors = ['rgba(255, 99, 132, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)'];
+                    const clusterLabels = ['VIP 고객', '일반 고객', '신규 고객'];
+                    const datasets = [];
+
+                    for (let i = 0; i < 3; i++) {
+                        datasets.push({
+                            label: clusterLabels[i],
+                            data: Array.from({length: 30}, () => ({ x: Math.random() * 100 + i * 50, y: Math.random() * 100 + (2-i) * 30 })),
+                            backgroundColor: clusterColors[i],
+                            pointRadius: 6,
+                        });
+                    }
+
+                    new Chart(ctx, {
+                        type: 'scatter',
+                        data: { datasets: datasets },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                title: { display: true, text: '고객 군집 분석 (K-Means 결과)' },
+                                legend: { position: 'bottom' }
+                            },
+                            scales: {
+                                x: { title: { display: true, text: '주요 특징 1' }},
+                                y: { title: { display: true, text: '주요 특징 2' }}
+                            }
+                        }
+                    });
+
+                } else if (widget.id === 'datatable' || widget.id === 'loaddata' || widget.id === 'reg_file' || widget.id === 'customer_file' || widget.id === 'predictions' || widget.id === 'testandscore_reg' || widget.id === 'selectcolumns' || widget.id === 'pca') {
+                    let tableContent = '';
+                    let infoText = '';
+
+                    switch(widget.id) {
+                        case 'datatable':
+                            infoText = '붓꽃 데이터 예시입니다. 각 행은 개별 꽃, 각 열은 측정된 특성을 나타냅니다.';
+                            tableContent = `
+                                <thead><tr><th scope="col" class="px-6 py-3">Sepal L.</th><th scope="col" class="px-6 py-3">Sepal W.</th><th scope="col" class="px-6 py-3">Petal L.</th><th scope="col" class="px-6 py-3">Petal W.</th><th scope="col" class="px-6 py-3">Iris</th></tr></thead>
+                                <tbody>
+                                    <tr class="bg-white border-b"><td class="px-6 py-4">5.1</td><td class="px-6 py-4">3.5</td><td class="px-6 py-4">1.4</td><td class="px-6 py-4">0.2</td><td class="px-6 py-4">setosa</td></tr>
+                                    <tr class="bg-white border-b"><td class="px-6 py-4">7.0</td><td class="px-6 py-4">3.2</td><td class="px-6 py-4">4.7</td><td class="px-6 py-4">1.4</td><td class="px-6 py-4">versicolor</td></tr>
+                                    <tr class="bg-white border-b"><td class="px-6 py-4">6.3</td><td class="px-6 py-4">3.3</td><td class="px-6 py-4">6.0</td><td class="px-6 py-4">2.5</td><td class="px-6 py-4">virginica</td></tr>
+                                </tbody>
+                            `;
+                            break;
+                        case 'loaddata':
+                            infoText = '유전자 발현 데이터 예시입니다. 각 행은 유전자, 각 열은 샘플을 나타냅니다.';
+                            tableContent = `
+                                <thead><tr><th scope="col" class="px-6 py-3">Gene</th><th scope="col" class="px-6 py-3">Patient 1</th><th scope="col" class="px-6 py-3">Patient 2</th><th scope="col" class="px-6 py-3">Control 1</th></tr></thead>
+                                <tbody>
+                                    <tr class="bg-white border-b"><td class="px-6 py-4">Gene A</td><td class="px-6 py-4">10.5</td><td class="px-6 py-4">11.2</td><td class="px-6 py-4">1.2</td></tr>
+                                    <tr class="bg-white border-b"><td class="px-6 py-4">Gene B</td><td class="px-6 py-4">9.8</td><td class="px-6 py-4">10.1</td><td class="px-6 py-4">2.5</td></tr>
+                                    <tr class="bg-white border-b"><td class="px-6 py-4">Gene C</td><td class="px-6 py-4">2.1</td><td class="px-6 py-4">1.9</td><td class="px-6 py-4">8.7</td></tr>
+                                </tbody>
+                            `;
+                            break;
+                        case 'reg_file':
+                            infoText = '주택 데이터 예시입니다. 면적, 방 개수, 연식 등의 정보를 포함합니다.';
+                            tableContent = `
+                                <thead><tr><th scope="col" class="px-6 py-3">면적(평)</th><th scope="col" class="px-6 py-3">방 개수</th><th scope="col" class="px-6 py-3">연식(년)</th><th scope="col" class="px-6 py-3">가격(천원)</th></tr></thead>
+                                <tbody>
+                                    <tr class="bg-white border-b"><td class="px-6 py-4">25</td><td class="px-6 py-4">3</td><td class="px-6 py-4">5</td><td class="px-6 py-4">50000</td></tr>
+                                    <tr class="bg-white border-b"><td class="px-6 py-4">32</td><td class="px-6 py-4">4</td><td class="px-6 py-4">2</td><td class="px-6 py-4">65000</td></tr>
+                                    <tr class="bg-white border-b"><td class="px-6 py-4">18</td><td class="px-6 py-4">2</td><td class="px-6 py-4">10</td><td class="px-6 py-4">38000</td></tr>
+                                </tbody>
+                            `;
+                            break;
+                        case 'customer_file':
+                            infoText = '고객 데이터 예시입니다. 구매 금액, 방문 횟수, 나이 등의 정보를 포함합니다.';
+                            tableContent = `
+                                <thead><tr><th scope="col" class="px-6 py-3">고객ID</th><th scope="col" class="px-6 py-3">총 구매액</th><th scope="col" class="px-6 py-3">방문 횟수</th><th scope="col" class="px-6 py-3">나이</th></tr></thead>
+                                <tbody>
+                                    <tr class="bg-white border-b"><td class="px-6 py-4">C001</td><td class="px-6 py-4">1200000</td><td class="px-6 py-4">25</td><td class="px-6 py-4">34</td></tr>
+                                    <tr class="bg-white border-b"><td class="px-6 py-4">C002</td><td class="px-6 py-4">300000</td><td class="px-6 py-4">8</td><td class="px-6 py-4">28</td></tr>
+                                    <tr class="bg-white border-b"><td class="px-6 py-4">C003</td><td class="px-6 py-4">2500000</td><td class="px-6 py-4">40</td><td class="px-6 py-4">55</td></tr>
+                                </tbody>
+                            `;
+                            break;
+                        case 'selectcolumns':
+                            infoText = '데이터에서 분석에 필요한 특정 열(변수)을 선택하는 단계입니다. 불필요한 데이터를 제거하고 모델의 복잡성을 줄일 수 있습니다.';
+                             modalBody.innerHTML = `<p class="text-center p-8 text-stone-600">${infoText}</p>`;
+                            break;
+                        case 'predictions':
+                            infoText = '훈련된 모델이 예측한 값과 실제 값들을 나란히 보여줍니다. 이를 통해 모델의 예측 정확도를 직관적으로 확인할 수 있습니다.';
+                            tableContent = `
+                                <thead><tr><th scope="col" class="px-6 py-3">실제 가격</th><th scope="col" class="px-6 py-3">예측 가격</th><th scope="col" class="px-6 py-3">오차</th></tr></thead>
+                                <tbody>
+                                    <tr class="bg-white border-b"><td class="px-6 py-4">50000</td><td class="px-6 py-4">48500</td><td class="px-6 py-4">1500</td></tr>
+                                    <tr class="bg-white border-b"><td class="px-6 py-4">65000</td><td class="px-6 py-4">64800</td><td class="px-6 py-4">200</td></tr>
+                                    <tr class="bg-white border-b"><td class="px-6 py-4">38000</td><td class="px-6 py-4">39200</td><td class="px-6 py-4">-1200</td></tr>
+                                </tbody>
+                            `;
+                            break;
+                        case 'testandscore_reg':
+                             infoText = '회귀 모델의 성능을 평가하는 결과입니다. RMSE(평균 제곱근 오차)와 R2(결정계수) 등이 표시됩니다. 값이 낮을수록, R2가 1에 가까울수록 좋습니다.';
+                             modalBody.innerHTML = `
+                                <p class="mb-4 text-stone-600">${infoText}</p>
+                                <ul class="list-disc list-inside text-stone-700 space-y-2 pl-4">
+                                    <li>RMSE: <span>1234.56</span></li>
+                                    <li>MAE: <span>987.65</span></li>
+                                    <li>R2 Score: <span>0.87</span></li>
+                                </ul>
+                             `;
+                            break;
+                        case 'pca':
+                             infoText = '주성분 분석(PCA)은 여러 변수의 데이터를 더 적은 수의 새로운 변수(주성분)로 줄이는 기법입니다. 데이터의 복잡성을 줄이고 시각화하기 쉽게 만듭니다.';
+                             modalBody.innerHTML = `<p class="text-center p-8 text-stone-600">${infoText}</p>`;
+                             break;
+                        default:
+                            infoText = '이 위젯은 워크플로우를 위한 중간 단계입니다. 다음 위젯을 연결하여 결과를 확인하세요.';
+                            modalBody.innerHTML = `<p class="text-center p-8 text-stone-600">${infoText}</p>`;
+                            break;
+                    }
+
+                    if (tableContent) {
+                        modalBody.innerHTML = `
+                            <p class="mb-4 text-stone-600">${infoText}</p>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left text-stone-500">
+                                    <thead class="text-xs text-stone-700 uppercase bg-stone-100">
+                                        ${tableContent.split('<tbody>')[0]}
+                                    </thead>
+                                    <tbody>
+                                        ${tableContent.split('<tbody>')[1].split('</tbody>')[0]}
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+                    }
+                }
+                 else {
+                    modalBody.innerHTML = `<p class="text-center p-8 text-stone-600">이 위젯은 워크플로우를 위한 중간 단계입니다. 다음 위젯을 연결하여 결과를 확인하세요.</p>`;
+                }
+                openModal();
+            }
+
+            function openModal() {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                setTimeout(() => modal.querySelector('div.transform').classList.remove('scale-95', 'opacity-0'), 10);
+            }
+
+            function closeModal() {
+                modal.querySelector('div.transform').classList.add('scale-95', 'opacity-0');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+
+            closeModalBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if(e.target === modal) closeModal();
+            });
+
+            document.getElementById('set-basic-workflow').addEventListener('click', () => setupWorkflow('basic'));
+            document.getElementById('set-bio-workflow').addEventListener('click', () => setupWorkflow('bio'));
+            document.getElementById('set-reg-workflow').addEventListener('click', () => setupWorkflow('reg'));
+            document.getElementById('set-cluster-workflow').addEventListener('click', () => setupWorkflow('cluster'));
+
+            // Widgets Accordion
+            const widgetCategories = [
+                { name: 'Data', icon: '💾', desc: '데이터를 불러오고, 샘플링하고, 전처리하는 위젯', items: ['File', 'Data Table', 'Select Columns', 'Select Rows', 'Data Sampler'] },
+                { name: 'Visualize', icon: '📊', desc: '데이터를 다양한 차트로 시각화하는 위젯', items: ['Scatter Plot', 'Box Plot', 'Distributions', 'Heat Map', 'Venn Diagram'] },
+                { name: 'Model', icon: ' ', desc: '기계 학습 모델을 훈련시키는 위젯', items: ['Tree', 'Logistic Regression', 'SVM', 'Neural Network', 'Linear Regression'] },
+                { name: 'Evaluate', icon: '✅', desc: '모델의 성능을 평가하고 비교하는 위젯', items: ['Test and Score', 'Confusion Matrix', 'ROC Analysis', 'Lift Curve'] },
+                { name: 'Unsupervised', icon: '🧠', desc: '비지도 학습 알고리즘을 사용하는 위젯', items: ['k-Means', 'Hierarchical Clustering', 'PCA', 't-SNE'] },
+                { name: 'Bioinformatics', icon: '🧬', desc: '생물정보학 특화 분석을 위한 위젯 (애드온)', items: ['Load Expression Data', 'GEO Data Sets', 'Phylogenetic Tree', 'Enrichment Analysis'] }
+            ];
+            const accordionContainer = document.querySelector('#widgets .space-y-4');
+            widgetCategories.forEach(cat => {
+                const item = document.createElement('div');
+                item.className = 'bg-white rounded-lg shadow border border-stone-200';
+                item.innerHTML = `
+                    <button class="accordion-toggle w-full flex justify-between items-center p-4 text-left">
+                        <div class="flex items-center gap-4">
+                            <span class="text-2xl">${cat.icon}</span>
+                            <div>
+                                <h4 class="font-bold text-lg">${cat.name}</h4>
+                                <p class="text-sm text-stone-600">${cat.desc}</p>
+                            </div>
+                        </div>
+                        <span class="arrow-right text-2xl text-orange-500">&rarr;</span>
+                    </button>
+                    <div class="accordion-content px-4 pb-4">
+                        <ul class="list-disc list-inside text-stone-700 space-y-1 pl-12">
+                            ${cat.items.map(i => `<li>${i}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+                accordionContainer.appendChild(item);
+            });
+            document.querySelectorAll('.accordion-toggle').forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    const arrow = button.querySelector('.arrow-right');
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        arrow.style.transform = 'rotate(0deg)';
+                    } else {
+                        document.querySelectorAll('.accordion-content').forEach(c => c.style.maxHeight = null);
+                        document.querySelectorAll('.arrow-right').forEach(a => a.style.transform = 'rotate(0deg)');
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        arrow.style.transform = 'rotate(90deg)';
+                    }
+                });
+            });
+
+            // Initial setup
+            setupWorkflow('basic');
+        });
+    </script>
+</body>
+</html>
+ 
